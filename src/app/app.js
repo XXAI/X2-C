@@ -13,7 +13,8 @@
 									'http-auth-interceptor',
 									'DashboardModule',
 									'UsuariosModule',
-									'RolesModule']);
+									'RolesModule',
+									'ActasModule']);
 	   
 	app.config(['$mdThemingProvider','$mdIconProvider','$routeProvider','$httpProvider','$translateProvider','$mdDateLocaleProvider',function($mdThemingProvider,$mdIconProvider,$routeProvider,$httpProvider,$translateProvider,$mdDateLocaleProvider){
 		$mdDateLocaleProvider.months = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];

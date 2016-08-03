@@ -11,13 +11,13 @@
                          { 
                             grupo:false ,
                             lista: [
-                                { titulo: 'Actas', key: 'LISTAR_ACTAS', path: '/actas', icono: 'file-document-box' }
+                                { titulo: 'Actas', key: 'uhTnLHn9JU7tEq3CLLxj9TLN4ISxd67d', path: '/actas', icono: 'file-document-box' }
                             ]
                          },
                          { 
                             grupo:'Administrador' ,
                             lista: [
-                                { titulo: 'Usuarios', key: 'gvk27TgNQ76RbOsG5tB83bpNO3zCRhdd', path: '/usuarios', icono: 'account' }
+                                { titulo: 'Usuarios', key: 'uhTnLHn9JU7tEq3CLLxj9TLN4ISxd67d', path: '/usuarios', icono: 'account' }
                             ]
                          },
 						 {
