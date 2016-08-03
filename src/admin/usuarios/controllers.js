@@ -3,8 +3,8 @@
     angular.module('UsuariosModule')
     .controller('UsuariosCtrl',
     [
-        '$rootScope', '$scope', 'UsuariosDataApi', '$mdSidenav','$location','$mdBottomSheet','$mdDialog', '$mdToast','Auth','Menu','UsuarioData', 
-    function($rootScope, $scope, UsuariosDataApi,$mdSidenav,$location,$mdBottomSheet, $mdDialog, $mdToast,Auth, Menu, UsuarioData){
+        '$rootScope', '$scope', 'UsuariosDataApi', '$mdSidenav','$location','$mdBottomSheet','$mdDialog', '$mdToast','Auth','Menu','UsuarioData','Mensajero', 
+    function($rootScope, $scope, UsuariosDataApi,$mdSidenav,$location,$mdBottomSheet, $mdDialog, $mdToast,Auth, Menu, UsuarioData,Mensajero){
             
             $scope.menuSelected = $location.path();
             $scope.menu = Menu.getMenu();
@@ -56,7 +56,8 @@
                         for (var i = 0; i < res.data.length; i++){
                             var obj = {
                                 id: res.data[i].id,
-                                email: res.data[i].email
+                                nombre: res.data[i].nombre,
+                                apellidos: res.data[i].apellidos
                             };
                             
                             $scope.usuariosInfinitos.usuarios.push(obj);
@@ -65,6 +66,12 @@
                         $scope.cargandoLista = false;
                         $scope.cargando = false;
                     }, function (e) {
+                        if(status == 403){
+                            Mensajero.mostrarToast({contenedor:'#lista-usuarios',titulo:'Acceso Denegado:',mensaje:'No tiene permiso para listar estos elementos.'});
+                        }else{
+                            Mensajero.mostrarToast({contenedor:'#lista-usuarios',titulo:'Error:',mensaje:'Ocurrió un error al intentar listar los elementos.'});
+                        }
+                        $scope.usuariosInfinitos.maxItems = 0;
                         $scope.cargandoLista = false;
                         $scope.cargando = false;
                     });
@@ -175,7 +182,8 @@
                 if(res.data != null){
                     $scope.usuario = { 
                         id: res.data.id, 
-                        email: res.data.email, 
+                        nombre: res.data.nombre,
+                        apellidos: res.data.apellidos,
                         roles: res.data.roles
                     };
                 }
@@ -210,7 +218,7 @@
                 });
             };
 
-            $scope.cargarPermisos = function(event){
+            /*$scope.cargarPermisos = function(event){
                 var ctrl = angular.element(event.currentTarget).controller('mdChips');
                 if(ctrl !== undefined){
                     var selectedChip = ctrl.items[ctrl.selectedChip];
@@ -240,7 +248,7 @@
                 }else{
                     $scope.permisos = {};
                 }
-            };
+            };*/
 
             // Roles
             $scope.selectedItem = null;
@@ -258,8 +266,7 @@
                                 
                                 var obj = {
                                     id: res.data.data[i].id,
-                                    nombre: res.data.data[i].nombre,
-                                    permisos: res.data.data[i].permisos
+                                    nombre: res.data.data[i].nombre
                                 };
                                 
                                 // Ocultemos los resultados que ya están seleccionados
@@ -357,7 +364,7 @@
 
             };
 
-            $scope.cargarPermisos = function(event){
+            /*$scope.cargarPermisos = function(event){
                 var ctrl = angular.element(event.currentTarget).controller('mdChips');
                 if(ctrl !== undefined){
                     var selectedChip = ctrl.items[ctrl.selectedChip];
@@ -387,7 +394,7 @@
                 }else{
                     $scope.permisos = {};
                 }
-            }
+            }*/
             
             $scope.usuario = {
                 email: "",
@@ -410,8 +417,7 @@
                                 
                                 var obj = {
                                     id: res.data.data[i].id,
-                                    nombre: res.data.data[i].nombre,
-                                    permisos: res.data.data[i].permisos
+                                    nombre: res.data.data[i].nombre
                                 };
                                 
                                 // Ocultemos los resultados que ya están seleccionados

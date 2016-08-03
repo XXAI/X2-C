@@ -10,7 +10,7 @@
 			<form flex layout="column" ng-submit="signin()">
 				<md-input-container class="filtro-busqueda" style="margin-bottom:1px;">
 					<label translate="EMAIL"></label>
-					<input name="email" type="email" ng-model="email" required>
+					<input name="email" ng-model="email" required>
 				</md-input-container>
 				<md-input-container class="filtro-busqueda" style="margin-bottom:1px;">
 					<label translate="PASSWORD"></label>
@@ -20,10 +20,6 @@
 					<md-icon md-svg-icon="salud-id" ></md-icon> {{ 'INICIAR_SESION' | translate }}
 				</md-button>
 			</form>
-			<md-button style="display:inline-block" ng-href="{{urlOlvidePassword}}"  target="_blank" aria-label="{{ 'OLVIDE_PASSWORD' | translate }}">
-				<small>{{ 'OLVIDE_PASSWORD' | translate }}</small>
-				<md-icon md-svg-icon="launch" style="width:10px;height:10px;vertical-align:top;margin-top:8px"></md-icon>
-			</md-button>
 		</md-content>
 	</md-content>
 	<div flex></div>

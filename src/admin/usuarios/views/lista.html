@@ -36,10 +36,13 @@
 	</md-toolbar>
 	
 	
-	<md-virtual-repeat-container style="height:880px;">
+	<md-virtual-repeat-container style="height:880px;" id="lista-usuarios">
 		<md-list layout="column">
-      		<md-list-item  class="paciente-item" md-virtual-repeat="usuario in usuariosInfinitos" md-on-demand ng-click="ir('usuarios/'+usuario.id+'/editar')" ng-hide="!usuario.id" aria-label="usuario">
-	      		<p>{{  usuario.email }}</p>
+      		<md-list-item  class="md-2-line paciente-item" md-virtual-repeat="usuario in usuariosInfinitos" md-on-demand ng-click="ir('usuarios/'+usuario.id+'/editar')" ng-hide="!usuario.id" aria-label="usuario">
+      			<div class="md-list-item-text">
+	      			<h3>{{  usuario.id }}</h3>
+		      		<p>{{  usuario.nombre }} {{  usuario.apellidos }}</p>
+	      		<div class="md-list-item-text">
 				<md-icon class="md-secondary"  aria-label="Eliminar" ng-click="eliminar($event,usuario.id,$index)" md-svg-icon="delete"></md-icon>
 				<md-divider></md-divider>
       		</md-list-item>

@@ -123,7 +123,7 @@
 				if($localStorage.remedin.access_token){
 					var Auth = $injector.get('Auth');
 		      		
-						Auth.refreshToken({ refresh_token: $localStorage.remedin.access_token },
+						Auth.refreshToken({ access_token: $localStorage.remedin.access_token },
 						   function(res){
 								$localStorage.remedin.access_token = res.token;
 						  		//$localStorage.remedin.refresh_token = res.refresh_token;

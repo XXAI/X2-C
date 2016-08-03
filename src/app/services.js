@@ -27,6 +27,8 @@
 										}
                							$localStorage.remedin.access_token = res.data.token;
                							$localStorage.remedin.usuario = res.data.usuario;
+               							Menu.setMenu(res.data.permisos);
+               							//$localStorage.remedin.permisos = res.data.permisos;
 		                                return true;
 		                            });
 		                },/*
@@ -129,7 +131,7 @@
 
 					if($mdMedia('gt-sm')){
 	                    $mdToast.show({
-	                        template: '<md-toast><strong>'+titulo+'</strong>&nbsp;'+mensaje+'<md-toast>',
+	                        template: '<md-toast><div class="md-toast-content"><strong>'+titulo+'</strong>&nbsp;'+mensaje+'</div><md-toast>',
 	                        parent : $document[0].querySelector(contenedor),
 	                        hideDelay: duracion,
 	                        position: posicion
@@ -216,7 +218,7 @@
 					if(nuevo_menu.length){
 						menuAutorizado = nuevo_menu;
 					}else{
-						menuAutorizado = ['DASHBOARD'];
+						menuAutorizado = [];
 					}
 					//menuAutorizado = nuevo_menu || [ 'DASHBOARD' ];
 					$localStorage.remedin.permisos = menuAutorizado;
