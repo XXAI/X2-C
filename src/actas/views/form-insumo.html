@@ -1,0 +1,84 @@
+<md-dialog aria-label="form insumo" flex ng-cloak>
+  <form>
+    <md-toolbar>
+      <div class="md-toolbar-tools">
+        <h2>Insumo</h2>
+        <span flex></span>
+        <md-button class="md-icon-button" ng-click="cancel()">
+          <md-icon md-svg-icon="close" aria-label="Close dialog"></md-icon>
+        </md-button>
+      </div>
+    </md-toolbar>
+    <md-dialog-content>
+      <div class="md-dialog-content">
+        <div flex layout="row" layout-wrap>
+          <md-autocomplete flex="100"
+            md-no-cache="true"
+            md-selected-item="insumoAutoComplete.insumo"
+            md-search-text="insumoAutoComplete.searchText"
+            md-selected-item-change ="insumoAutoCompleteItemChange()"
+            md-items="item in querySearchInsumo(insumoAutoComplete.searchText)"
+            md-item-text="item.clave"
+            md-min-length="3"
+            placeholder="Buscar insumo"
+            md-menu-class="autocomplete-custom-template">
+            <md-item-template>
+              <span class="item-title">
+                <div layout="row" layout-padding>
+                  <div flex="none"><span><strong>{{item.clave}}</strong></span></div>
+                  <div flex></div>
+                  <div flex="none"><span>{{item.marca}}</span></div>
+                  <div flex></div>
+                  <div flex="none"><span>($ {{item.precio}})</span></div>
+                </div>
+              </span>
+              <span class="item-metadata md-padding">
+                <span class="item-metastat">
+                  <span md-highlight-text="insumoAutoComplete.searchText" >{{item.descripcion}}</span>
+                </span>
+              </span>
+            </md-item-template>
+            <md-not-found>
+              No hay resultados para  "{{insumoAutoComplete.searchText}}".
+            </md-not-found>
+          </md-autocomplete>
+        </div>
+        <br>
+        <div flex layout="row" layout-wrap ng-show="(insumo)">
+          <div flex="100">
+            <div class="hint">{{insumo.descripcion}}</div>
+          </div>
+          <md-input-container flex>
+            <label>Lote</label>
+            <input value="{{insumo.lote}}" readonly>
+          </md-input-container>
+          <md-input-container flex>
+            <label>Unidad</label>
+            <input value="{{insumo.unidad}}" readonly>
+          </md-input-container>
+          <md-input-container flex>
+            <label>Precio</label>
+            <input value="$ {{insumo.precio | number:2}}" readonly>
+          </md-input-container>
+          <md-input-container flex>
+            <label>Cantidad</label>
+            <input type="number" ng-model="insumo.cantidad" ng-change="calcularTotal()">
+          </md-input-container>
+          <md-input-container flex>
+            <label>Total</label>
+            <input value="$ {{insumo.total | number:2}}" readonly>
+          </md-input-container>
+        </div>
+      </div>
+    </md-dialog-content>
+    <md-dialog-actions layout="row">
+      <span flex></span>
+      <md-button class="md-raised" ng-click="cancel()">
+       Cancelar
+      </md-button>
+      <md-button class="md-raised md-primary" ng-click="answer()" style="margin-right:20px;">
+        <md-icon md-svg-icon="plus-box"></md-icon> Agregar
+      </md-button>
+    </md-dialog-actions>
+  </form>
+</md-dialog>

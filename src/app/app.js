@@ -55,6 +55,29 @@
 	    $mdThemingProvider.theme('altTheme')
 	    		.primaryPalette('green')
 	    		.accentPalette('light-green');
+	    $mdThemingProvider.definePalette('greyPalette', {
+            '50': 'eeeeee',
+            '100': 'eeeeee',
+            '200': 'eeeeee',
+            '300': 'eeeeee',
+            '400': 'eeeeee',
+            '500': 'eeeeee',
+            '600': 'eeeeee',
+            '700': 'eeeeee',
+            '800': 'eeeeee',
+            '900': 'eeeeee',
+            'A100': 'eeeeee',
+            'A200': 'eeeeee',
+            'A400': 'eeeeee',
+            'A700': 'eeeeee',
+            'contrastDefaultColor': 'light',    // whether, by default, text (contrast)
+                                                // on this palette should be dark or light
+            'contrastDarkColors': ['50', '100', //hues which contrast should be 'dark' by default
+            '200', '300', '400', 'A100','500'],
+            'contrastLightColors': undefined    // could also specify this if default was 'dark'
+        });
+        $mdThemingProvider.theme('grey', 'default')
+				.primaryPalette('greyPalette');
 
 			  
 		// Configuramos las rutas
@@ -86,15 +109,15 @@
 		.otherwise({ redirectTo: '/dashboard' });
 		
 		$httpProvider.interceptors.push(['$q', '$location', '$localStorage', function ($q, $location, $localStorage) {
-		   if(angular.isUndefined($localStorage.remedin)){
-			   $localStorage.remedin = {}
+		   if(angular.isUndefined($localStorage.control_desabasto)){
+			   $localStorage.control_desabasto = {}
 		   }
 		   return {
 		       'request': function (config) {
 		           config.headers = config.headers || {};
-		           if ($localStorage.remedin.access_token) {
-		               config.headers.Authorization = 'Bearer ' + $localStorage.remedin.access_token;
-		               config.headers['X-Usuario'] = $localStorage.remedin.usuario.id;
+		           if ($localStorage.control_desabasto.access_token) {
+		               config.headers.Authorization = 'Bearer ' + $localStorage.control_desabasto.access_token;
+		               config.headers['X-Usuario'] = $localStorage.control_desabasto.usuario.id;
 		           }
 		           return config;
 		       },
@@ -121,13 +144,13 @@
 
 	
 			$rootScope.$on('event:auth-loginRequired', function() {
-				if($localStorage.remedin.access_token){
+				if($localStorage.control_desabasto.access_token){
 					var Auth = $injector.get('Auth');
 		      		
-						Auth.refreshToken({ access_token: $localStorage.remedin.access_token },
+						Auth.refreshToken({ access_token: $localStorage.control_desabasto.access_token },
 						   function(res){
-								$localStorage.remedin.access_token = res.token;
-						  		//$localStorage.remedin.refresh_token = res.refresh_token;
+								$localStorage.control_desabasto.access_token = res.token;
+						  		//$localStorage.control_desabasto.refresh_token = res.refresh_token;
 								authService.loginConfirmed();
 						   }, function (e) {                  
 						       
@@ -145,7 +168,7 @@
 		    });
 		
 		$rootScope.$on('$routeChangeStart',function(event, next, current){
-			if($localStorage.remedin.access_token){
+			if($localStorage.control_desabasto.access_token){
 				if(typeof next.$$route !== 'undefined'){					
 					var path =  next.$$route.originalPath.split('/');
 					// Aquí deberiamos comprobar permisos para acciones de "subrutas"

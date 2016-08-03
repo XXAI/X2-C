@@ -89,12 +89,12 @@
 	<md-virtual-repeat-container style="height:880px;" id="modulo-importar">
 		<md-list layout="column">
       		<md-list-item class="md-2-line paciente-item" md-virtual-repeat="acta in actasInfinitas" md-on-demand ng-click="ir('actas/'+acta.id+'/editar')" ng-hide="!acta.id">
-      			<md-icon hide-xs ng-if="acta.id" md-svg-icon="file" class="md-avatar-icon"></md-icon>
+      			<md-icon hide-xs ng-if="acta.id" md-svg-icon="{{(acta.estatus == 1)?'file':'file-check'}}" class="md-avatar-icon"></md-icon>
 				<div class="md-list-item-text">
 		        	<h3>{{ acta.folio }}</h3>
-		        	<h4><strong>Fecha de Carga:</strong> {{acta.fecha}}</h4>
+		        	<h4><strong>Fecha:</strong> {{acta.fecha | date:'yyyy-MM-dd'}}</h4>
 		        </div>
-		        <md-icon md-svg-icon="delete" ng-if="acta.id" ng-permiso="permisoEliminar" ng-click="eliminarActa(acta,$event)" aria-label="Borrar acta" class="md-secondary md-hue-3">
+		        <md-icon md-svg-icon="delete" ng-if="(acta.id && acta.estatus == 1)" ng-permiso="permisoEliminar" ng-click="eliminarActa(acta,$event)" aria-label="Borrar acta" class="md-secondary md-hue-3">
 	    		</md-icon>
 				<md-divider></md-divider>
       		</md-list-item>

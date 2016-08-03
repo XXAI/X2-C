@@ -19,16 +19,16 @@
 							
 		                    return AuthService.autenticar(data)                     
 		                			.then(function(res){
-										//$localStorage.remedin.access_token = res.data.access_token;
-               							//$localStorage.remedin.refresh_token = res.data.refresh_token;
-               							//$localStorage.remedin.user_email = data.email;
+										//$localStorage.control_desabasto.access_token = res.data.access_token;
+               							//$localStorage.control_desabasto.refresh_token = res.data.refresh_token;
+               							//$localStorage.control_desabasto.user_email = data.email;
                							if(!res.data.usuario.avatar){
 											res.data.usuario.avatar = 'assets/images/avatar-placeholder.png';
 										}
-               							$localStorage.remedin.access_token = res.data.token;
-               							$localStorage.remedin.usuario = res.data.usuario;
+               							$localStorage.control_desabasto.access_token = res.data.token;
+               							$localStorage.control_desabasto.usuario = res.data.usuario;
                							Menu.setMenu(res.data.permisos);
-               							//$localStorage.remedin.permisos = res.data.permisos;
+               							//$localStorage.control_desabasto.permisos = res.data.permisos;
 		                                return true;
 		                            });
 		                },/*
@@ -46,12 +46,12 @@
 								if(!data.data.data.avatar){
 									data.data.data.avatar = 'assets/images/avatar-placeholder.png';
 								}
-						        $localStorage.remedin.usuario = data.data.data
+						        $localStorage.control_desabasto.usuario = data.data.data
 							});
 						},
 						*/
 						error = function (error) {
-							$localStorage.remedin = {};
+							$localStorage.control_desabasto = {};
 							var error_code = '';
 							
 							if(error.data == null){
@@ -91,7 +91,7 @@
 					$http.post(URLS.BASE + '/refresh-token', data).success(success).error(error)
 				},
 				logout: function (success) {
-					$localStorage.remedin = {};
+					$localStorage.control_desabasto = {};
 					success();
 				}
 			};
@@ -101,10 +101,10 @@
 		.factory('UsuarioData',['$localStorage','AuthService','filterFilter',function($localStorage, AuthService, filterFilter){
 			 return {
 				getDatosUsuario: function(){
-					return $localStorage.remedin.usuario;	
+					return $localStorage.control_desabasto.usuario;	
 				},
 				tienePermiso: function(clave){
-					var resultados = filterFilter($localStorage.remedin.permisos,clave);
+					var resultados = filterFilter($localStorage.control_desabasto.permisos,clave);
 					if(clave == resultados[0]){
 						return true;
 					}else{
@@ -112,10 +112,10 @@
 					}
 				},
 				obtenerEstadoMenu: function(){
-					return $localStorage.remedin.estado_menu;
+					return $localStorage.control_desabasto.estado_menu;
 				},
 				guardarEstadoMenu: function(estado){
-					$localStorage.remedin.estado_menu = estado;
+					$localStorage.control_desabasto.estado_menu = estado;
 				}
 			 }
 		}]);
@@ -169,7 +169,7 @@
 	
 	angular.module('App')
 		.factory('Menu',['$localStorage','$mdSidenav','MENU',function($localStorage,$mdSidenav, MENU){
-			var menuAutorizado = $localStorage.remedin.permisos || [ '' ];
+			var menuAutorizado = $localStorage.control_desabasto.permisos || [ '' ];
 			var menu = [''];
 			var menuIsOpen = false;
 			function updateMenu(){
@@ -195,7 +195,7 @@
 					}
 				}
 			}
-			if($localStorage.remedin.access_token){
+			if($localStorage.control_desabasto.access_token){
 				updateMenu();
 			}
 			
@@ -221,7 +221,7 @@
 						menuAutorizado = [];
 					}
 					//menuAutorizado = nuevo_menu || [ 'DASHBOARD' ];
-					$localStorage.remedin.permisos = menuAutorizado;
+					$localStorage.control_desabasto.permisos = menuAutorizado;
 					updateMenu();
 				},
 				

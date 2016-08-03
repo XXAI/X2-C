@@ -29,8 +29,8 @@
                 });
             };
             
-            $scope.access_token = $localStorage.remedin.access_token;
-            $scope.refresh_token = $localStorage.remedin.refresh_token;
+            $scope.access_token = $localStorage.control_desabasto.access_token;
+            $scope.refresh_token = $localStorage.control_desabasto.refresh_token;
             
             $scope.menuSelected = '';
             
