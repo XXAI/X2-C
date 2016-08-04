@@ -550,9 +550,17 @@
             }, function() {});
         };
 
-        $scope.imprimir = function(){
-            window.open(URLS.BASE_API +'/acta-pdf/'+$routeParams.id+'?token='+$localStorage.control_desabasto.access_token);
+        $scope.imprimir = function(tipo){
+            if(tipo == 'acta'){
+                window.open(URLS.BASE_API +'/acta-pdf/'+$routeParams.id+'?token='+$localStorage.control_desabasto.access_token);
+            }else{
+                window.open(URLS.BASE_API +'/requisiciones-pdf/'+$routeParams.id+'?token='+$localStorage.control_desabasto.access_token);
+            }
         };
+
+        $scope.exportar = function(){
+            window.open(URLS.BASE_API +'/exportar-csv/'+$routeParams.id+'?token='+$localStorage.control_desabasto.access_token);
+        }
         
         $scope.menuCerrado = !UsuarioData.obtenerEstadoMenu();
         if(!$scope.menuCerrado){

@@ -62,14 +62,30 @@
 			<md-button ng-if="(acta.estatus == 2)" class="md-icon-button"  hide-gt-sm ng-disabled="cargando" ng-click="exportar()"  aria-label="{{ 'EXPORTAR' | translate }}">
 			  <md-icon md-svg-icon="file-export"></md-icon>
 			</md-button>
-
-			<md-button ng-if="(acta.estatus == 2)" hide-xs hide-sm ng-click="imprimir()" ng-disabled="cargando"  aria-label="{{ 'IMPRIMIR' | translate }}">
-			  <md-icon md-svg-icon="printer"></md-icon>
-			  {{ 'IMPRIMIR' | translate }}
-			</md-button>		 
-			<md-button ng-if="(acta.estatus == 2)" class="md-icon-button"  hide-gt-sm ng-disabled="cargando" ng-click="imprimir()"  aria-label="{{ 'IMPRIMIR' | translate }}">
-			  <md-icon md-svg-icon="printer"></md-icon>
-			</md-button>
+			
+			<md-menu ng-if="(acta.estatus == 2)" md-position-mode="target-right target" >
+	          <md-button aria-label="Open demo menu" class="md-icon-button" ng-disabled="cargando" ng-click="$mdOpenMenu($event)">
+	            <md-icon md-menu-origin md-svg-icon="printer"></md-icon>
+	          </md-button>
+	          <md-menu-content width="4" >
+	            <md-menu-item>
+		            <md-button ng-click="imprimir('acta')">
+		                <div layout="row">
+		                    <p flex>Acta</p>
+		                    <md-icon md-menu-align-target md-svg-icon="file" style="margin: auto 3px auto 0;"></md-icon>
+		                </div>
+		            </md-button>
+	            </md-menu-item>
+	            <md-menu-item>
+	            	<md-button ng-click="imprimir('req')">
+		                <div layout="row">
+		                	<p flex>Requisiciones</p>
+		                    <md-icon md-menu-align-target md-svg-icon="file" style="margin: auto 3px auto 0;"></md-icon>
+		                </div>
+		            </md-button>
+	            </md-menu-item>
+	          </md-menu-content>
+	        </md-menu>
 		</div>
 	</md-toolbar>
 	<md-content layout="column" flex ng-include="'src/actas/views/form.html'"></md-content>

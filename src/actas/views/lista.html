@@ -30,31 +30,9 @@
 				<label>Buscar</label>
 				<md-icon md-svg-icon="magnify" class="buscar"></md-icon>
             	<input type="text" ng-model="textoBusqueda" ng-keyup="$event.keyCode==13?realizarBusqueda():null">
-            	<div class="hint" ng-if="mostrarAyuda"><small>La busqueda se realiza en los campos de email, fecha de carga y CLUES</small></div>
+            	<div class="hint" ng-if="mostrarAyuda"><small>La busqueda se realiza en los campos de folio, lugar, empresa o ciudad</small></div>
           	</md-input-container>
 			<div layout="column">
-				<!--md-input-container flex ng-if="datosDelUsuario.clues" style="margin:10px 0;">
-					<label>CLUES</label>
-					<input value="{{datosDelUsuario.clues.clues}}" disabled>
-					<div class="hint"><small>{{datosDelUsuario.clues.nombre}}</small></div>
-				</md-input-container>
-
-				<md-input-container flex ng-if="datosDelUsuario.jurisdiccion" style="margin:10px 0;">
-					<label>Jurisdicción</label>
-					<input value="{{datosDelUsuario.jurisdiccion.nombre}}" disabled>
-				</md-input-container>
-				<md-input-container ng-if="(!datosDelUsuario.clues && !datosDelUsuario.jurisdiccion)" style="margin:10px 0;" flex>
-					<label>Jurisdicción</label>
-					<md-select ng-model="menuFiltro.jurisdiccion" aria-label="jurisdiccion" ng-model-options="{trackBy: '$value.clave'}">
-		        		<md-option ng-value="">
-							Todas las Jurisdicciones
-						</md-option>
-						<md-option ng-repeat="jurisdiccion in jurisdicciones" ng-value="jurisdiccion">
-							{{jurisdiccion.clave}} - {{jurisdiccion.nombre}}
-						</md-option>
-					</md-select>
-					<div class="hint" ng-if="mostrarAyuda"><small>Filtra los resultados por la jurisdicción seleccionada</small></div>
-				</md-input-container-->
 				<div flex layout-padding></div>
 				<div layout="row" flex>
 					<div flex>
@@ -69,22 +47,6 @@
 			</div>
 		</md-content>
 	</md-sidenav>
-
-	<!--div ng-if="filtro.aplicado">
-		<md-content class="md-whiteframe-z2">
-			<div layout="row" layout-padding>
-				<div flex="grow" ng-if="(filtro.jurisdiccion)">
-					<small><strong>Jurisdicción: {{filtro.jurisdiccion.nombre}}</strong></small>
-				</div>
-				<div flex="grow" layout="row" layout-align="end center" style="padding:0px;">
-					<md-button style="margin:0px;" class="md-raised" ng-click="quitarFiltro()">
-						Quitar filtro
-					</md-button>
-				</div>
-			</div>
-		</md-content>
-		<md-divider></md-divider>
-	</div-->
 
 	<md-virtual-repeat-container style="height:880px;" id="modulo-importar">
 		<md-list layout="column">
