@@ -212,10 +212,10 @@
         };
     }])
     .controller('FormActaCtrl',
-    ['$rootScope', '$scope', 'ActasDataApi', '$mdSidenav','$location','$mdBottomSheet','$routeParams','$filter',
+    ['$rootScope', '$scope', 'ActasDataApi', '$mdSidenav','$location','$mdBottomSheet','$routeParams','$filter','$localStorage',
     '$http','$mdToast','Auth','Menu','URLS','UsuarioData','$mdDialog','$mdMedia','Mensajero',
     function(
-    $rootScope, $scope, ActasDataApi,$mdSidenav,$location,$mdBottomSheet,$routeParams,$filter,
+    $rootScope, $scope, ActasDataApi,$mdSidenav,$location,$mdBottomSheet,$routeParams,$filter,$localStorage,
     $http,$mdToast,Auth,Menu,URLS,UsuarioData,$mdDialog,$mdMedia,Mensajero
     ){
         $scope.menuSelected = "/actas";
@@ -548,6 +548,10 @@
                     console.log(e);
                 });
             }, function() {});
+        };
+
+        $scope.imprimir = function(){
+            window.open(URLS.BASE_API +'/acta-pdf/'+$routeParams.id+'?token='+$localStorage.control_desabasto.access_token);
         };
         
         $scope.menuCerrado = !UsuarioData.obtenerEstadoMenu();
