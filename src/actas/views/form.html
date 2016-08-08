@@ -1,51 +1,51 @@
 <md-content id="modulo-contenedor" layout="column" flex>
 	<md-content ng-show="toggleDatosActa" layout="row" flex="none" layout-wrap layout-padding >
-		<md-input-container flex="25" md-is-error="validacion.ciudad">
+		<md-input-container flex="55" md-is-error="validacion.ciudad" style="margin-bottom:0px;">
 			<label>Ciudad</label>
 			<input ng-model="acta.ciudad">
 			<div class="errors" ng-messages="validacion.ciudad" >
 				<div ng-message="required">{{ 'CAMPO_REQUERIDO' | translate }}</div>
 			</div>
 		</md-input-container>
-		<md-input-container flex="25" md-is-error="validacion.fecha">
+		<md-input-container flex="15" md-is-error="validacion.fecha" style="margin-bottom:0px;">
 			<label>Fecha</label>
 			<input type="date" ng-model="acta.fecha">
 			<div class="errors" ng-messages="validacion.fecha" >
 				<div ng-message="required">{{ 'CAMPO_REQUERIDO' | translate }}</div>
 			</div>
 		</md-input-container>
-		<md-input-container flex="25" md-is-error="validacion.hora_inicio">
+		<md-input-container flex="15" md-is-error="validacion.hora_inicio" style="margin-bottom:0px;">
 			<label>Hora de inicio</label>
 			<input type="time" ng-model="acta.hora_inicio_date">
 			<div class="errors" ng-messages="validacion.hora_inicio" >
 				<div ng-message="required">{{ 'CAMPO_REQUERIDO' | translate }}</div>
 			</div>
 		</md-input-container>
-		<md-input-container flex="25" md-is-error="validacion.hora_termino">
+		<md-input-container flex="15" md-is-error="validacion.hora_termino" style="margin-bottom:0px;">
 			<label>Hora de termino</label>
 			<input type="time" ng-model="acta.hora_termino_date">
 			<div class="errors" ng-messages="validacion.hora_termino" >
 				<div ng-message="required">{{ 'CAMPO_REQUERIDO' | translate }}</div>
 			</div>
 		</md-input-container>
-		<md-input-container flex="33" md-is-error="validacion.lugar_reunion">
+		<md-input-container flex="33" md-is-error="validacion.lugar_reunion" style="margin-bottom:0px;">
 			<label>Lugar de Reunion</label>
 			<input ng-model="acta.lugar_reunion">
 			<div class="errors" ng-messages="validacion.lugar_reunion" >
 				<div ng-message="required">{{ 'CAMPO_REQUERIDO' | translate }}</div>
 			</div>
 		</md-input-container>
-		<md-input-container flex="33" md-is-error="validacion.firma_director">
-			<label>Director de la Unidad Medica</label>
-			<input ng-model="acta.firma_director">
-			<div class="errors" ng-messages="validacion.firma_director" >
+		<md-input-container flex="33" md-is-error="validacion.firma_solicita" style="margin-bottom:0px;">
+			<label>Solicitante</label>
+			<input ng-model="acta.firma_solicita">
+			<div class="errors" ng-messages="validacion.firma_solicita" >
 				<div ng-message="required">{{ 'CAMPO_REQUERIDO' | translate }}</div>
 			</div>
 		</md-input-container>
-		<md-input-container flex="33" md-is-error="validacion.firma_solicita">
-			<label>Administrador</label>
-			<input ng-model="acta.firma_solicita">
-			<div class="errors" ng-messages="validacion.firma_solicita" >
+		<md-input-container flex="33" md-is-error="validacion.cargo_solicita" style="margin-bottom:0px;">
+			<label>Cargo del Solicitante</label>
+			<input ng-model="acta.cargo_solicita">
+			<div class="errors" ng-messages="validacion.cargo_solicita" >
 				<div ng-message="required">{{ 'CAMPO_REQUERIDO' | translate }}</div>
 			</div>
 		</md-input-container>
@@ -81,7 +81,7 @@
 					<div flex="10" style="text-align:center;">{{insumo.cantidad | number}}</div>
 					<div flex="15" style="text-align:center;">$ {{insumo.total | number:2}}</div>
 				</div>
-		    	<md-icon hide-sm md-svg-icon="delete" ng-click="eliminarInsumo($index)" aria-label="quitar" class="md-secondary md-hue-3">
+		    	<md-icon ng-if="(acta.estatus != 2)" md-svg-icon="delete" ng-click="eliminarInsumo($index)" aria-label="quitar" class="md-secondary md-hue-3">
 		    	</md-icon>
 				<md-divider></md-divider>
 			</md-list-item>
@@ -89,16 +89,16 @@
 	</md-content>
 	<md-divider></md-divider>
 	<md-content layout="row" flex="none" layout-wrap>
-		<md-button class="md-raised md-accent" ng-click="agregarInsumo($event)">
+		<md-button class="md-raised md-accent" ng-click="agregarInsumo($event)" ng-if="(acta.estatus != 2)">
 			<md-icon md-svg-icon="plus"></md-icon> Agregar Insumo
 		</md-button>
 		<div flex></div>
-		<div flex="none" layout="row">
-			<md-input-container flex style="margin-bottom:0px;">
+		<div flex="none" layout="row" style="overflow:hidden;">
+			<md-input-container flex style="margin-bottom:0px;height:46px;">
 				<label>Subtotal</label>
 				<input value="$ {{acta.subtotal | number:2}}" readonly>
 			</md-input-container>
-			<md-input-container flex style="margin-bottom:0px;">
+			<md-input-container flex style="margin-bottom:0px;height:46px;">
 				<label>Total</label>
 				<input value="$ {{acta.total | number:2}}" readonly>
 			</md-input-container>

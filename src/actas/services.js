@@ -9,6 +9,9 @@
 			   ver: function (id, success, error) {
 	               $http.get(URLS.BASE_API + '/actas/' + id).success(success).error(error)
 	           },
+	           cargarConfiguracion: function (id, success, error) {
+	               $http.get(URLS.BASE_API + '/configuracion/' + id).success(success).error(error)
+	           },
 			   crear: function (data, success, error) {
 	               $http.post(URLS.BASE_API + '/actas', data).success(success).error(error)
 	           },

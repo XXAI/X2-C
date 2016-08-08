@@ -50,15 +50,15 @@
           </div>
           <md-input-container flex>
             <label>Lote</label>
-            <input value="{{insumo.lote}}" readonly>
+            <input value="{{insumo.lote}}" disabled>
           </md-input-container>
           <md-input-container flex>
             <label>Unidad</label>
-            <input value="{{insumo.unidad}}" readonly>
+            <input value="{{insumo.unidad}}" disabled>
           </md-input-container>
           <md-input-container flex>
             <label>Precio</label>
-            <input value="$ {{insumo.precio | number:2}}" readonly>
+            <input value="$ {{insumo.precio | number:2}}" disabled>
           </md-input-container>
           <md-input-container flex>
             <label>Cantidad</label>
@@ -66,16 +66,13 @@
           </md-input-container>
           <md-input-container flex>
             <label>Total</label>
-            <input value="$ {{insumo.total | number:2}}" readonly>
+            <input value="$ {{insumo.total | number:2}}" disabled>
           </md-input-container>
         </div>
       </div>
     </md-dialog-content>
     <md-dialog-actions layout="row">
       <span flex></span>
-      <md-button class="md-raised" ng-click="cancel()">
-       Cancelar
-      </md-button>
       <md-button class="md-raised md-primary" ng-click="answer()" style="margin-right:20px;">
         <md-icon md-svg-icon="plus-box"></md-icon> Agregar
       </md-button>

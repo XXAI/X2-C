@@ -265,6 +265,7 @@
 
                         $scope.acta.firma_director = requisicion.firma_director;
                         $scope.acta.firma_solicita = requisicion.firma_solicita;
+                        $scope.acta.cargo_solicita = requisicion.cargo_solicita;
 
                         $scope.acta.iva = requisicion.iva;
 
@@ -303,6 +304,7 @@
                     $scope.acta.total = $scope.acta.subtotal;
                 }
                 res.data.requisiciones = requisiciones;
+
                 $scope.cargando = false;
             },function(e){
                 Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:'Ocurrió un error al intentar obtener los datos.'});
@@ -310,14 +312,33 @@
             });
         }else{
             $scope.acta = {total:0.00,subtotal:0.00,requisiciones:{},insumos:[]};
-            $scope.cargando = false;
+            ActasDataApi.cargarConfiguracion($routeParams.id,function(res){
+                $scope.acta.ciudad = res.data.ciudad;
+                $scope.acta.lugar_reunion = res.data.clues_nombre;
+                $scope.acta.firma_solicita = res.data.solicitante_nombre;
+                $scope.acta.cargo_solicita = res.data.solicitante_cargo;
+
+                var fecha_actual = new Date();
+                fecha_actual = new Date(fecha_actual.getFullYear(), fecha_actual.getMonth(), fecha_actual.getDate(), fecha_actual.getHours(), fecha_actual.getMinutes(), 0);
+                
+                $scope.acta.fecha = fecha_actual;
+                $scope.acta.hora_inicio_date = fecha_actual;
+                $scope.cargando = false;
+            },function(e){
+                Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:'Ocurrió un error al intentar obtener los datos.'});
+                console.log(e);
+            });
         }
 
         $scope.agregarInsumo = function(ev){
-            $scope.mostrarDialogo(ev);
+            if($scope.acta.estatus != 2){
+                $scope.mostrarDialogo(ev);
+            }
         };
         $scope.editarInsumo = function(ev,index){
-            $scope.mostrarDialogo(ev,index);
+            if($scope.acta.estatus != 2){
+                $scope.mostrarDialogo(ev,index);
+            }
         };
         $scope.eliminarInsumo = function(index){
             var insumo_local = $scope.acta.insumos[index];
@@ -331,14 +352,15 @@
         };
         $scope.mostrarDialogo = function(ev,index) {
             var useFullScreen = ($mdMedia('sm') || $mdMedia('xs'))  && $scope.customFullscreen;
-            var locals = {insumo:undefined,index:undefined};
+            var locals = {insumo:undefined,index:undefined,acta:$scope.acta};
             if(index >= 0){
                 locals.insumo = JSON.parse(JSON.stringify($scope.acta.insumos[index]));;
                 locals.index = index;
             }
 
             $mdDialog.show({
-                controller: function($scope, $mdDialog, insumo, index) {
+                //controller: function($scope, $mdDialog, insumo, index) {
+                    controller: function($scope, $mdDialog, insumo, index, acta) {
                     if(insumo){
                         $scope.insumoAutoComplete = {insumo:insumo, searchText:insumo.clave};
                         $scope.insumo = insumo;
@@ -348,12 +370,31 @@
                         $scope.insumo = undefined;
                         $scope.index = undefined;
                     }
+                    $scope.acta = acta;
 
                     $scope.cancel = function() {
                         $mdDialog.cancel();
                     };
                     $scope.answer = function() {
-                        $mdDialog.hide({insumo:$scope.insumo,index:$scope.index});
+                        //$mdDialog.hide({insumo:$scope.insumo,index:$scope.index});
+                        if($scope.index >= 0){
+                            var insumo_local = $scope.acta.insumos[$scope.index];
+                            $scope.acta.subtotal -= insumo_local.total;
+                            $scope.acta.insumos[$scope.index] = $scope.insumo;
+                            $scope.acta.subtotal += $scope.insumo.total;
+                        }else{
+                            $scope.acta.insumos.push($scope.insumo);
+                            $scope.acta.subtotal += $scope.insumo.total;
+                        }
+                        
+                        if($scope.acta.iva){
+                            //
+                        }else{
+                            $scope.acta.total = $scope.acta.subtotal;
+                        }
+                        $scope.insumoAutoComplete = {};
+                        $scope.insumo = undefined;
+                        $scope.index = undefined;
                     };
 
                     $scope.calcularTotal = function(){
@@ -393,6 +434,7 @@
                 locals:locals
             })
             .then(function(res) {
+                /*
                 if(res.index >= 0){
                     var insumo_local = $scope.acta.insumos[res.index];
                     $scope.acta.subtotal -= insumo_local.total;
@@ -408,8 +450,9 @@
                 }else{
                     $scope.acta.total = $scope.acta.subtotal;
                 }
+                */
             }, function() {
-                console.log('cancelado');
+                //console.log('cancelado');
             });
             $scope.$watch(function() {
                 return $mdMedia('xs') || $mdMedia('sm');
@@ -475,6 +518,7 @@
                     if(requisicion.insumos.length){
                         requisicion.firma_director = $scope.acta.firma_director;
                         requisicion.firma_solicita = $scope.acta.firma_solicita;
+                        requisicion.cargo_solicita = $scope.acta.cargo_solicita;
                         requisicion.iva = $scope.acta.iva;
                         if($scope.acta.iva){
                             //

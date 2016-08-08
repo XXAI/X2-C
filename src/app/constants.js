@@ -17,7 +17,8 @@
                          { 
                             grupo:'Administrador' ,
                             lista: [
-                                { titulo: 'Usuarios', key: '2EA4582FC8A19', path: '/usuarios', icono: 'account' }
+                                { titulo: 'Usuarios', key: '2EA4582FC8A19', path: '/usuarios', icono: 'account' },
+                                { titulo: 'Configuración', key: '71A3786CCEBD4', path: '/configuracion', icono: 'settings'}
                             ]
                          },
 						 {
