@@ -247,6 +247,7 @@
                 $scope.acta.insumos = [];
                 $scope.acta.subtotal = 0;
                 $scope.acta.total = 0;
+                $scope.acta.iva = 0;
                 var requisiciones = {};
                 if(res.data.requisiciones.length){
                     for(var i in res.data.requisiciones){
@@ -267,7 +268,7 @@
                         $scope.acta.firma_solicita = requisicion.firma_solicita;
                         $scope.acta.cargo_solicita = requisicion.cargo_solicita;
 
-                        $scope.acta.iva = requisicion.iva;
+                        //$scope.acta.iva += requisicion.iva;
 
                         for(var j in requisicion.insumos){
 
@@ -289,20 +290,18 @@
                             
                             $scope.acta.subtotal += insumo.total;
 
+                            if(requisicion.tipo_requisicion == 3){
+                                $scope.acta.iva += (insumo.total*16/100);
+                            }
+
                             $scope.acta.insumos.push(insumo);
                         }
                         //$scope.acta.insumos += requisicion.insumos;
                     }
                 }
 
-                if(parseFloat($scope.acta.iva) == 0){
-                    $scope.acta.iva = undefined;
-                }
-                if($scope.acta.iva){
-                    //
-                }else{
-                    $scope.acta.total = $scope.acta.subtotal;
-                }
+                $scope.acta.total = $scope.acta.iva + $scope.acta.subtotal;
+
                 res.data.requisiciones = requisiciones;
 
                 $scope.cargando = false;
@@ -311,7 +310,7 @@
                 console.log(e);
             });
         }else{
-            $scope.acta = {total:0.00,subtotal:0.00,requisiciones:{},insumos:[]};
+            $scope.acta = {iva:0.00,total:0.00,subtotal:0.00,requisiciones:{},insumos:[]};
             ActasDataApi.cargarConfiguracion($routeParams.id,function(res){
                 $scope.acta.ciudad = res.data.ciudad;
                 $scope.acta.lugar_reunion = res.data.clues_nombre;
@@ -343,12 +342,12 @@
         $scope.eliminarInsumo = function(index){
             var insumo_local = $scope.acta.insumos[index];
             $scope.acta.subtotal -= insumo_local.total;
-            $scope.acta.insumos.splice(index,1);
-            if($scope.acta.iva){
-                //
-            }else{
-                $scope.acta.total = $scope.acta.subtotal;
+            if(insumo_local.tipo == 2){
+                var iva = (insumo_local.total*16/100);
+                $scope.acta.iva -= iva;
             }
+            $scope.acta.insumos.splice(index,1);
+            $scope.acta.total = $scope.acta.iva + $scope.acta.subtotal;
         };
         $scope.mostrarDialogo = function(ev,index) {
             var useFullScreen = ($mdMedia('sm') || $mdMedia('xs'))  && $scope.customFullscreen;
@@ -370,16 +369,37 @@
                         $scope.insumo = undefined;
                         $scope.index = undefined;
                     }
+                    $scope.validacion = {};
                     $scope.acta = acta;
+                    $scope.insumos_seleccionados = {};
+                    
+                    for(var i in $scope.acta.insumos){
+                        var insumo = $scope.acta.insumos[i];
+                        $scope.insumos_seleccionados[insumo.pedido+'|'+insumo.lote] = true;
+                    }
 
                     $scope.cancel = function() {
                         $mdDialog.cancel();
                     };
                     $scope.answer = function() {
+                        if(!$scope.insumo){
+                            $scope.validacion.insumo = {'required':true};
+                            return false;
+                        }
+
+                        if(!$scope.insumo.cantidad){
+                            $scope.validacion.cantidad = {'required':true};
+                            return false;
+                        }
+
                         //$mdDialog.hide({insumo:$scope.insumo,index:$scope.index});
                         if($scope.index >= 0){
                             var insumo_local = $scope.acta.insumos[$scope.index];
                             $scope.acta.subtotal -= insumo_local.total;
+                            if(insumo_local.tipo == 2){
+                                var iva = (insumo_local.total*16/100);
+                                $scope.acta.iva -= iva;
+                            }
                             $scope.acta.insumos[$scope.index] = $scope.insumo;
                             $scope.acta.subtotal += $scope.insumo.total;
                         }else{
@@ -387,11 +407,13 @@
                             $scope.acta.subtotal += $scope.insumo.total;
                         }
                         
-                        if($scope.acta.iva){
-                            //
-                        }else{
-                            $scope.acta.total = $scope.acta.subtotal;
+                        if($scope.insumo.tipo == 2){
+                            var iva = ($scope.insumo.total*16/100);
+                            $scope.acta.iva += iva;
                         }
+
+                        $scope.acta.total = $scope.acta.iva + $scope.acta.subtotal;
+
                         $scope.insumoAutoComplete = {};
                         $scope.insumo = undefined;
                         $scope.index = undefined;
@@ -402,18 +424,24 @@
                     };
 
                     $scope.insumoAutoCompleteItemChange = function(){
+                        $scope.validacion = {};
                         if ($scope.insumoAutoComplete.insumo != null){
-                            $scope.insumo = {};
-                            $scope.insumo.insumo_id = $scope.insumoAutoComplete.insumo.id;
-                            $scope.insumo.descripcion = $scope.insumoAutoComplete.insumo.descripcion;
-                            $scope.insumo.clave = $scope.insumoAutoComplete.insumo.clave;
-                            $scope.insumo.lote = $scope.insumoAutoComplete.insumo.lote;
-                            $scope.insumo.unidad = $scope.insumoAutoComplete.insumo.unidad;
-                            $scope.insumo.precio = $scope.insumoAutoComplete.insumo.precio;
-                            $scope.insumo.tipo = $scope.insumoAutoComplete.insumo.tipo;
-                            $scope.insumo.cause = $scope.insumoAutoComplete.insumo.cause;
-                            $scope.insumo.pedido = $scope.insumoAutoComplete.insumo.pedido;
-                            $scope.insumo.total = 0.00;
+                            if($scope.insumos_seleccionados[$scope.insumoAutoComplete.insumo.pedido+'|'+$scope.insumoAutoComplete.insumo.lote]){
+                                $scope.insumo = undefined;
+                                $scope.validacion.insumo = {'duplicate':true};
+                            }else{
+                                $scope.insumo = {};
+                                $scope.insumo.insumo_id = $scope.insumoAutoComplete.insumo.id;
+                                $scope.insumo.descripcion = $scope.insumoAutoComplete.insumo.descripcion;
+                                $scope.insumo.clave = $scope.insumoAutoComplete.insumo.clave;
+                                $scope.insumo.lote = $scope.insumoAutoComplete.insumo.lote;
+                                $scope.insumo.unidad = $scope.insumoAutoComplete.insumo.unidad;
+                                $scope.insumo.precio = $scope.insumoAutoComplete.insumo.precio;
+                                $scope.insumo.tipo = $scope.insumoAutoComplete.insumo.tipo;
+                                $scope.insumo.cause = $scope.insumoAutoComplete.insumo.cause;
+                                $scope.insumo.pedido = $scope.insumoAutoComplete.insumo.pedido;
+                                $scope.insumo.total = 0.00;
+                            }
                         }else{
                             $scope.insumo = undefined;
                         }
@@ -422,6 +450,8 @@
                     $scope.querySearchInsumo = function(query) {
                         return $http.get(URLS.BASE_API + '/insumos',{ params:{ query: query }})
                             .then(function(res){
+                                var resultados = [];
+
                                 return res.data.data;
                             });
                     };
@@ -508,6 +538,9 @@
                     }
                 }
                 $scope.acta.requisiciones[tipo_req].sub_total += insumos[i].total;
+                if(tipo_req == 3){
+                    $scope.acta.requisiciones[tipo_req].iva += (insumos[i].total*16/100);
+                }
                 $scope.acta.requisiciones[tipo_req].insumos.push(insumos[i]);
             }
 
@@ -519,12 +552,8 @@
                         requisicion.firma_director = $scope.acta.firma_director;
                         requisicion.firma_solicita = $scope.acta.firma_solicita;
                         requisicion.cargo_solicita = $scope.acta.cargo_solicita;
-                        requisicion.iva = $scope.acta.iva;
-                        if($scope.acta.iva){
-                            //
-                        }else{
-                            requisicion.gran_total = requisicion.sub_total;
-                        }
+                        requisicion.gran_total = requisicion.iva + requisicion.sub_total;
+                        
                         requisicion.lotes = requisicion.insumos.length;
                     }else{
                         borrar_requisiciones.push(i);
@@ -541,6 +570,12 @@
             if($routeParams.id){
                 ActasDataApi.editar($scope.acta.id,$scope.acta,function (res) {
                     $scope.cargando = false;
+                    for(var i in res.data.requisiciones){
+                        var res_requisicion = res.data.requisiciones[i];
+                        if(!$scope.acta.requisiciones[res_requisicion.tipo_requisicion].id){
+                            $scope.acta.requisiciones[res_requisicion.tipo_requisicion].id = res_requisicion.id;
+                        }
+                    }
                     Mensajero.mostrarToast({contenedor:'#modulo-contenedor',mensaje:'Acta guardada con éxito.'});
                 }, function (e) {
                     $scope.cargando = false;

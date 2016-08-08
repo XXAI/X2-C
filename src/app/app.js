@@ -109,7 +109,7 @@
 		})
 		.otherwise({ redirectTo: '/dashboard' });
 		
-		$httpProvider.interceptors.push(['$q', '$location', '$localStorage', function ($q, $location, $localStorage) {
+		$httpProvider.interceptors.push(['$q', '$location', '$localStorage','$injector', function ($q, $location, $localStorage,$injector) {
 		   if(angular.isUndefined($localStorage.control_desabasto)){
 			   $localStorage.control_desabasto = {}
 		   }
@@ -123,8 +123,24 @@
 		           return config;
 		       },
 		       'responseError': function (response) {				 
+		       		console.log('response error : '+response.status);
+		       		console.log(response);
 		           	if (response.status === 401) {
-		               	$location.path('signin');
+		           		var Auth = $injector.get('Auth');
+		           		Auth.refreshToken({ token: $localStorage.control_desabasto.access_token },
+		           			function(res){
+		           				console.log('refreshed')
+		           				$localStorage.control_desabasto.access_token = res.token;
+		           			}, function(e){
+		           				console.log('CONNECTION_REFUSED');
+						   		$rootScope.error = "CONNECTION_REFUSED";
+								Auth.logout(function () {
+							       	$location.path("/");
+							   	});
+		           			}
+		           		);
+		           		//console.log('location path');
+		               	//$location.path('signin');
 		           	}
 		           return $q.reject(response);
 		       }
@@ -147,19 +163,17 @@
 			$rootScope.$on('event:auth-loginRequired', function() {
 				if($localStorage.control_desabasto.access_token){
 					var Auth = $injector.get('Auth');
-		      		
-						Auth.refreshToken({ access_token: $localStorage.control_desabasto.access_token },
-						   function(res){
-								$localStorage.control_desabasto.access_token = res.token;
-						  		//$localStorage.control_desabasto.refresh_token = res.refresh_token;
-								authService.loginConfirmed();
-						   }, function (e) {                  
-						       
-						   		$rootScope.error = "CONNECTION_REFUSED";
-								Auth.logout(function () {
+		      		console.log('refresh access token');
+					Auth.refreshToken({ token: $localStorage.control_desabasto.access_token },
+					   	function(res){
+							$localStorage.control_desabasto.access_token = res.token;
+					  		//$localStorage.control_desabasto.refresh_token = res.refresh_token;
+							authService.loginConfirmed();
+					   	}, function (e) {
+					   		$rootScope.error = "CONNECTION_REFUSED";
+							Auth.logout(function () {
 						       	$location.path("/");
-						   });
-						       
+						   	});
 						});
 				}else{
 					// Dejamos que pase la peticion porque ni siquiera hay un access_token

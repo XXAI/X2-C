@@ -11,15 +11,6 @@
 			</h2>
 			
 			<span flex></span>
-			<md-button hide-xs hide-sm ng-click="ir('actas')"   aria-label="{{ 'REGRESAR' | translate }}">
-			  <md-icon md-svg-icon="keyboard-backspace"></md-icon>
-			  {{ 'REGRESAR' | translate }}
-			</md-button>   
-			<md-button class="md-icon-button"  hide-gt-sm  ng-click="ir('actas')"   aria-label="{{ 'REGRESAR' | translate }}">
-			  <md-icon md-svg-icon="keyboard-backspace"></md-icon>
-			</md-button>
-
-			<md-icon md-svg-icon="dots-vertical" style="color: #005DA7;"></md-icon>
 
 			<md-button ng-permiso="permisoAgregar" hide-xs hide-sm ng-click="guardar()" ng-disabled="cargando"  aria-label="{{ 'GUARDAR' | translate }}">
 			  <md-icon md-svg-icon="content-save"></md-icon>

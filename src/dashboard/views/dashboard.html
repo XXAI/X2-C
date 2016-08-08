@@ -12,6 +12,82 @@
 			<span flex></span>
 		</div>
 	</md-toolbar>
-	<md-content md-theme="dashboardTheme" layout-padding>
+	<md-content layout-padding>
+		<div layout="row" layout-padding layout-wrap>
+			<div flex="50">
+				<div class="md-whiteframe-z2">
+					<md-toolbar class="md-primary md-hue-2">
+						<h1 class="md-toolbar-tools">Bienvenido<div flex></div></h1>
+					</md-toolbar>
+					<md-subheader class="md-primary md-hue-1">
+						<strong>Informacón del Usuario</strong>
+					</md-subheader>
+					<md-list>
+						<md-list-item class="md-2-line">
+							<div class="md-list-item-text">
+								<p><strong>Nombre completo</strong></p>
+								<h3><strong>{{loggedUser.nombre}} {{loggedUser.apellidos}}</strong></h3>
+							</div>
+						</md-list-item>
+						<md-list-item class="md-2-line">
+							<div class="md-list-item-text">
+								<p><strong>Correo eléctronico</strong></p>
+								<h3><strong>{{loggedUser.id}}</strong></h3>
+							</div>
+						</md-list-item>
+						<md-subheader class="md-primary md-hue-1">
+							<strong>Configuración</strong>
+						</md-subheader>
+						<md-list-item class="md-2-line">
+							<div class="md-list-item-text">
+								<p><strong>CLUES de la Unidad Médica</strong></p>
+								<h3><strong>{{appInfo.clues}}</strong></h3>
+							</div>
+						</md-list-item>
+						<md-list-item class="md-2-line">
+							<div class="md-list-item-text">
+								<p><strong>Nombre de la Unidad Médica</strong></p>
+								<h3><strong>{{appInfo.clues_nombre}}</strong></h3>
+							</div>
+						</md-list-item>
+						<md-list-item class="md-2-line">
+							<div class="md-list-item-text">
+								<p><strong>Empresa adjudicada</strong></p>
+								<h3><strong>{{appInfo.empresa_nombre}}</strong></h3>
+							</div>
+						</md-list-item>
+					</md-list>
+				</div>
+			</div>
+			<div flex="50">
+				<div class="md-whiteframe-z2">
+					<md-toolbar class="md-primary md-hue-2">
+						<h1 class="md-toolbar-tools">Conteo de Registros<div flex></div></h1>
+					</md-toolbar>
+					<md-list>
+						<md-list-item layout="row">
+							<div flex><strong>Total de actas Capturadas: </strong></div>
+							<div flex="none"><md-chips><md-chip><strong>
+								{{userInfo.totalActasCap|number}}
+							</strong></md-chip></md-chips></div>
+						</md-list-item>
+						<md-divider></md-divider>
+						<md-list-item layout="row">
+							<div flex><strong>Total de actas Finalizadas: </strong></div>
+							<div flex="none"><md-chips><md-chip><strong>
+								{{userInfo.totalActasFin|number}}
+							</strong></md-chip></md-chips></div>
+						</md-list-item>
+						<md-divider></md-divider>
+						<md-list-item layout="row">
+							<div flex><strong>Total de requisiciones hechas: </strong></div>
+							<div flex="none"><md-chips><md-chip><strong>
+								{{userInfo.totalRequisiciones|number}}
+							</strong></md-chip></md-chips></div>
+						</md-list-item>
+					</md-list>
+				</div>
+			</div>
+		</div>
 	</md-content>
 </div>

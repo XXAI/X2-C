@@ -57,9 +57,9 @@
 			<div flex="15" style="text-align:center;">Clave</div>
 			<div flex style="text-align:center;">Descripción del Insumo</div>
 			<div flex="15" style="text-align:center;">Unidad de Medida</div>
-			<div flex="15" style="text-align:center;">Precio Unitario</div>
+			<div flex="10" style="text-align:center;">Precio Unitario</div>
 			<div flex="10" style="text-align:center;">Cantidad</div>
-			<div flex="15" style="text-align:center;">Total</div>
+			<div flex="20" style="text-align:center;">Importe</div>
 		</div>
 	</md-subheader>
 	<md-divider></md-divider>
@@ -76,10 +76,10 @@
 					<div flex="5" style="text-align:center;">{{insumo.lote}}</div>
 					<div flex="15" style="text-align:center;">{{insumo.clave}}</div>
 					<div flex style="text-align:center;"><p style="line-height:14px; margin:0px;"><small>{{insumo.descripcion}}</small></p></div>
-					<div flex="15" style="text-align:center;">{{insumo.unidad}}</div>
-					<div flex="15" style="text-align:center;">$ {{insumo.precio | number:2}}</div>
+					<div flex="15" style="text-align:center;"><p style="line-height:14px; margin:0px;"><small>{{insumo.unidad}}</small></p></div>
+					<div flex="10" style="text-align:center;">$ {{insumo.precio | number:2}}</div>
 					<div flex="10" style="text-align:center;">{{insumo.cantidad | number}}</div>
-					<div flex="15" style="text-align:center;">$ {{insumo.total | number:2}}</div>
+					<div flex="20" style="text-align:center;">$ {{insumo.total | number:2}}</div>
 				</div>
 		    	<md-icon ng-if="(acta.estatus != 2)" md-svg-icon="delete" ng-click="eliminarInsumo($index)" aria-label="quitar" class="md-secondary md-hue-3">
 		    	</md-icon>
@@ -97,6 +97,10 @@
 			<md-input-container flex style="margin-bottom:0px;height:46px;">
 				<label>Subtotal</label>
 				<input value="$ {{acta.subtotal | number:2}}" readonly>
+			</md-input-container>
+			<md-input-container flex style="margin-bottom:0px;height:46px;">
+				<label>I.V.A.</label>
+				<input value="$ {{acta.iva | number:2}}" readonly>
 			</md-input-container>
 			<md-input-container flex style="margin-bottom:0px;height:46px;">
 				<label>Total</label>

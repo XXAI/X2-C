@@ -13,6 +13,7 @@
       <div class="md-dialog-content">
         <div flex layout="row" layout-wrap>
           <md-autocomplete flex="100"
+            md-autofocus="!insumo"
             md-no-cache="true"
             md-selected-item="insumoAutoComplete.insumo"
             md-search-text="insumoAutoComplete.searchText"
@@ -42,6 +43,10 @@
               No hay resultados para  "{{insumoAutoComplete.searchText}}".
             </md-not-found>
           </md-autocomplete>
+          <div ng-show="validacion.insumo" class="hint" ng-messages="validacion.insumo"  style="color:rgb(221,44,0);">
+            <div ng-message="required"><small>{{ 'CAMPO_REQUERIDO' | translate }}</small></div>
+            <div ng-message="duplicate"><small>El insumo ya se encuentra en la lista</small></div>
+          </div>
         </div>
         <br>
         <div flex layout="row" layout-wrap ng-show="(insumo)">
@@ -60,9 +65,12 @@
             <label>Precio</label>
             <input value="$ {{insumo.precio | number:2}}" disabled>
           </md-input-container>
-          <md-input-container flex>
+          <md-input-container flex md-is-error="validacion.cantidad">
             <label>Cantidad</label>
             <input type="number" ng-model="insumo.cantidad" ng-change="calcularTotal()">
+            <div class="errors" ng-messages="validacion.cantidad" >
+              <div ng-message="required">{{ 'CAMPO_REQUERIDO' | translate }}</div>
+            </div>
           </md-input-container>
           <md-input-container flex>
             <label>Total</label>
@@ -74,7 +82,7 @@
     <md-dialog-actions layout="row">
       <span flex></span>
       <md-button class="md-raised md-primary" ng-click="answer()" style="margin-right:20px;">
-        <md-icon md-svg-icon="plus-box"></md-icon> Agregar
+        <md-icon md-svg-icon="{{(index)?'pencil-box':'plus-box'}}"></md-icon> {{(index)?'Modificar':'Agregar'}}
       </md-button>
     </md-dialog-actions>
   </form>
