@@ -405,6 +405,7 @@
                         }else{
                             $scope.acta.insumos.push($scope.insumo);
                             $scope.acta.subtotal += $scope.insumo.total;
+                            $scope.insumos_seleccionados[$scope.insumo.pedido+'|'+$scope.insumo.lote] = true;
                         }
                         
                         if($scope.insumo.tipo == 2){
