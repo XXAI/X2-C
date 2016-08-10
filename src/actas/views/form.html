@@ -1,13 +1,16 @@
-<md-content id="modulo-contenedor" layout="column" flex>
+<div layout="row" flex id="modulo-contenedor">
+	
+
+<md-content layout="column" flex>
 	<md-content ng-show="toggleDatosActa" layout="row" flex="none" layout-wrap layout-padding >
-		<md-input-container flex="55" md-is-error="validacion.ciudad" style="margin-bottom:0px;">
+		<md-input-container flex="50" md-is-error="validacion.ciudad" style="margin-bottom:0px;">
 			<label>Ciudad</label>
 			<input ng-model="acta.ciudad">
 			<div class="errors" ng-messages="validacion.ciudad" >
 				<div ng-message="required">{{ 'CAMPO_REQUERIDO' | translate }}</div>
 			</div>
 		</md-input-container>
-		<md-input-container flex="15" md-is-error="validacion.fecha" style="margin-bottom:0px;">
+		<md-input-container flex="20" md-is-error="validacion.fecha" style="margin-bottom:0px;">
 			<label>Fecha</label>
 			<input type="date" ng-model="acta.fecha">
 			<div class="errors" ng-messages="validacion.fecha" >
@@ -71,7 +74,7 @@
 					<span ng-show="validacion.requisiciones">Es necesario capturar al menos un insumo</span>
 		    	</md-subheader>
 		    </md-list-item>
-			<md-list-item ng-repeat="insumo in acta.insumos track by $index" ng-click="editarInsumo($event,$index)">
+			<md-list-item ng-repeat="insumo in acta.insumos | filter: filtroTipo" ng-click="editarInsumo($event,$index)">
 				<div flex layout="row">
 					<div flex="5" style="text-align:center;">{{insumo.lote}}</div>
 					<div flex="15" style="text-align:center;">{{insumo.clave}}</div>
@@ -81,7 +84,7 @@
 					<div flex="10" style="text-align:center;">{{insumo.cantidad | number}}</div>
 					<div flex="20" style="text-align:center;">$ {{insumo.total | number:2}}</div>
 				</div>
-		    	<md-icon ng-if="(acta.estatus != 2)" md-svg-icon="delete" ng-click="eliminarInsumo($index)" aria-label="quitar" class="md-secondary md-hue-3">
+		    	<md-icon ng-if="(acta.estatus != 2)" md-svg-icon="delete" ng-click="eliminarInsumo(insumo)" aria-label="quitar" class="md-secondary md-hue-3">
 		    	</md-icon>
 				<md-divider></md-divider>
 			</md-list-item>
@@ -94,18 +97,50 @@
 		</md-button>
 		<div flex></div>
 		<div flex="none" layout="row" style="overflow:hidden;">
-			<md-input-container flex style="margin-bottom:0px;height:46px;">
+			<md-input-container flex style="margin-bottom:0px;height:35px;">
 				<label>Subtotal</label>
 				<input value="$ {{acta.subtotal | number:2}}" readonly>
 			</md-input-container>
-			<md-input-container flex style="margin-bottom:0px;height:46px;">
+			<md-input-container flex style="margin-bottom:0px;height:35px;">
 				<label>I.V.A.</label>
 				<input value="$ {{acta.iva | number:2}}" readonly>
 			</md-input-container>
-			<md-input-container flex style="margin-bottom:0px;height:46px;">
+			<md-input-container flex style="margin-bottom:0px;height:35px;">
 				<label>Total</label>
 				<input value="$ {{acta.total | number:2}}" readonly>
 			</md-input-container>
 		</div>
 	</md-content>
 </md-content>
+
+<md-content layout="column" flex="15" class="md-whiteframe-z2">
+	<md-subheader class="md-primary md-hue-1">
+		Totales por tipo:
+	</md-subheader>
+	<md-input-container flex="none" style="margin-bottom:0px; height:35px;">
+		<label>Causes:</label>
+		<input value="$ {{subtotales.causes | number:2}}" readonly>
+	</md-input-container>
+	
+	<md-input-container flex="none" style="margin-bottom:0px; height:35px;">
+		<label>No Causes:</label>
+		<input value="$ {{subtotales.no_causes | number:2}}" readonly>
+	</md-input-container>
+	
+	<md-input-container flex="none" style="margin-bottom:0px; height:35px;">
+		<label>Material de Curación:</label>
+		<input value="$ {{subtotales.material_curacion | number:2}}" readonly>
+	</md-input-container>
+	<md-subheader class="md-primary md-hue-1">
+		Filtrar por tipo:
+	</md-subheader>
+	<md-radio-group ng-model="filtroTipo" class="md-primary md-padding" ng-change="cambiaFiltro(filtroTipo)">
+		<md-radio-button ng-value="1">Todos</md-radio-button>
+		<md-radio-button ng-value="{tipo:1,cause:1}">Causes</md-radio-button>
+		<md-radio-button ng-value="{tipo:1,cause:0}">No Causes</md-radio-button>
+		<md-radio-button ng-value="{tipo:2,cause:0}">Material de Curación</md-radio-button>
+	</md-radio-group>
+	<div flex></div>
+</md-content>
+
+</div>

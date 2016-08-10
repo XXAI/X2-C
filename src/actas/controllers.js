@@ -95,8 +95,15 @@
                             id: res.data[i].id,
                             folio: res.data[i].folio,
                             fecha: new Date(res.data[i].fecha + ' 00:00:00'),
-                            estatus: res.data[i].estatus
+                            estatus: res.data[i].estatus,
+                            numero_requisiciones: res.data[i].requisiciones.length,
+                            total_requisitado: 0
                         };
+
+                        for(var j in res.data[i].requisiciones){
+                            var requisicion = res.data[i].requisiciones[j];
+                            obj.total_requisitado += parseFloat(requisicion.gran_total);
+                        }
                         
                         $scope.actasInfinitas.actas.push(obj);
                         $scope.actasInfinitas.numLoaded_++;
@@ -223,6 +230,8 @@
         $scope.menuIsOpen = false;
         $scope.loggedUser = UsuarioData.getDatosUsuario();
         $scope.toggleDatosActa = true;
+        $scope.filtroTipo = 1;
+        $scope.subtotales = {causes:0,no_causes:0,material_curacion:0};
 
         $scope.cargando = true;
 
@@ -292,6 +301,11 @@
 
                             if(requisicion.tipo_requisicion == 3){
                                 $scope.acta.iva += (insumo.total*16/100);
+                                $scope.subtotales.material_curacion += insumo.total
+                            }else if(requisicion.tipo_requisicion == 2){
+                                $scope.subtotales.no_causes += insumo.total
+                            }else{
+                                $scope.subtotales.causes += insumo.total
                             }
 
                             $scope.acta.insumos.push(insumo);
@@ -299,7 +313,7 @@
                         //$scope.acta.insumos += requisicion.insumos;
                     }
                 }
-
+                $scope.subtotales.material_curacion += $scope.acta.iva;
                 $scope.acta.total = $scope.acta.iva + $scope.acta.subtotal;
 
                 res.data.requisiciones = requisiciones;
@@ -339,19 +353,75 @@
                 $scope.mostrarDialogo(ev,index);
             }
         };
-        $scope.eliminarInsumo = function(index){
-            var insumo_local = $scope.acta.insumos[index];
+        $scope.eliminarInsumo = function(insumo){
+            //var insumo_local = $scope.acta.insumos[index];
+            var insumo_local = insumo;
             $scope.acta.subtotal -= insumo_local.total;
             if(insumo_local.tipo == 2){
                 var iva = (insumo_local.total*16/100);
                 $scope.acta.iva -= iva;
             }
+
+            if(insumo.tipo == 1 && insumo.cause == 1){
+                $scope.subtotales.causes -= insumo.total;
+            }else if(insumo.tipo == 1 && insumo.cause == 0){
+                $scope.subtotales.no_causes -= insumo.total;
+            }else{
+                $scope.subtotales.material_curacion -= (insumo.total+(insumo.total*16/100));
+            }
+
+            var index = $scope.acta.insumos.indexOf(insumo);
             $scope.acta.insumos.splice(index,1);
             $scope.acta.total = $scope.acta.iva + $scope.acta.subtotal;
+
         };
+
+        $scope.cambiaFiltro = function(tipo){
+            var tipo_requisicion = 0;
+            if(tipo == 1){
+                tipo_requisicion = 0;
+            }else if(tipo.tipo == 1 && tipo.cause == 1){
+                tipo_requisicion = 1;
+            }else if(tipo.tipo == 1 && tipo.cause == 0){
+                tipo_requisicion = 2;
+            }else if(tipo.tipo == 2 && tipo.cause == 0){
+                tipo_requisicion = 3;
+            }
+            recalcularTotales(tipo_requisicion);
+        };
+
+        var recalcularTotales = function(tipo){
+            $scope.acta.subtotal = 0;
+            $scope.acta.iva = 0;
+            $scope.acta.total = 0;
+            
+            for(var i in $scope.acta.insumos){
+                var insumo = $scope.acta.insumos[i];
+                if(tipo === 0){
+                    $scope.acta.subtotal += insumo.total;
+                    if(insumo.tipo == 2 && insumo.cause == 0){
+                        $scope.acta.iva += (insumo.total*16/100);
+                    }
+                }else if(insumo.tipo == 1 && insumo.cause == 1 && tipo == 1){
+                    $scope.acta.subtotal += insumo.total;
+                }else if(insumo.tipo == 1 && insumo.cause == 0 && tipo == 2){
+                    $scope.acta.subtotal += insumo.total;
+                }else if(insumo.tipo == 2 && insumo.cause == 0 && tipo == 3){
+                    $scope.acta.subtotal += insumo.total;
+                    $scope.acta.iva += (insumo.total*16/100);
+                }
+            }
+            $scope.acta.total = $scope.acta.iva + $scope.acta.subtotal;
+        };
+        
         $scope.mostrarDialogo = function(ev,index) {
             var useFullScreen = ($mdMedia('sm') || $mdMedia('xs'))  && $scope.customFullscreen;
-            var locals = {insumo:undefined,index:undefined,acta:$scope.acta};
+            var locals = {
+                insumo: undefined,
+                index: undefined,
+                acta: $scope.acta,
+                subtotales: $scope.subtotales
+            };
             if(index >= 0){
                 locals.insumo = JSON.parse(JSON.stringify($scope.acta.insumos[index]));;
                 locals.index = index;
@@ -359,7 +429,7 @@
 
             $mdDialog.show({
                 //controller: function($scope, $mdDialog, insumo, index) {
-                    controller: function($scope, $mdDialog, insumo, index, acta) {
+                    controller: function($scope, $mdDialog, insumo, index, acta, subtotales) {
                     if(insumo){
                         $scope.insumoAutoComplete = {insumo:insumo, searchText:insumo.clave};
                         $scope.insumo = insumo;
@@ -371,6 +441,7 @@
                     }
                     $scope.validacion = {};
                     $scope.acta = acta;
+                    $scope.subtotales = subtotales;
                     $scope.insumos_seleccionados = {};
                     
                     for(var i in $scope.acta.insumos){
@@ -402,10 +473,31 @@
                             }
                             $scope.acta.insumos[$scope.index] = $scope.insumo;
                             $scope.acta.subtotal += $scope.insumo.total;
+
+                            //Ajsutar Subtotales
+                            if(insumo_local.tipo == 1 && insumo_local.cause == 1){
+                                $scope.subtotales.causes -= insumo_local.total;
+                                $scope.subtotales.causes += $scope.insumo.total;
+                            }else if(insumo_local.tipo == 1 && insumo_local.cause == 0){
+                                $scope.subtotales.no_causes -= insumo_local.total;
+                                $scope.subtotales.no_causes += $scope.insumo.total;
+                            }else{
+                                $scope.subtotales.material_curacion -= (insumo_local.total+(insumo_local.total*16/100));
+                                $scope.subtotales.material_curacion += ($scope.insumo.total+($scope.insumo.total*16/100));
+                            }
                         }else{
                             $scope.acta.insumos.push($scope.insumo);
                             $scope.acta.subtotal += $scope.insumo.total;
                             $scope.insumos_seleccionados[$scope.insumo.pedido+'|'+$scope.insumo.lote] = true;
+
+                            //Ajsutar Subtotales
+                            if($scope.insumo.tipo == 1 && $scope.insumo.cause == 1){
+                                $scope.subtotales.causes += $scope.insumo.total;
+                            }else if($scope.insumo.tipo == 1 && $scope.insumo.cause == 0){
+                                $scope.subtotales.no_causes += $scope.insumo.total;
+                            }else{
+                                $scope.subtotales.material_curacion += ($scope.insumo.total+($scope.insumo.total*16/100));
+                            }
                         }
                         
                         if($scope.insumo.tipo == 2){
@@ -580,12 +672,16 @@
                     Mensajero.mostrarToast({contenedor:'#modulo-contenedor',mensaje:'Acta guardada con éxito.'});
                 }, function (e) {
                     $scope.cargando = false;
-                    Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:'Ocurrió un error al intentar guardar los datos.'});
-                    $scope.validacion = {}; 
-                    var errors = e.error;
-                    for (var i in errors){
-                        var error = JSON.parse('{ "' + errors[i] + '" : true }');
-                        $scope.validacion[i] = error;
+                    $scope.validacion = {};
+                    if(e.error_type = 'form_validation'){
+                        Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:'Hay un error en los datos del formulario.'});
+                        var errors = e.error;
+                        for (var i in errors){
+                            var error = JSON.parse('{ "' + errors[i] + '" : true }');
+                            $scope.validacion[i] = error;
+                        }
+                    }else{
+                        Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:'Ocurrió un error al intentar guardar los datos.'});
                     }
                 });
             }else{
@@ -594,12 +690,17 @@
                     $location.path('actas/'+res.data.id+'/editar');
                 }, function (e) {
                     $scope.cargando = false;
-                    Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:'Ocurrió un error al intentar guardar los datos.'});
-                    $scope.validacion = {}; 
-                    var errors = e.error;
-                    for (var i in errors){
-                        var error = JSON.parse('{ "' + errors[i] + '" : true }');
-                        $scope.validacion[i] = error;
+                    $scope.validacion = {};
+                    if(e.error_type = 'form_validation'){
+                        Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:'Hay un error en los datos del formulario.'});
+                        $scope.toggleDatosActa = true;
+                        var errors = e.error;
+                        for (var i in errors){
+                            var error = JSON.parse('{ "' + errors[i] + '" : true }');
+                            $scope.validacion[i] = error;
+                        }
+                    }else{
+                        Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:'Ocurrió un error al intentar guardar los datos.'});
                     }
                 });
             }

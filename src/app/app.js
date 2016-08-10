@@ -123,13 +123,12 @@
 		           return config;
 		       },
 		       'responseError': function (response) {				 
-		       		console.log('response error : '+response.status);
-		       		console.log(response);
+		       		console.log('interceptor: responseError : '+response.status);
 		           	if (response.status === 401) {
 		           		var Auth = $injector.get('Auth');
 		           		Auth.refreshToken({ token: $localStorage.control_desabasto.access_token },
 		           			function(res){
-		           				console.log('refreshed')
+		           				console.log('Auth.refreshToken -> refreshed');
 		           				$localStorage.control_desabasto.access_token = res.token;
 		           			}, function(e){
 		           				console.log('CONNECTION_REFUSED');
@@ -163,9 +162,10 @@
 			$rootScope.$on('event:auth-loginRequired', function() {
 				if($localStorage.control_desabasto.access_token){
 					var Auth = $injector.get('Auth');
-		      		console.log('refresh access token');
+		      		console.log('event:auth-loginRequired -> getAuth');
 					Auth.refreshToken({ token: $localStorage.control_desabasto.access_token },
 					   	function(res){
+					   		console.log('Auth.refreshToken -> 200');
 							$localStorage.control_desabasto.access_token = res.token;
 					  		//$localStorage.control_desabasto.refresh_token = res.refresh_token;
 							authService.loginConfirmed();

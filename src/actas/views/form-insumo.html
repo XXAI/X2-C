@@ -28,7 +28,7 @@
                 <div layout="row" layout-padding>
                   <div flex="none"><span><strong>{{item.clave}}</strong></span></div>
                   <div flex></div>
-                  <div flex="none"><span>{{item.marca}}</span></div>
+                  <div flex="none"><strong>{{(item.tipo == 1 && item.cause == 1)?'Causes':((item.tipo == 2)?'Material de Curación':'No Causes')}}</strong></div>
                   <div flex></div>
                   <div flex="none"><span>($ {{item.precio}})</span></div>
                 </div>

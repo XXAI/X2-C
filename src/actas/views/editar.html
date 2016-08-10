@@ -22,10 +22,10 @@
 			<md-button ng-click="toggleDatosActa=!toggleDatosActa"  ng-disabled="cargando" aria-label="Toggle Datos Acta">
 				<md-icon md-svg-icon="{{(toggleDatosActa)?'format-vertical-align-top':'format-vertical-align-bottom'}}"></md-icon>
 				<span show-gt-sm>
-				{{ (toggleDatosActa)?'OCULTAR DATOS DEL ACTA':'MOSTRAR DATOS DEL ACTA' | translate }}
+				{{ (toggleDatosActa)?'OCULTAR DATOS':'MOSTRAR DATOS' | translate }}
 				</span>
 				<md-tooltip hide-gt-sm md-direction="down">
-					{{ (toggleDatosActa)?'OCULTAR DATOS DEL ACTA':'MOSTRAR DATOS DEL ACTA' | translate }}
+					{{ (toggleDatosActa)?'OCULTAR DATOS':'MOSTRAR DATOS' | translate }}
 				</md-tooltip>
 			</md-button>
 
@@ -63,7 +63,7 @@
 			  <md-icon md-svg-icon="file-export"></md-icon>
 			</md-button>
 			
-			<md-menu ng-if="(acta.estatus == 2)" md-position-mode="target-right target" >
+			<md-menu md-position-mode="target-right target" >
 	          <md-button aria-label="Open demo menu" class="md-icon-button" ng-disabled="cargando" ng-click="$mdOpenMenu($event)">
 	            <md-icon md-menu-origin md-svg-icon="printer"></md-icon>
 	          </md-button>
