@@ -12,13 +12,15 @@
         $scope.userInfo = {
           totalActasFin: 0,
           totalActasCap: 0,
-          totalRequisiciones: 0
+          totalRequisiciones: 0,
+          totalRequisitado: 0
         };
 
         DashboardDataApi.cargarDatos(function(res){
           $scope.userInfo.totalActasFin       = res.data.total_actas_finalizadas;
           $scope.userInfo.totalActasCap       = res.data.total_actas_capturadas;
           $scope.userInfo.totalRequisiciones  = res.data.total_requisiciones;
+          $scope.userInfo.totalRequisitado    = res.data.total_requisitado;
           $scope.appInfo = res.data.configuracion;
         },function(e) {
           // body...
