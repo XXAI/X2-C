@@ -446,7 +446,7 @@
                     
                     for(var i in $scope.acta.insumos){
                         var insumo = $scope.acta.insumos[i];
-                        $scope.insumos_seleccionados[insumo.pedido+'|'+insumo.lote] = true;
+                        $scope.insumos_seleccionados[insumo.insumo_id] = true;
                     }
 
                     $scope.cancel = function() {
@@ -471,6 +471,12 @@
                                 var iva = (insumo_local.total*16/100);
                                 $scope.acta.iva -= iva;
                             }
+
+                            if(insumo_local.insumo_id != $scope.insumo.id){
+                                delete $scope.insumos_seleccionados[insumo_local.insumo_id];
+                                $scope.insumos_seleccionados[$scope.insumo.id] = true;
+                            }
+
                             $scope.acta.insumos[$scope.index] = $scope.insumo;
                             $scope.acta.subtotal += $scope.insumo.total;
 
@@ -488,7 +494,7 @@
                         }else{
                             $scope.acta.insumos.push($scope.insumo);
                             $scope.acta.subtotal += $scope.insumo.total;
-                            $scope.insumos_seleccionados[$scope.insumo.pedido+'|'+$scope.insumo.lote] = true;
+                            $scope.insumos_seleccionados[$scope.insumo.id] = true;
 
                             //Ajsutar Subtotales
                             if($scope.insumo.tipo == 1 && $scope.insumo.cause == 1){
@@ -519,11 +525,12 @@
                     $scope.insumoAutoCompleteItemChange = function(){
                         $scope.validacion = {};
                         if ($scope.insumoAutoComplete.insumo != null){
-                            if($scope.insumos_seleccionados[$scope.insumoAutoComplete.insumo.pedido+'|'+$scope.insumoAutoComplete.insumo.lote]){
+                            if($scope.insumos_seleccionados[$scope.insumoAutoComplete.insumo.id]){
                                 $scope.insumo = undefined;
                                 $scope.validacion.insumo = {'duplicate':true};
                             }else{
                                 $scope.insumo = {};
+                                $scope.insumo.id = $scope.insumoAutoComplete.insumo.id;
                                 $scope.insumo.insumo_id = $scope.insumoAutoComplete.insumo.id;
                                 $scope.insumo.descripcion = $scope.insumoAutoComplete.insumo.descripcion;
                                 $scope.insumo.clave = $scope.insumoAutoComplete.insumo.clave;
