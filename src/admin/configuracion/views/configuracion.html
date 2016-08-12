@@ -24,56 +24,44 @@
 	<md-content layout="column" flex >
 		<md-content id="modulo-contenedor" layout="column" flex>
 			<md-content layout="row" flex="none" layout-wrap layout-padding >
-				<md-input-container flex="25" md-is-error="validacion.clues" style="margin-bottom:0px;">
-					<label>CLUES</label>
-					<input ng-model="configuracion.clues">
-					<div class="errors" ng-messages="validacion.clues" >
-						<div ng-message="required">{{ 'CAMPO_REQUERIDO' | translate }}</div>
-					</div>
-				</md-input-container>
-				<md-input-container flex="25" md-is-error="validacion.clues_nombre" style="margin-bottom:0px;">
-					<label>Nombre Unidad Médica</label>
-					<input ng-model="configuracion.clues_nombre">
-					<div class="errors" ng-messages="validacion.clues_nombre" >
-						<div ng-message="required">{{ 'CAMPO_REQUERIDO' | translate }}</div>
-					</div>
-				</md-input-container>
-				<md-input-container flex="25" md-is-error="validacion.empresa_clave" style="margin-bottom:0px;">
-					<label>Empresa Asignada</label>
-					<md-select ng-model="configuracion.empresa_clave">
-						<md-option ng-repeat="empresa in empresas" value="{{empresa.clave}}">
-							{{empresa.nombre}}
-						</md-option>
-		    		</md-select>
-					<div class="errors" ng-messages="validacion.empresa_clave" >
-						<div ng-message="required">{{ 'CAMPO_REQUERIDO' | translate }}</div>
-					</div>
-				</md-input-container>
-				<md-input-container flex="25" md-is-error="validacion.director_unidad" style="margin-bottom:0px;">
+				<md-input-container flex="33" md-is-error="validacion.director_unidad" style="margin-bottom:0px;">
 					<label>Director de la Unidad Médica</label>
 					<input ng-model="configuracion.director_unidad">
 					<div class="errors" ng-messages="validacion.director_unidad" >
 						<div ng-message="required">{{ 'CAMPO_REQUERIDO' | translate }}</div>
 					</div>
 				</md-input-container>
-				<md-input-container flex="50" style="margin-bottom:0px;" md-is-error="validacion.lugar_entrega">
+
+				<md-input-container flex="33" md-is-error="validacion.administrador" style="margin-bottom:0px;">
+					<label>Administrador</label>
+					<input ng-model="configuracion.administrador">
+					<div class="errors" ng-messages="validacion.administrador" >
+						<div ng-message="required">{{ 'CAMPO_REQUERIDO' | translate }}</div>
+					</div>
+				</md-input-container>
+
+				<md-input-container flex="33" md-is-error="validacion.encargado_almacen" style="margin-bottom:0px;">
+					<label>Encargado de Almacén</label>
+					<input ng-model="configuracion.encargado_almacen">
+					<div class="errors" ng-messages="validacion.encargado_almacen" >
+						<div ng-message="required">{{ 'CAMPO_REQUERIDO' | translate }}</div>
+					</div>
+				</md-input-container>
+
+				<md-input-container flex="33" md-is-error="validacion.coordinador_comision_abasto" style="margin-bottom:0px;">
+					<label>Coordinador de la Comisión de Abasto de Medicamentos</label>
+					<input ng-model="configuracion.coordinador_comision_abasto">
+					<div class="errors" ng-messages="validacion.coordinador_comision_abasto" >
+						<div ng-message="required">{{ 'CAMPO_REQUERIDO' | translate }}</div>
+					</div>
+				</md-input-container>
+				
+				<md-input-container flex="66" style="margin-bottom:0px;" md-is-error="validacion.lugar_entrega">
 					<label>Lugar de Entrega</label>
 					<input ng-model="configuracion.lugar_entrega">
 					<div class="errors" ng-messages="validacion.lugar_entrega" >
 						<div ng-message="required">{{ 'CAMPO_REQUERIDO' | translate }}</div>
 					</div>
-				</md-input-container>
-				<md-input-container flex="25" style="margin-bottom:0px;">
-					<label>Nombre Solicitante</label>
-					<input ng-model="configuracion.solicitante_nombre">
-				</md-input-container>
-				<md-input-container flex="25" style="margin-bottom:0px;">
-					<label>Cargo Solicitante</label>
-					<input ng-model="configuracion.solicitante_cargo">
-				</md-input-container>
-				<md-input-container flex="50" style="margin-bottom:0px;">
-					<label>Ciudad</label>
-					<input ng-model="configuracion.ciudad">
 				</md-input-container>
 			</md-content>
 		</md-content>

@@ -18,7 +18,6 @@
 
         ConfiguracionDataApi.ver(1,function(res){
             $scope.configuracion = res.data;
-            $scope.empresas = res.catalogos.empresas;
             $scope.cargando = false;
         },function(e){
             Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:'Ocurrió un error al intentar obtener los datos.'});
@@ -26,13 +25,20 @@
         });
         
         $scope.guardar = function() {
+            $scope.validacion = {}; 
             $scope.cargando = true;
             ConfiguracionDataApi.editar(1,$scope.configuracion,function (res) {
                 $scope.cargando = false;
                 Mensajero.mostrarToast({contenedor:'#modulo-contenedor',mensaje:'Configuración guardada con éxito.'});
             }, function (e) {
                 $scope.cargando = false;
-                Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:'Ocurrió un error al intentar guardar los datos.'});
+                if(e.error_code){
+                    if(e.error_code == 'invalid_form'){
+                        Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:'Hay un error en los datos del formulario.'});
+                    }
+                }else{
+                    Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:'Ocurrió un error al intentar guardar los datos.'});
+                }
                 $scope.validacion = {}; 
                 var errors = e.error;
                 for (var i in errors){

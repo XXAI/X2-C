@@ -24,12 +24,6 @@
 		</md-list-item>
 		
 		<md-content md-theme="userInfoTheme" ng-show="mostrarMenuUsuario" >
-			<md-list-item ng-click="mostrarIdiomas($event)" aria-label="'CAMBIAR_IDIOMA' | translate">
-			  	<md-icon class="md-primary" md-svg-icon="language"></md-icon>
-			    <p ng-show="menuIsOpen" translate="CAMBIAR_IDIOMA"></p>
-			    <md-tooltip md-direction="right" show-gt-sm>{{'CAMBIAR_IDIOMA' | translate}}</md-tooltip>
-			</md-list-item>
-			
 			<md-list-item ng-click="logout()" aria-label=" 'CERRAR_SESION' | translate">
 			  	<md-icon class="md-primary" md-svg-icon="exit-to-app"></md-icon>
 			    <p ng-show="menuIsOpen" translate="CERRAR_SESION"></p>

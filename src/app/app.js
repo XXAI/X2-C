@@ -109,7 +109,7 @@
 		})
 		.otherwise({ redirectTo: '/dashboard' });
 		
-		$httpProvider.interceptors.push(['$q', '$location', '$localStorage','$injector', function ($q, $location, $localStorage,$injector) {
+		$httpProvider.interceptors.push(['$q','$rootScope', '$location', '$localStorage','$injector', function ($q,$rootScope, $location, $localStorage,$injector) {
 		   if(angular.isUndefined($localStorage.control_desabasto)){
 			   $localStorage.control_desabasto = {}
 		   }
@@ -124,7 +124,7 @@
 		       },
 		       'responseError': function (response) {				 
 		       		console.log('interceptor: responseError : '+response.status);
-		           	if (response.status === 401) {
+		           	if (response.status === 401 && response.data.error != 'invalid_credentials') {
 		           		var Auth = $injector.get('Auth');
 		           		Auth.refreshToken({ token: $localStorage.control_desabasto.access_token },
 		           			function(res){

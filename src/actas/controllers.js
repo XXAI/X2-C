@@ -326,10 +326,10 @@
         }else{
             $scope.acta = {iva:0.00,total:0.00,subtotal:0.00,requisiciones:{},insumos:[]};
             ActasDataApi.cargarConfiguracion($routeParams.id,function(res){
-                $scope.acta.ciudad = res.data.ciudad;
+                $scope.acta.ciudad = res.data.localidad;
                 $scope.acta.lugar_reunion = res.data.clues_nombre;
-                $scope.acta.firma_solicita = res.data.solicitante_nombre;
-                $scope.acta.cargo_solicita = res.data.solicitante_cargo;
+                $scope.acta.firma_solicita = res.data.administrador;
+                $scope.acta.cargo_solicita = 'Administrador';
 
                 var fecha_actual = new Date();
                 fecha_actual = new Date(fecha_actual.getFullYear(), fecha_actual.getMonth(), fecha_actual.getDate(), fecha_actual.getHours(), fecha_actual.getMinutes(), 0);
@@ -669,11 +669,20 @@
                             $scope.acta.requisiciones[res_requisicion.tipo_requisicion].id = res_requisicion.id;
                         }
                     }
+                    if(res.data.folio){
+                        $scope.acta.folio = res.data.folio;
+                    }
+                    if(!res.respuesta_code){
+                        Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Alerta',mensaje:'Ocurrió un error al intentar almacenar los datos, por favor intente de nuevo.'});
+                    }
                     Mensajero.mostrarToast({contenedor:'#modulo-contenedor',mensaje:'Acta guardada con éxito.'});
                 }, function (e) {
                     $scope.cargando = false;
                     $scope.validacion = {};
-                    if(e.error_type = 'form_validation'){
+                    if($scope.acta.estatus == 2){
+                        $scope.acta.estatus = 1;
+                    }
+                    if(e.error_type == 'form_validation'){
                         Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:'Hay un error en los datos del formulario.'});
                         var errors = e.error;
                         for (var i in errors){
