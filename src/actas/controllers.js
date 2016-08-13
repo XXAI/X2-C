@@ -232,7 +232,7 @@
         $scope.toggleDatosActa = true;
         $scope.filtroTipo = 1;
         $scope.subtotales = {causes:0,no_causes:0,material_curacion:0};
-
+        
         $scope.cargando = true;
 
         if($routeParams.id){
