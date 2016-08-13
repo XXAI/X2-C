@@ -273,9 +273,9 @@
                             insumos: []
                         }
 
-                        $scope.acta.firma_director = requisicion.firma_director;
-                        $scope.acta.firma_solicita = requisicion.firma_solicita;
-                        $scope.acta.cargo_solicita = requisicion.cargo_solicita;
+                        //$scope.acta.firma_director = requisicion.firma_director;
+                        //$scope.acta.firma_solicita = requisicion.firma_solicita;
+                        //$scope.acta.cargo_solicita = requisicion.cargo_solicita;
 
                         //$scope.acta.iva += requisicion.iva;
 
@@ -328,8 +328,8 @@
             ActasDataApi.cargarConfiguracion($routeParams.id,function(res){
                 $scope.acta.ciudad = res.data.localidad;
                 $scope.acta.lugar_reunion = res.data.clues_nombre;
-                $scope.acta.firma_solicita = res.data.administrador;
-                $scope.acta.cargo_solicita = 'Administrador';
+                //$scope.acta.firma_solicita = res.data.administrador;
+                //$scope.acta.cargo_solicita = 'Administrador';
 
                 var fecha_actual = new Date();
                 fecha_actual = new Date(fecha_actual.getFullYear(), fecha_actual.getMonth(), fecha_actual.getDate(), fecha_actual.getHours(), fecha_actual.getMinutes(), 0);
@@ -516,6 +516,8 @@
                         $scope.insumoAutoComplete = {};
                         $scope.insumo = undefined;
                         $scope.index = undefined;
+
+                        document.querySelector('#autocomplete-insumos').focus();
                     };
 
                     $scope.calcularTotal = function(){
@@ -649,9 +651,9 @@
                 for(var i in $scope.acta.requisiciones){
                     var requisicion = $scope.acta.requisiciones[i];
                     if(requisicion.insumos.length){
-                        requisicion.firma_director = $scope.acta.firma_director;
-                        requisicion.firma_solicita = $scope.acta.firma_solicita;
-                        requisicion.cargo_solicita = $scope.acta.cargo_solicita;
+                        //requisicion.firma_director = $scope.acta.firma_director;
+                        //requisicion.firma_solicita = $scope.acta.firma_solicita;
+                        //requisicion.cargo_solicita = $scope.acta.cargo_solicita;
                         requisicion.gran_total = requisicion.iva + requisicion.sub_total;
                         
                         requisicion.lotes = requisicion.insumos.length;

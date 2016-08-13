@@ -31,24 +31,10 @@
 				<div ng-message="required">{{ 'CAMPO_REQUERIDO' | translate }}</div>
 			</div>
 		</md-input-container>
-		<md-input-container flex="33" md-is-error="validacion.lugar_reunion" style="margin-bottom:0px;">
+		<md-input-container flex="100" md-is-error="validacion.lugar_reunion" style="margin-bottom:0px;">
 			<label>Lugar de Reunion</label>
 			<input ng-model="acta.lugar_reunion">
 			<div class="errors" ng-messages="validacion.lugar_reunion" >
-				<div ng-message="required">{{ 'CAMPO_REQUERIDO' | translate }}</div>
-			</div>
-		</md-input-container>
-		<md-input-container flex="33" md-is-error="validacion.firma_solicita" style="margin-bottom:0px;">
-			<label>Solicitante</label>
-			<input ng-model="acta.firma_solicita">
-			<div class="errors" ng-messages="validacion.firma_solicita" >
-				<div ng-message="required">{{ 'CAMPO_REQUERIDO' | translate }}</div>
-			</div>
-		</md-input-container>
-		<md-input-container flex="33" md-is-error="validacion.cargo_solicita" style="margin-bottom:0px;">
-			<label>Cargo del Solicitante</label>
-			<input ng-model="acta.cargo_solicita">
-			<div class="errors" ng-messages="validacion.cargo_solicita" >
 				<div ng-message="required">{{ 'CAMPO_REQUERIDO' | translate }}</div>
 			</div>
 		</md-input-container>
@@ -97,15 +83,15 @@
 		</md-button>
 		<div flex></div>
 		<div flex="none" layout="row" style="overflow:hidden;">
-			<md-input-container flex style="margin-bottom:0px;height:35px;">
+			<md-input-container flex="none" style="margin-bottom:0px;height:35px;">
 				<label>Subtotal</label>
 				<input value="$ {{acta.subtotal | number:2}}" readonly>
 			</md-input-container>
-			<md-input-container flex style="margin-bottom:0px;height:35px;">
+			<md-input-container flex="none" style="margin-bottom:0px;height:35px;">
 				<label>I.V.A.</label>
 				<input value="$ {{acta.iva | number:2}}" readonly>
 			</md-input-container>
-			<md-input-container flex style="margin-bottom:0px;height:35px;">
+			<md-input-container flex="none" style="margin-bottom:0px;height:35px;">
 				<label>Total</label>
 				<input value="$ {{acta.total | number:2}}" readonly>
 			</md-input-container>
@@ -141,6 +127,11 @@
 		<md-radio-button ng-value="{tipo:2,cause:0}">Material de Curación</md-radio-button>
 	</md-radio-group>
 	<div flex></div>
+	<md-divider></md-divider>
+	<md-input-container flex="none" style="margin-bottom:0px;height:35px;">
+		<label>Total Insumos</label>
+		<input value="{{(acta.insumos | filter: filtroTipo).length | number}}" readonly>
+	</md-input-container>
 </md-content>
 
 </div>

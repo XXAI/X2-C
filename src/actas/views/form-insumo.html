@@ -13,6 +13,7 @@
       <div class="md-dialog-content">
         <div flex layout="row" layout-wrap>
           <md-autocomplete flex="100"
+            md-input-id="autocomplete-insumos"
             md-autofocus="!insumo"
             md-no-cache="true"
             md-selected-item="insumoAutoComplete.insumo"
@@ -26,11 +27,13 @@
             <md-item-template>
               <span class="item-title">
                 <div layout="row" layout-padding>
-                  <div flex="none"><span><strong>{{item.clave}}</strong></span></div>
+                  <div flex="none"><strong>Lote:</strong> {{item.lote}}</div>
                   <div flex></div>
-                  <div flex="none"><strong>{{(item.tipo == 1 && item.cause == 1)?'Causes':((item.tipo == 2)?'Material de Curación':'No Causes')}}</strong></div>
+                  <div flex="none"><span><strong>Clave:</strong> {{item.clave}}</span></div>
                   <div flex></div>
-                  <div flex="none"><span>($ {{item.precio}})</span></div>
+                  <div flex="none"><strong>Tipo:</strong> {{(item.tipo == 1 && item.cause == 1)?'Causes':((item.tipo == 2)?'Material de Curación':'No Causes')}}</div>
+                  <div flex></div>
+                  <div flex="none"><span><strong>Precio: </strong>$ {{item.precio}}</span></div>
                 </div>
               </span>
               <span class="item-metadata md-padding">
@@ -67,7 +70,7 @@
           </md-input-container>
           <md-input-container flex md-is-error="validacion.cantidad">
             <label>Cantidad</label>
-            <input type="number" ng-model="insumo.cantidad" ng-change="calcularTotal()">
+            <input type="number" ng-model="insumo.cantidad" ng-change="calcularTotal()" ng-keyup="$event.keyCode == 13 ? answer() : null">
             <div class="errors" ng-messages="validacion.cantidad" >
               <div ng-message="required">{{ 'CAMPO_REQUERIDO' | translate }}</div>
             </div>
