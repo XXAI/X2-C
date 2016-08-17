@@ -259,6 +259,7 @@
                 $scope.acta.iva = 0;
                 var requisiciones = {};
                 if(res.data.requisiciones.length){
+                    var insumos_guardados = {};
                     for(var i in res.data.requisiciones){
                         var requisicion = res.data.requisiciones[i];
                         requisiciones[requisicion.tipo_requisicion] = {
@@ -273,14 +274,7 @@
                             insumos: []
                         }
 
-                        //$scope.acta.firma_director = requisicion.firma_director;
-                        //$scope.acta.firma_solicita = requisicion.firma_solicita;
-                        //$scope.acta.cargo_solicita = requisicion.cargo_solicita;
-
-                        //$scope.acta.iva += requisicion.iva;
-
                         for(var j in requisicion.insumos){
-
                             var insumo = {};
                             
                             insumo.descripcion = requisicion.insumos[j].descripcion;
@@ -306,6 +300,12 @@
                                 $scope.subtotales.no_causes += insumo.total
                             }else{
                                 $scope.subtotales.causes += insumo.total
+                            }
+
+                            if(!insumos_guardados[insumo.insumo_id]){
+                                insumos_guardados[insumo.insumo_id] = true;
+                            }else{
+                                insumo.repetido = true;
                             }
 
                             $scope.acta.insumos.push(insumo);
@@ -429,7 +429,8 @@
 
             $mdDialog.show({
                 //controller: function($scope, $mdDialog, insumo, index) {
-                    controller: function($scope, $mdDialog, insumo, index, acta, subtotales) {
+                controller: function($scope, $mdDialog, insumo, index, acta, subtotales) {
+                    console.log('inicia la aventura.');
                     if(insumo){
                         $scope.insumoAutoComplete = {insumo:insumo, searchText:insumo.clave};
                         $scope.insumo = insumo;
@@ -447,6 +448,9 @@
                     for(var i in $scope.acta.insumos){
                         var insumo = $scope.acta.insumos[i];
                         $scope.insumos_seleccionados[insumo.insumo_id] = true;
+                        console.log('     Insumos seleccionados: '+$scope.insumos_seleccionados.length);
+                        console.log($scope.insumos_seleccionados);
+                        console.log('---------------------------------------------------------------------------');
                     }
 
                     $scope.cancel = function() {
@@ -462,9 +466,10 @@
                             $scope.validacion.cantidad = {'required':true};
                             return false;
                         }
-
+                        console.log('--answervvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv');
                         //$mdDialog.hide({insumo:$scope.insumo,index:$scope.index});
                         if($scope.index >= 0){
+                            console.log('     Editando en insumos: '+$scope.insumo.lote);
                             var insumo_local = $scope.acta.insumos[$scope.index];
                             $scope.acta.subtotal -= insumo_local.total;
                             if(insumo_local.tipo == 2){
@@ -472,11 +477,14 @@
                                 $scope.acta.iva -= iva;
                             }
 
-                            if(insumo_local.insumo_id != $scope.insumo.id){
+                            if(insumo_local.insumo_id != $scope.insumo_id){
+                                console.log('          IDs diferentes: '+$scope.insumo.lote);
                                 delete $scope.insumos_seleccionados[insumo_local.insumo_id];
                                 $scope.insumos_seleccionados[$scope.insumo.id] = true;
                             }
 
+                            console.log('          Agregando insumo: '+$scope.insumo.lote);
+                            $scope.insumo.editado = true;
                             $scope.acta.insumos[$scope.index] = $scope.insumo;
                             $scope.acta.subtotal += $scope.insumo.total;
 
@@ -492,8 +500,12 @@
                                 $scope.subtotales.material_curacion += ($scope.insumo.total+($scope.insumo.total*16/100));
                             }
                         }else{
+                            console.log('          Agregando a insumos: '+$scope.insumo.lote);
                             $scope.acta.insumos.push($scope.insumo);
+
+                            console.log('          Sumando subtotal: '+$scope.insumo.total);
                             $scope.acta.subtotal += $scope.insumo.total;
+                            console.log('Agregando a seleccionados: '+$scope.insumo.lote);
                             $scope.insumos_seleccionados[$scope.insumo.id] = true;
 
                             //Ajsutar Subtotales
@@ -516,8 +528,11 @@
                         $scope.insumoAutoComplete = {};
                         $scope.insumo = undefined;
                         $scope.index = undefined;
+                        console.log('     Insumos seleccionados');
+                        console.log($scope.insumos_seleccionados);
 
                         document.querySelector('#autocomplete-insumos').focus();
+                        console.log('--answer^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^');
                     };
 
                     $scope.calcularTotal = function(){
@@ -526,11 +541,15 @@
 
                     $scope.insumoAutoCompleteItemChange = function(){
                         $scope.validacion = {};
+                        console.log('--insumoAutoCompleteItemChangevvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv');
                         if ($scope.insumoAutoComplete.insumo != null){
+                            console.log('     checando si existe: '+$scope.insumoAutoComplete.insumo.id)
                             if($scope.insumos_seleccionados[$scope.insumoAutoComplete.insumo.id]){
+                                console.log('          existe');
                                 $scope.insumo = undefined;
                                 $scope.validacion.insumo = {'duplicate':true};
                             }else{
+                                console.log('          no existe');
                                 $scope.insumo = {};
                                 $scope.insumo.id = $scope.insumoAutoComplete.insumo.id;
                                 $scope.insumo.insumo_id = $scope.insumoAutoComplete.insumo.id;
@@ -547,13 +566,13 @@
                         }else{
                             $scope.insumo = undefined;
                         }
+                        console.log('--insumoAutoCompleteItemChange^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^');
                     };
 
                     $scope.querySearchInsumo = function(query) {
                         return $http.get(URLS.BASE_API + '/insumos',{ params:{ query: query }})
                             .then(function(res){
                                 var resultados = [];
-
                                 return res.data.data;
                             });
                     };
@@ -651,11 +670,7 @@
                 for(var i in $scope.acta.requisiciones){
                     var requisicion = $scope.acta.requisiciones[i];
                     if(requisicion.insumos.length){
-                        //requisicion.firma_director = $scope.acta.firma_director;
-                        //requisicion.firma_solicita = $scope.acta.firma_solicita;
-                        //requisicion.cargo_solicita = $scope.acta.cargo_solicita;
                         requisicion.gran_total = requisicion.iva + requisicion.sub_total;
-                        
                         requisicion.lotes = requisicion.insumos.length;
                     }else{
                         borrar_requisiciones.push(i);
@@ -672,10 +687,56 @@
             if($routeParams.id){
                 ActasDataApi.editar($scope.acta.id,$scope.acta,function (res) {
                     $scope.cargando = false;
+                    var index_insumos_guardados = {};
+                    var insumos_guardados = [];
+                    var insumos_duplicados = [];
                     for(var i in res.data.requisiciones){
                         var res_requisicion = res.data.requisiciones[i];
                         if(!$scope.acta.requisiciones[res_requisicion.tipo_requisicion].id){
                             $scope.acta.requisiciones[res_requisicion.tipo_requisicion].id = res_requisicion.id;
+                        }
+
+                        for(var j in res_requisicion.insumos){
+                            var insumo = res_requisicion.insumos[j];
+                            if(!index_insumos_guardados[insumo.id]){
+                                index_insumos_guardados[insumo.id] = insumos_guardados.length;
+                                insumos_guardados.push(insumo);
+                            }else{
+                                insumo.repetido = true;
+                                insumos_duplicados.push(insumo);
+                            }
+                        }
+                    }
+                    for(var i in $scope.acta.insumos){
+                        var insumo = $scope.acta.insumos[i];
+
+                        if(!insumo.requisicion_id){
+                            var index = index_insumos_guardados[insumo.id];
+                            insumo.requisicion_id = insumos_guardados[index];
+                            insumo.editado = undefined;
+                        }else if(insumo.editado){
+                            insumo.editado = undefined;
+                        }
+                    }
+                    if(insumos_duplicados.length){
+                        for (var i in insumos_duplicados) {
+                            var insumo = insumos_duplicados[i];
+                            insumo.insumo_id = insumo.id;
+                            insumo.cantidad = insumo.pivot.cantidad;
+                            insumo.total = parseFloat(insumo.pivot.total);
+                            insumo.requisicion_id = insumo.pivot.requisicion_id;
+                            
+                            $scope.acta.subtotal += insumo.total;
+
+                            if(requisicion.tipo_requisicion == 3){
+                                $scope.acta.iva += (insumo.total*16/100);
+                                $scope.subtotales.material_curacion += insumo.total;
+                            }else if(requisicion.tipo_requisicion == 2){
+                                $scope.subtotales.no_causes += insumo.total;
+                            }else{
+                                $scope.subtotales.causes += insumo.total;
+                            }
+                            $scope.acta.insumos.push(insumo);
                         }
                     }
                     if(res.data.folio){

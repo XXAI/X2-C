@@ -92,3 +92,6 @@ Para el autocomplete de CLUES
 .clues-estatus-pendiente{
 	color:#9C9C00;
 }
+.insumo-repetido{
+	color:#DD0000 !important;
+}
