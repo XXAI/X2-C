@@ -10,9 +10,6 @@
 		    </md-button>   
 			<h2><span ng-hide="textoBuscado">Actas</span><span ng-show="textoBuscado">Resultados para: "{{textoBuscado}}"</span></h2>
 			<span flex></span>
-			<!--md-button aria-label="importar" ng-click="importarExcel()" ng-disabled="cargando">
-				<md-icon md-svg-icon="file-import"></md-icon> Importar
-			</md-button-->
 			<md-button class="md-icon-button" aria-label="buscar" ng-click="prepararBusqueda()" >
 			  <md-icon md-svg-icon="magnify"></md-icon>
 			</md-button>
@@ -86,7 +83,7 @@
 					</small>
 				</div>
 			</div>
-			<md-button class="md-fab md-fab-right" ng-click="ir('actas/nuevo')" aria-label="{{ 'NUEVA' | translate }}">
+			<md-button ng-permiso="permisoAgregar" class="md-fab md-fab-right" ng-click="ir('actas/nuevo')" aria-label="{{ 'NUEVA' | translate }}">
 				<md-icon md-svg-icon="plus"></md-icon>
 	  		</md-button>
 		</div>

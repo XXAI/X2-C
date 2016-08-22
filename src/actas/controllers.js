@@ -13,8 +13,8 @@
         $scope.menuFiltro = {estatus:'todos'};
         $scope.textoBuscado = '';
 
-        $scope.permisoAgregar = 'B646BDDC8ADB8';
-        $scope.permisoEliminar = '47DC5FB9FD13F';
+        $scope.permisoAgregar = '2EF18B5F2E2D7';
+        $scope.permisoEliminar = 'FF915DEC2F235';
 
         $scope.datosDelUsuario = {};
         $scope.cargasIniciales = {catalogos:false, listaActas:false};
@@ -233,6 +233,11 @@
         $scope.filtroTipo = 1;
         $scope.subtotales = {causes:0,no_causes:0,material_curacion:0};
         
+        $scope.permisoAgregar = '2EF18B5F2E2D7';
+        $scope.permisoEditar = 'AC634E145647F';
+        $scope.permisoExportar = 'F4CA88791CD94';
+        $scope.permisoEliminar = 'FF915DEC2F235';
+
         $scope.cargando = true;
 
         if($routeParams.id){

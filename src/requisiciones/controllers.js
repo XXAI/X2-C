@@ -35,6 +35,8 @@
             subtotal:0
         };
 
+        $scope.permisoGuardar = '2438B88CD5ECC';
+
         $scope.cargando = true;
 
         RequisicionesDataApi.requisiciones(
@@ -446,7 +448,7 @@
             var lowercaseQuery = angular.lowercase(query);
             return function filterFn(item) {
                 for(var i in searchValues){
-                    if(angular.lowercase(item[searchValues[i]]).indexOf(lowercaseQuery) === 0){
+                    if(angular.lowercase(item[searchValues[i]]).indexOf(lowercaseQuery) >= 0){
                         return true;
                     }
                 }
@@ -582,6 +584,7 @@
                     nuevos:{},
                     editados:{}
                 };
+                Mensajero.mostrarToast({contenedor:'#modulo-contenedor',mensaje:'Requisiciones guardadas.'});
                 //console.log(res.data);
                 //$location.path('actas/'+res.data.id+'/editar');
             }, function (e) {

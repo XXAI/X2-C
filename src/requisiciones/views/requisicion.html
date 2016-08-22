@@ -9,19 +9,19 @@
 			<h2><span></span></h2>
 			<span flex></span>
 
-			<md-button class="md-accent md-raised" hide-xs hide-sm ng-click="crearActa($event)" ng-disabled="cargando"  aria-label="{{ 'CREAR ACTA' | translate }}">
+			<md-button ng-permiso="permisoGuardar" class="md-accent md-raised" hide-xs hide-sm ng-click="crearActa($event)" ng-disabled="cargando"  aria-label="{{ 'CREAR ACTA' | translate }}">
 			  <md-icon md-svg-icon="check"></md-icon>
 			  {{ 'CREAR ACTA' | translate }}
 			</md-button>
-			<md-button class="md-icon-button md-accent"  hide-gt-sm  ng-disabled="cargando" ng-click="crearActa($event)"  aria-label="{{ 'CREAR ACTA' | translate }}">
+			<md-button ng-permiso="permisoGuardar" class="md-icon-button md-accent"  hide-gt-sm  ng-disabled="cargando" ng-click="crearActa($event)"  aria-label="{{ 'CREAR ACTA' | translate }}">
 			  <md-icon md-svg-icon="check"></md-icon>
 			</md-button>
 
-			<md-button ng-permiso="permisoAgregar" hide-xs hide-sm ng-click="guardar()" ng-disabled="cargando"  aria-label="{{ 'GUARDAR' | translate }}">
+			<md-button ng-permiso="permisoGuardar" hide-xs hide-sm ng-click="guardar()" ng-disabled="cargando"  aria-label="{{ 'GUARDAR' | translate }}">
 			  <md-icon md-svg-icon="content-save"></md-icon>
 			  {{ 'GUARDAR' | translate }}
 			</md-button>		 
-			<md-button ng-permiso="permisoAgregar" class="md-icon-button"  hide-gt-sm ng-disabled="cargando" ng-click="guardar()"  aria-label="{{ 'GUARDAR' | translate }}">
+			<md-button ng-permiso="permisoGuardar" class="md-icon-button"  hide-gt-sm ng-disabled="cargando" ng-click="guardar()"  aria-label="{{ 'GUARDAR' | translate }}">
 			  <md-icon md-svg-icon="content-save"></md-icon>
 			</md-button>
 			
@@ -77,12 +77,12 @@
 			              No hay resultados para  "{{cluesAutoComplete.searchText}}".
 			            </md-not-found>
 			        	</md-autocomplete>
-						<div flex="none">
+						<!--div flex="none">
 							<input class="ng-hide" id="input-file-id" type="file" accept=".zip"/>
 							<label for="input-file-id" class="md-button md-primary">
 					    		<md-icon md-svg-icon="attachment"></md-icon> Importar archivo
 					    	</label>
-						</div>
+						</div-->
 					</div>
 				</md-content>
 				<md-divider></md-divider>

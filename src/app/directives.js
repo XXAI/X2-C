@@ -6,7 +6,7 @@
       link: function(scope, element, attrs){
         var model = $parse(attrs.ngPermiso);
         scope.$watch(model, function(value) {
-          var resultados = filterFilter($localStorage.plataforma_app.permisos,value);
+          var resultados = filterFilter($localStorage.control_desabasto.permisos,value);
           if(resultados[0] != value){
             element.addClass('ng-hide');
           }
