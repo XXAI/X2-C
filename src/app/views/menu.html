@@ -31,15 +31,13 @@
 			</md-list-item>
 			<md-divider></md-divider>
 		</md-content>
-
+		<md-divider></md-divider>
 		<md-list-item ng-click="ir('/dashboard')" aria-label=" 'DASHBOARD' | translate">
 		  	<md-icon ng-class="{'md-primary': menuSelected == '/dashboard'}" md-svg-icon="view-dashboard">
 		  		<md-tooltip md-direction="right" show-gt-sm>{{'DASHBOARD'|translate}}</md-tooltip>
 		  	</md-icon>
 		    <p ng-show="menuIsOpen" ng-style="menuSelected == '/dashboard' ? { 'font-weight':'bold' }: { 'font-weight': 'inherit' }" translate="DASHBOARD"></p>
 		</md-list-item>
-
-		<md-divider></md-divider>
 
 		<div ng-repeat="grupo in menu">
 			<md-subheader ng-show="menuIsOpen && grupo.grupo" class="md-no-sticky">{{ grupo.grupo }}</md-subheader>
