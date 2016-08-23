@@ -441,12 +441,21 @@
         };
         $scope.querySearchClues = function(query){
             var results = query ? $scope.lista_clues.filter( createFilterFor(query,['clues','nombre'])) : $scope.lista_clues;
-            return results;
+            for(var i in results){
+                results[i].total_insumos = $scope.totalInsumosClues(results[i].clues);
+            }
+            return $filter('orderBy')(results, 'total_insumos',true);
         };
 
         function createFilterFor(query,searchValues) {
             var lowercaseQuery = angular.lowercase(query);
             return function filterFn(item) {
+                /*var total = 0;
+                if($scope.elementos.por_clues[item.clues]){
+                    total = $scope.elementos.por_clues[item.clues].insumos.length;
+                }
+                item.total_insumos = total;
+                */
                 for(var i in searchValues){
                     if(angular.lowercase(item[searchValues[i]]).indexOf(lowercaseQuery) >= 0){
                         return true;

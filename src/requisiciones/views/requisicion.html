@@ -54,7 +54,7 @@
 			            md-search-text="cluesAutoComplete.searchText"
 			            md-selected-item-change ="cluesAutoCompleteItemChange()"
 			            md-items="item in querySearchClues(cluesAutoComplete.searchText)"
-			            md-item-text="item.clues"
+			            md-item-text="item.clues + ' - ' + item.nombre"
 			            md-min-length="0"
 			            placeholder="Buscar CLUES"
 			            md-menu-class="autocomplete-custom-template">
@@ -63,7 +63,7 @@
 			                	<div layout="row" layout-padding>
 					                <div flex="none"><strong><span md-highlight-text="cluesAutoComplete.searchText">CLUES:</span></strong> {{item.clues}}</div>
 					                <div flex></div>
-					                <div flex="none"><span><strong>Insumos:</strong> {{totalInsumosClues(item.clues) | number}}</span></div>
+					                <div flex="none"><span><strong>Claves:</strong> {{item.total_insumos | number}}</span></div>
 			                	</div>
 			            	</span>
 			            	<span class="item-metadata md-padding">
@@ -175,7 +175,7 @@
 				<div flex></div>
 				<md-divider></md-divider>
 				<md-input-container flex="none" style="margin-bottom:0px;">
-					<label>Total Lotes</label>
+					<label>Total Claves</label>
 					<input value="{{(lista_insumos | filter: filtroTipo).length | number}}" readonly>
 				</md-input-container>
 			</md-content>

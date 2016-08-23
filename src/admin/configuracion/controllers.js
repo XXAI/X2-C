@@ -14,6 +14,8 @@
         $scope.loggedUser = UsuarioData.getDatosUsuario();
         $scope.toggleDatosActa = true;
 
+        $scope.permisoConfiguracion = '37DC1A627A44E';
+
         $scope.cargando = true;
 
         ConfiguracionDataApi.ver(1,function(res){
