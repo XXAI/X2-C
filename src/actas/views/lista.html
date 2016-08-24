@@ -10,6 +10,16 @@
 		    </md-button>   
 			<h2><span ng-hide="textoBuscado">Actas</span><span ng-show="textoBuscado">Resultados para: "{{textoBuscado}}"</span></h2>
 			<span flex></span>
+			
+			<md-button ng-permiso="permisoExportar" hide-xs hide-sm ng-click="importar()" ng-disabled="cargando"  aria-label="{{ 'IMPORTAR' | translate }}">
+			  <md-icon md-svg-icon="upload"></md-icon>
+			  {{ 'IMPORTAR' | translate }}
+			</md-button>		 
+			<md-button ng-permiso="permisoExportar" class="md-icon-button"  hide-gt-sm ng-disabled="cargando" ng-click="importar()"  aria-label="{{ 'IMPORTAR' | translate }}">
+			  <md-icon md-svg-icon="upload"></md-icon>
+			</md-button>
+			<input class="ng-hide" id="import-file-id" type="file" accept=".zip"/>
+
 			<md-button class="md-icon-button" aria-label="buscar" ng-click="prepararBusqueda()" >
 			  <md-icon md-svg-icon="magnify"></md-icon>
 			</md-button>
@@ -45,14 +55,31 @@
 		</md-content>
 	</md-sidenav>
 
-	<md-virtual-repeat-container style="height:880px;" id="modulo-importar">
+	<md-virtual-repeat-container style="height:880px;" id="modulo-actas">
 		<md-list layout="column">
       		<md-list-item class="md-3-line paciente-item" md-virtual-repeat="acta in actasInfinitas" md-on-demand ng-click="ir('actas/'+acta.id+'/editar')" ng-hide="!acta.id">
-      			<md-icon hide-xs ng-if="acta.id" md-svg-icon="{{(acta.estatus == 1)?'file':'file-check'}}" class="md-avatar-icon"></md-icon>
+      			<md-icon ng-if="acta.id" md-svg-icon="{{(acta.estatus == 1)?'file':((acta.estatus == 2)?'file-send':'file-check')}}" class="md-avatar-icon"></md-icon>
 				<div class="md-list-item-text">
 		        	<h3>{{ acta.folio }}</h3>
-		        	<h4><strong>Fecha:</strong> {{acta.fecha | date:'yyyy-MM-dd'}}</h4>
-		        	<h4><strong>Total Importe:</strong> $ {{acta.total_requisitado | number:2}}</h4>
+		        	<h4>
+		        		<div layout="row">
+		        			<div flex="none">
+		        				<strong>Fecha:</strong> {{acta.fecha | date:'yyyy-MM-dd'}}
+		        			</div>
+		        			<div flex></div>
+		        			<div flex="none" ng-if="acta.fecha_validacion">
+		        				<strong>Fecha de Validación:</strong> {{acta.fecha_validacion | date:'yyyy-MM-dd HH:mm'}} hrs.
+		        			</div>
+		        		</div>
+		        	</h4>
+		        	<h4>
+		        		<span ng-if="!acta.total_validado">
+		        			<strong>Total Importe:</strong> $ {{acta.total_requisitado | number:2}}
+		        		</span>
+		        		<span ng-if="acta.total_validado">
+		        			<strong>Total Validado:</strong> $ {{acta.total_validado | number:2}}
+		        		</span>
+		        	</h4>
 		        </div>
 		        <md-icon md-svg-icon="delete" ng-if="(acta.id && acta.estatus == 1)" ng-permiso="permisoEliminar" ng-click="eliminarActa(acta,$event)" aria-label="Borrar acta" class="md-secondary md-hue-3">
 	    		</md-icon>

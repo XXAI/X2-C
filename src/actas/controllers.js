@@ -15,6 +15,7 @@
 
         $scope.permisoAgregar = '2EF18B5F2E2D7';
         $scope.permisoEliminar = 'FF915DEC2F235';
+        $scope.permisoExportar = 'F4CA88791CD94';
 
         $scope.datosDelUsuario = {};
         $scope.cargasIniciales = {catalogos:false, listaActas:false};
@@ -95,14 +96,21 @@
                             id: res.data[i].id,
                             folio: res.data[i].folio,
                             fecha: new Date(res.data[i].fecha + ' 00:00:00'),
+                            fecha_validacion: undefined,
                             estatus: res.data[i].estatus,
                             numero_requisiciones: res.data[i].requisiciones.length,
-                            total_requisitado: 0
+                            total_requisitado: 0,
+                            total_validado: 0
                         };
+
+                        if(res.data[i].fecha_validacion){
+                            obj.fecha_validacion = new Date(res.data[i].fecha_validacion);
+                        }
 
                         for(var j in res.data[i].requisiciones){
                             var requisicion = res.data[i].requisiciones[j];
                             obj.total_requisitado += parseFloat(requisicion.gran_total);
+                            obj.total_validado +=  parseFloat(requisicion.gran_total_validado) || 0;
                         }
                         
                         $scope.actasInfinitas.actas.push(obj);
@@ -127,10 +135,51 @@
             }
           }
         };
+
+        var input = angular.element($document[0].querySelector('input#import-file-id'));
+        input.bind('change', function(e) {
+          $scope.$apply(function() {
+            var files = e.target.files;
+            if (files[0]) {
+              $scope.informacionArchivo = files[0];
+            } else {
+              $scope.informacionArchivo = null;
+            }
+            if($scope.informacionArchivo){
+                ActasDataApi.importar($scope.informacionArchivo,function(res){
+                    $scope.informacionArchivo = null;
+
+                    $scope.actasInfinitas.numLoaded_ = 0;
+                    $scope.actasInfinitas.toLoad_ = 0;
+                    $scope.actasInfinitas.actas = [];
+                    $scope.actasInfinitas.maxItems = 1;
+
+                    input.val(null);
+                    $scope.cargando = false;
+                    console.log(res);
+                },function(e){
+                    $scope.cargando = false;
+                    input.val(null);
+                    if(e.error_type == 'data_validation'){
+                        Mensajero.mostrarToast({contenedor:'#modulo-actas',titulo:'Error:',mensaje:e.error});
+                    }else{
+                        Mensajero.mostrarToast({contenedor:'#modulo-actas',titulo:'Error:',mensaje:'Ocurrio un error al importar el achivo.'});
+                    }
+                    console.log(e);
+                });
+            }
+            
+          });
+        });
+
+        $scope.importar = function(){
+            $scope.cargando = true;
+            document.getElementById('import-file-id').click()
+        };
         
         $scope.prepararBusqueda = function(){
             $mdSidenav('busqueda-filtro').open();
-        }
+        };
 
         $scope.cancelarBusqueda = function(){
             $mdSidenav('busqueda-filtro').close();
@@ -245,7 +294,11 @@
                 $scope.acta = res.data;
 
                 if($scope.acta.fecha){
-                    $scope.acta.fecha = new Date(res.data.fecha);
+                    $scope.acta.fecha = new Date(res.data.fecha + ' 00:00:00');
+                }
+
+                if($scope.acta.fecha_validacion){
+                    $scope.acta.fecha_validacion = new Date(res.data.fecha_validacion);
                 }
 
                 if($scope.acta.hora_inicio){
@@ -292,8 +345,16 @@
                             insumo.pedido = requisicion.insumos[j].pedido;
 
                             insumo.insumo_id = requisicion.insumos[j].id;
-                            insumo.cantidad = requisicion.insumos[j].pivot.cantidad;
-                            insumo.total = parseFloat(requisicion.insumos[j].pivot.total);
+
+                            if($scope.acta.estatus > 2){
+                                insumo.cantidad = requisicion.insumos[j].pivot.cantidad_validada;
+                                insumo.total = parseFloat(requisicion.insumos[j].pivot.total_validado);
+                            }else{
+                                insumo.cantidad = requisicion.insumos[j].pivot.cantidad;
+                                insumo.total = parseFloat(requisicion.insumos[j].pivot.total);
+                            }
+                            
+
                             insumo.requisicion_id = requisicion.insumos[j].pivot.requisicion_id;
                             
                             $scope.acta.subtotal += insumo.total;
@@ -329,7 +390,7 @@
                 console.log(e);
             });
         }else{
-            $scope.acta = {iva:0.00,total:0.00,subtotal:0.00,requisiciones:{},insumos:[]};
+            $scope.acta = {estatus:1, iva:0.00,total:0.00,subtotal:0.00,requisiciones:{},insumos:[]};
             ActasDataApi.cargarConfiguracion($routeParams.id,function(res){
                 $scope.acta.ciudad = res.data.localidad;
                 $scope.acta.lugar_reunion = res.data.clues_nombre;
@@ -349,12 +410,12 @@
         }
 
         $scope.agregarInsumo = function(ev){
-            if($scope.acta.estatus != 2){
+            if($scope.acta.estatus < 2){
                 $scope.mostrarDialogo(ev);
             }
         };
         $scope.editarInsumo = function(ev,index){
-            if($scope.acta.estatus != 2){
+            if($scope.acta.estatus < 2){
                 $scope.mostrarDialogo(ev,index);
             }
         };

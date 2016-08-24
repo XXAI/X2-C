@@ -70,7 +70,7 @@
 					<div flex="10" style="text-align:center;">{{insumo.cantidad | number}}</div>
 					<div flex="20" style="text-align:center;">$ {{insumo.total | number:2}}</div>
 				</div>
-		    	<md-icon ng-if="(acta.estatus != 2)" md-svg-icon="delete" ng-click="eliminarInsumo(insumo)" aria-label="quitar" class="md-secondary md-hue-3">
+		    	<md-icon ng-if="(acta.estatus < 2)" md-svg-icon="delete" ng-click="eliminarInsumo(insumo)" aria-label="quitar" class="md-secondary md-hue-3">
 		    	</md-icon>
 				<md-divider></md-divider>
 			</md-list-item>
@@ -78,9 +78,15 @@
 	</md-content>
 	<md-divider></md-divider>
 	<md-content layout="row" flex="none" layout-wrap>
-		<md-button class="md-raised md-accent" ng-click="agregarInsumo($event)" ng-if="(acta.estatus != 2)">
+		<md-button class="md-raised md-accent" ng-click="agregarInsumo($event)" ng-if="(acta.estatus < 2)">
 			<md-icon md-svg-icon="plus"></md-icon> Agregar Insumo
 		</md-button>
+		<div flex="none" ng-if="(acta.estatus > 1)" style="overflow:hidden;">
+			<md-input-container style="margin-bottom:0px;height:35px;">
+				<label>Validado</label>
+				<input value="{{(acta.estatus < 3)?'Sin Validar':(acta.fecha_validacion | date:'yyyy-MM-dd HH:mm')+' hrs'}}">
+			</md-input-container>
+		</div>
 		<div flex></div>
 		<div flex="none" layout="row" style="overflow:hidden;">
 			<md-input-container flex="none" style="margin-bottom:0px;height:35px;">
