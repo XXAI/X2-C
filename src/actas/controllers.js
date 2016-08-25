@@ -138,42 +138,41 @@
 
         var input = angular.element($document[0].querySelector('input#import-file-id'));
         input.bind('change', function(e) {
-          $scope.$apply(function() {
-            var files = e.target.files;
-            if (files[0]) {
-              $scope.informacionArchivo = files[0];
-            } else {
-              $scope.informacionArchivo = null;
-            }
-            if($scope.informacionArchivo){
-                ActasDataApi.importar($scope.informacionArchivo,function(res){
-                    $scope.informacionArchivo = null;
+            $scope.$apply(function() {
+                var files = e.target.files;
+                if (files[0]) {
+                  $scope.informacionArchivo = files[0];
+                } else {
+                  $scope.informacionArchivo = null;
+                  $scope.cargando = false;
+                }
+                if($scope.informacionArchivo){
+                    ActasDataApi.importar($scope.informacionArchivo,function(res){
+                        $scope.informacionArchivo = null;
 
-                    $scope.actasInfinitas.numLoaded_ = 0;
-                    $scope.actasInfinitas.toLoad_ = 0;
-                    $scope.actasInfinitas.actas = [];
-                    $scope.actasInfinitas.maxItems = 1;
+                        $scope.actasInfinitas.numLoaded_ = 0;
+                        $scope.actasInfinitas.toLoad_ = 0;
+                        $scope.actasInfinitas.actas = [];
+                        $scope.actasInfinitas.maxItems = 1;
 
-                    input.val(null);
-                    $scope.cargando = false;
-                    console.log(res);
-                },function(e){
-                    $scope.cargando = false;
-                    input.val(null);
-                    if(e.error_type == 'data_validation'){
-                        Mensajero.mostrarToast({contenedor:'#modulo-actas',titulo:'Error:',mensaje:e.error});
-                    }else{
-                        Mensajero.mostrarToast({contenedor:'#modulo-actas',titulo:'Error:',mensaje:'Ocurrio un error al importar el achivo.'});
-                    }
-                    console.log(e);
-                });
-            }
-            
-          });
+                        input.val(null);
+                        $scope.cargando = false;
+                        console.log(res);
+                    },function(e){
+                        $scope.cargando = false;
+                        input.val(null);
+                        if(e.error_type == 'data_validation'){
+                            Mensajero.mostrarToast({contenedor:'#modulo-actas',titulo:'Error:',mensaje:e.error});
+                        }else{
+                            Mensajero.mostrarToast({contenedor:'#modulo-actas',titulo:'Error:',mensaje:'Ocurrio un error al importar el achivo.'});
+                        }
+                        console.log(e);
+                    });
+                }
+            });
         });
 
         $scope.importar = function(){
-            $scope.cargando = true;
             document.getElementById('import-file-id').click()
         };
         
