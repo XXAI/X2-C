@@ -510,6 +510,8 @@
                                     var error = JSON.parse('{ "' + errors[i] + '" : true }');
                                     $scope.validacion[i] = error;
                                 }
+                            }else if(e.error_type == 'data_validation'){
+                                Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:e.error});
                             }else{
                                 Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:'Ocurrió un error al intentar guardar los datos.'});
                             }

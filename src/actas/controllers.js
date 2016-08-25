@@ -139,6 +139,7 @@
         var input = angular.element($document[0].querySelector('input#import-file-id'));
         input.bind('change', function(e) {
             $scope.$apply(function() {
+                $scope.cargando = true;
                 var files = e.target.files;
                 if (files[0]) {
                   $scope.informacionArchivo = files[0];

@@ -8,7 +8,8 @@
         $scope.menuIsOpen = false;
         $scope.menu = Menu.getMenu();
         $scope.loggedUser = UsuarioData.getDatosUsuario();
-        
+        $scope.cargando = true;
+
         $scope.userInfo = {
           totalActasFin: 0,
           totalActasCap: 0,
@@ -24,8 +25,10 @@
           $scope.userInfo.totalRequisitado    = res.data.total_requisitado;
           $scope.userInfo.totalValidado       = res.data.total_validado;
           $scope.appInfo = res.data.configuracion;
-        },function(e) {
-          // body...
+          $scope.cargando = false;
+        },function(e){
+            Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:'Ocurrió un error al intentar obtener los datos.'});
+            console.log(e);
         });
 
         $scope.menuCerrado = !UsuarioData.obtenerEstadoMenu();
