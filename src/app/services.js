@@ -92,6 +92,8 @@
 				},
 				logout: function (success) {
 					$localStorage.control_desabasto = {};
+					$localStorage.samm_modulo_requisiciones = undefined;
+					$localStorage.samm_modulo_actas = undefined;
 					success();
 				}
 			};
