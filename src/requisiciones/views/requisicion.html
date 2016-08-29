@@ -25,11 +25,11 @@
 			  <md-icon md-svg-icon="content-save{{(modulo.cambios)?'-all':''}}"></md-icon>
 			</md-button>
 
-			<md-button ng-if="modulo.cambios" hide-xs hide-sm ng-click="deshacer($event)" ng-disabled="cargando"  aria-label="{{ 'DESHACER CAMBIOS' | translate }}">
+			<md-button ng-if="modulo.cambios" hide-xs hide-sm ng-click="deshacer($event)" ng-disabled="cargando"  aria-label="{{ 'DESCARTAR CAMBIOS' | translate }}">
 			  <md-icon md-svg-icon="undo"></md-icon>
-			  {{ 'DESHACER CAMBIOS' | translate }}
+			  {{ 'DESCARTAR CAMBIOS' | translate }}
 			</md-button>		 
-			<md-button ng-if="modulo.cambios" class="md-icon-button"  hide-gt-sm ng-disabled="cargando" ng-click="deshacer($event)"  aria-label="{{ 'DESHACER CAMBIOS' | translate }}">
+			<md-button ng-if="modulo.cambios" class="md-icon-button"  hide-gt-sm ng-disabled="cargando" ng-click="deshacer($event)"  aria-label="{{ 'DESCARTAR CAMBIOS' | translate }}">
 			  <md-icon md-svg-icon="undo"></md-icon>
 			</md-button>
 

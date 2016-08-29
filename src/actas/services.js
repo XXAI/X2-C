@@ -28,7 +28,10 @@
 				},
 				eliminar: function (id,  success, error) {
 					$http.delete(URLS.BASE_API + '/actas/' + id).success(success).error(error)
-				}
+				},
+	           	insumos: function (success, error) {
+	           		$http.get(URLS.BASE_API + '/insumos').success(success).error(error)
+	           	}
 	       };
 	   }
 	]);

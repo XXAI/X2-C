@@ -30,12 +30,8 @@
 			</md-button>
 
 			<md-icon md-svg-icon="dots-vertical" style="color: #005DA7;"></md-icon>
-
-			<md-button ng-if="(acta.estatus == 1)" ng-permiso="permisoEliminar" hide-sm hide-xs ng-click="eliminar($event)" ng-disabled="cargando" aria-label="{{ 'ELIMINAR' | translate }}">
-			  <md-icon md-svg-icon="delete"></md-icon>
-			  {{ 'ELIMINAR' | translate }}
-			</md-button>
-			<md-button ng-if="(acta.estatus == 1)" ng-permiso="permisoEliminar" class="md-icon-button" hide-gt-sm show-sm ng-click="eliminar($event)"  aria-label="{{ 'ELIMINAR' | translate }}">
+			
+			<md-button ng-if="(acta.estatus == 1)" ng-permiso="permisoEliminar" class="md-icon-button" ng-click="eliminar($event)"  aria-label="{{ 'ELIMINAR' | translate }}">
 			  <md-icon md-svg-icon="delete"></md-icon>
 			</md-button>
 

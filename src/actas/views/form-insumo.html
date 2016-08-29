@@ -11,8 +11,10 @@
     </md-toolbar>
     <md-dialog-content>
       <div class="md-dialog-content">
+        <md-progress-linear  ng-if="cargando" class="md-accent" style="position:fixed; top:-3px; left:0px; z-index:999"  md-mode="indeterminate"></md-progress-linear>
         <div flex layout="row" layout-wrap>
           <md-autocomplete flex="100"
+            ng-disabled="cargando"
             md-input-id="autocomplete-insumos"
             md-autofocus="!insumo"
             md-no-cache="true"
@@ -84,7 +86,7 @@
     </md-dialog-content>
     <md-dialog-actions layout="row">
       <span flex></span>
-      <md-button class="md-raised md-primary" ng-click="answer()" style="margin-right:20px;">
+      <md-button ng-disabled="cargando" class="md-raised md-primary" ng-click="answer()" style="margin-right:20px;">
         <md-icon md-svg-icon="{{(index >= 0)?'pencil-box':'plus-box'}}"></md-icon> {{(index >= 0)?'Modificar':'Agregar'}}
       </md-button>
     </md-dialog-actions>

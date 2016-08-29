@@ -497,6 +497,18 @@
                 //controller: function($scope, $mdDialog, insumo, index) {
                 controller: function($scope, $mdDialog, insumo, index, acta, subtotales) {
                     console.log('inicia la aventura.');
+
+                    $scope.cargando = true;
+                    $scope.catalogo_insumos = [];
+
+                    ActasDataApi.insumos(function(res){
+                        $scope.catalogo_insumos = res.data;
+                        $scope.cargando = false;
+                    },function(e){
+                        Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:'Ocurrió un error al intentar obtener los datos.'});
+                        console.log(e);
+                    });
+
                     if(insumo){
                         $scope.insumoAutoComplete = {insumo:insumo, searchText:insumo.clave};
                         $scope.insumo = insumo;
@@ -514,10 +526,10 @@
                     for(var i in $scope.acta.insumos){
                         var insumo = $scope.acta.insumos[i];
                         $scope.insumos_seleccionados[insumo.insumo_id] = true;
-                        console.log('     Insumos seleccionados: '+$scope.insumos_seleccionados.length);
-                        console.log($scope.insumos_seleccionados);
-                        console.log('---------------------------------------------------------------------------');
                     }
+                    console.log('     Insumos seleccionados: '+$scope.insumos_seleccionados.length);
+                    console.log($scope.insumos_seleccionados);
+                    console.log('---------------------------------------------------------------------------');
 
                     $scope.cancel = function() {
                         $mdDialog.cancel();
@@ -635,12 +647,29 @@
                         console.log('--insumoAutoCompleteItemChange^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^');
                     };
 
-                    $scope.querySearchInsumo = function(query) {
+                    /*$scope.querySearchInsumo = function(query) {
                         return $http.get(URLS.BASE_API + '/insumos',{ params:{ query: query }})
                             .then(function(res){
                                 var resultados = [];
                                 return res.data.data;
                             });
+                    };*/
+
+                    $scope.querySearchInsumo = function(query){
+                        var results = query ? $scope.catalogo_insumos.filter( createFilterFor(query,['clave','descripcion','lote'])) : $scope.catalogo_insumos;
+                        return results;
+                    };
+
+                    function createFilterFor(query,searchValues) {
+                        var lowercaseQuery = angular.lowercase(query);
+                        return function filterFn(item) {
+                            for(var i in searchValues){
+                                if(angular.lowercase(item[searchValues[i]]+'').indexOf(lowercaseQuery) >= 0){
+                                    return true;
+                                }
+                            }
+                            return false;
+                        };
                     };
                 },
                 templateUrl: 'src/actas/views/form-insumo.html',
