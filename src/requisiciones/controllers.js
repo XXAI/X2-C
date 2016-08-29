@@ -151,17 +151,26 @@
 
         if($scope.modulo.cambios){
             $scope.cargando = true;
-            $scope.requisiciones = $scope.modulo.requisiciones;
-            $scope.elementos = $scope.modulo.elementos;
-            $scope.subtotales = $scope.modulo.subtotales;
-            $scope.totales = $scope.modulo.totales;
-            $scope.insumos_estatus = $scope.modulo.insumos_estatus;
-            $scope.lista_clues = $scope.modulo.lista_clues;
-            $scope.configuracion = $scope.modulo.configuracion;
-            $scope.modulo.cambios = $scope.modulo.cambios;
+            RequisicionesDataApi.catalogos(
+                function(res){
+                    $scope.modulo.lista_clues = res.clues;
+                    $scope.modulo.configuracion = res.configuracion;
 
-            $scope.lista_insumos = $scope.elementos.concentrado;
-            $scope.cargando = false;
+                    $scope.lista_clues = $scope.modulo.lista_clues;
+                    $scope.configuracion = $scope.modulo.configuracion;
+                    $scope.requisiciones = $scope.modulo.requisiciones;
+                    $scope.elementos = $scope.modulo.elementos;
+                    $scope.subtotales = $scope.modulo.subtotales;
+                    $scope.totales = $scope.modulo.totales;
+                    $scope.insumos_estatus = $scope.modulo.insumos_estatus;
+                    $scope.lista_insumos = $scope.elementos.concentrado;
+
+                    $scope.cargando = false;
+                },function(e){
+                    Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:'Ocurrió un error al intentar obtener los datos.'});
+                    console.log(e);
+                }
+            );
         }else{
             $scope.cargando = true;
             cargarRequisiciones();
@@ -264,12 +273,8 @@
                 insumo: undefined,
                 index: undefined,
                 modulo: $scope.modulo,
-                concentrado: $scope.elementos.concentrado,
-                concentrado_indices: $scope.elementos.concentrado_indices,
                 lista_insumos: $scope.lista_insumos,
-                totales: $scope.totales,
-                subtotales: $scope.subtotales,
-                insumos_estatus: $scope.insumos_estatus
+                RequisicionesDataApi: RequisicionesDataApi
             };
             if(index >= 0){
                 locals.insumo = JSON.parse(JSON.stringify($scope.lista_insumos[index]));
@@ -277,8 +282,19 @@
             }
 
             $mdDialog.show({
-                controller: function($scope, $mdDialog, insumo, index, modulo,concentrado,concentrado_indices,lista_insumos, totales,subtotales, insumos_estatus) {
+                controller: function($scope, $mdDialog, insumo, index, modulo,lista_insumos, RequisicionesDataApi) {
                     //console.log('inicia la aventura.');
+                    $scope.cargando = true;
+                    $scope.catalogo_insumos = [];
+
+                    RequisicionesDataApi.insumos(function(res){
+                        $scope.catalogo_insumos = res.data;
+                        $scope.cargando = false;
+                    },function(e){
+                        Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:'Ocurrió un error al intentar obtener los datos.'});
+                        console.log(e);
+                    });
+
                     if(insumo){
                         $scope.insumoAutoComplete = {insumo:insumo, searchText:insumo.clave};
                         $scope.insumo = insumo;
@@ -291,11 +307,13 @@
                     $scope.modulo = modulo;
                     $scope.validacion = {};
                     $scope.lista_insumos = lista_insumos;
-                    $scope.concentrado = concentrado;
-                    $scope.concentrado_indices = concentrado_indices;
-                    $scope.totales = totales;
-                    $scope.subtotales = subtotales;
-                    $scope.insumos_estatus = insumos_estatus;
+
+                    $scope.concentrado          = modulo.elementos.concentrado;
+                    $scope.concentrado_indices  = modulo.elementos.concentrado_indices;
+                    $scope.totales              = modulo.totales;
+                    $scope.subtotales           = modulo.subtotales;
+                    $scope.insumos_estatus      = modulo.insumos_estatus;
+
                     $scope.insumos_seleccionados = {};
                     
                     for(var i in $scope.lista_insumos){
@@ -445,13 +463,31 @@
                         }
                         //console.log('--insumoAutoCompleteItemChange^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^');
                     };
-
+                    /*
                     $scope.querySearchInsumo = function(query) {
                         return $http.get(URLS.BASE_API + '/insumos',{ params:{ query: query }})
                             .then(function(res){
                                 var resultados = [];
                                 return res.data.data;
                             });
+                    };
+                    */
+                    $scope.querySearchInsumo = function(query){
+                        var results = query ? $scope.catalogo_insumos.filter( createFilterFor(query,['clave','descripcion','lote'])) : $scope.catalogo_insumos;
+                        return results;
+                        //return $filter('orderBy')(results, 'total_insumos',true);
+                    };
+
+                    function createFilterFor(query,searchValues) {
+                        var lowercaseQuery = angular.lowercase(query);
+                        return function filterFn(item) {
+                            for(var i in searchValues){
+                                if(angular.lowercase(item[searchValues[i]]+'').indexOf(lowercaseQuery) >= 0){
+                                    return true;
+                                }
+                            }
+                            return false;
+                        };
                     };
                 },
                 templateUrl: 'src/requisiciones/views/form-insumo.html',
@@ -538,14 +574,17 @@
             var requisiciones = prepararGuardado();
             var locals = {
                 requisiciones: requisiciones,
-                configuracion: $scope.configuracion
+                configuracion: $scope.configuracion,
+                modulo: $scope.modulo
             };
 
             $mdDialog.show({
-                controller: function($scope, $mdDialog, requisiciones, configuracion) {
+                controller: function($scope, $mdDialog, requisiciones, configuracion, modulo) {
                     $scope.requisiciones = requisiciones;
                     $scope.acta = {};
                     $scope.validacion = {};
+                    $scope.cargando = false;
+                    $scope.modulo = modulo;
 
                     var fecha_actual = new Date();
                     fecha_actual = new Date(fecha_actual.getFullYear(), fecha_actual.getMonth(), fecha_actual.getDate(), fecha_actual.getHours(), fecha_actual.getMinutes(), 0);
@@ -559,31 +598,35 @@
                         $mdDialog.cancel();
                     };
                     $scope.guardar = function() {
-                        $scope.cargando = true;
+                        if(!$scope.cargando){
+                            $scope.cargando = true;
+                            $scope.acta.hora_inicio = $filter('date')($scope.acta.hora_inicio_date,'HH:mm:ss');
+                            $scope.acta.hora_termino = $filter('date')($scope.acta.hora_termino_date,'HH:mm:ss');
+                            $scope.acta.estatus = 2;
+                            var parametros = {requisiciones: $scope.requisiciones, acta: $scope.acta};
 
-                        $scope.acta.hora_inicio = $filter('date')($scope.acta.hora_inicio_date,'HH:mm:ss');
-                        $scope.acta.hora_termino = $filter('date')($scope.acta.hora_termino_date,'HH:mm:ss');
-                        $scope.acta.estatus = 2;
-                        var parametros = {requisiciones: $scope.requisiciones, acta: $scope.acta};
-
-                        RequisicionesDataApi.guardar(parametros,function (res) {
-                            $location.path('actas/'+res.acta.id+'/editar');
-                        }, function (e) {
-                            $scope.cargando = false;
-                            $scope.validacion = {};
-                            if(e.error_type == 'form_validation'){
-                                Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:'Hay un error en los datos del formulario.'});
-                                var errors = e.error;
-                                for (var i in errors){
-                                    var error = JSON.parse('{ "' + errors[i] + '" : true }');
-                                    $scope.validacion[i] = error;
+                            RequisicionesDataApi.guardar(parametros,function (res) {
+                                $scope.modulo.cambios = false;
+                                $location.path('actas/'+res.acta.id+'/editar');
+                            }, function (e) {
+                                $scope.cargando = false;
+                                $scope.validacion = {};
+                                if(e.error_type == 'form_validation'){
+                                    Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:'Hay un error en los datos del formulario.'});
+                                    var errors = e.error;
+                                    for (var i in errors){
+                                        var error = JSON.parse('{ "' + errors[i] + '" : true }');
+                                        $scope.validacion[i] = error;
+                                    }
+                                }else if(e.error_type == 'data_validation'){
+                                    Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:e.error});
+                                }else{
+                                    Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:'Ocurrió un error al intentar guardar los datos.'});
                                 }
-                            }else if(e.error_type == 'data_validation'){
-                                Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:e.error});
-                            }else{
-                                Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:'Ocurrió un error al intentar guardar los datos.'});
-                            }
-                        });
+                            });
+                        }else{
+                            console.log('cargando');
+                        }
                     };
                 },
                 templateUrl: 'src/requisiciones/views/form-acta.html',
@@ -685,89 +728,6 @@
                     Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:'Ocurrió un error al intentar guardar los datos.'});
                 }
             });
-            /*
-            if($routeParams.id){
-                RequisicionesDataApi.editar($scope.acta.id,$scope.acta,function (res) {
-                    $scope.cargando = false;
-                    var index_insumos_guardados = {};
-                    var insumos_guardados = [];
-                    var insumos_duplicados = [];
-                    for(var i in res.data.requisiciones){
-                        var res_requisicion = res.data.requisiciones[i];
-                        if(!$scope.acta.requisiciones[res_requisicion.tipo_requisicion].id){
-                            $scope.acta.requisiciones[res_requisicion.tipo_requisicion].id = res_requisicion.id;
-                        }
-
-                        for(var j in res_requisicion.insumos){
-                            var insumo = res_requisicion.insumos[j];
-                            if(!index_insumos_guardados[insumo.id]){
-                                index_insumos_guardados[insumo.id] = insumos_guardados.length;
-                                insumos_guardados.push(insumo);
-                            }else{
-                                insumo.repetido = true;
-                                insumos_duplicados.push(insumo);
-                            }
-                        }
-                    }
-                    for(var i in $scope.acta.insumos){
-                        var insumo = $scope.acta.insumos[i];
-
-                        if(!insumo.requisicion_id){
-                            var index = index_insumos_guardados[insumo.id];
-                            insumo.requisicion_id = insumos_guardados[index];
-                            insumo.editado = undefined;
-                        }else if(insumo.editado){
-                            insumo.editado = undefined;
-                        }
-                    }
-                    if(insumos_duplicados.length){
-                        for (var i in insumos_duplicados) {
-                            var insumo = insumos_duplicados[i];
-                            insumo.insumo_id = insumo.id;
-                            insumo.cantidad = insumo.pivot.cantidad;
-                            insumo.total = parseFloat(insumo.pivot.total);
-                            insumo.requisicion_id = insumo.pivot.requisicion_id;
-                            
-                            $scope.acta.subtotal += insumo.total;
-
-                            if(requisicion.tipo_requisicion == 3){
-                                $scope.acta.iva += (insumo.total*16/100);
-                                $scope.subtotales.material_curacion += insumo.total;
-                            }else if(requisicion.tipo_requisicion == 2){
-                                $scope.subtotales.no_causes += insumo.total;
-                            }else{
-                                $scope.subtotales.causes += insumo.total;
-                            }
-                            $scope.acta.insumos.push(insumo);
-                        }
-                    }
-                    if(res.data.folio){
-                        $scope.acta.folio = res.data.folio;
-                    }
-                    if(!res.respuesta_code){
-                        Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Alerta',mensaje:'Ocurrió un error al intentar almacenar los datos, por favor intente de nuevo.'});
-                    }
-                    Mensajero.mostrarToast({contenedor:'#modulo-contenedor',mensaje:'Acta guardada con éxito.'});
-                }, function (e) {
-                    $scope.cargando = false;
-                    $scope.validacion = {};
-                    if($scope.acta.estatus == 2){
-                        $scope.acta.estatus = 1;
-                    }
-                    if(e.error_type == 'form_validation'){
-                        Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:'Hay un error en los datos del formulario.'});
-                        var errors = e.error;
-                        for (var i in errors){
-                            var error = JSON.parse('{ "' + errors[i] + '" : true }');
-                            $scope.validacion[i] = error;
-                        }
-                    }else{
-                        Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:'Ocurrió un error al intentar guardar los datos.'});
-                    }
-                });
-            }else{
-            }
-            */
         };
 
         $scope.imprimir = function(){

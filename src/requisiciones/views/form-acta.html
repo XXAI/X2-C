@@ -53,10 +53,10 @@
     </md-dialog-content>
     <md-dialog-actions layout="row">
       <span flex></span>
-      <md-button class="md-raised md-accent" ng-click="guardar()" style="margin-right:20px;">
+      <md-button class="md-raised md-accent" ng-disabled="cargando" ng-click="guardar()" style="margin-right:20px;">
         <md-icon md-svg-icon="content-save"></md-icon> Guardar y Finalizar
       </md-button>
-      <md-button class="md-raised" ng-click="cancel()" style="margin-right:20px;">
+      <md-button class="md-raised" ng-disabled="cargando" ng-click="cancel()" style="margin-right:20px;">
         Cancelar
       </md-button>
     </md-dialog-actions>

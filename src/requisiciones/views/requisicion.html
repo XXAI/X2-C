@@ -99,7 +99,7 @@
 				<md-content flex>
 					<md-list>
 						<md-list-item ng-if="lista_insumos.length == 0">
-					    	<md-subheader class="{{(validacion.requisiciones)?'md-warn':''}}">
+					    	<md-subheader class="{{(validacion.requisiciones)?'md-warn':''}} md-no-sticky">
 					    		<span ng-hide="validacion.requisiciones">No hay insumos de médicamentos capturados</span>
 								<span ng-show="validacion.requisiciones">Es necesario capturar al menos un insumo</span>
 					    	</md-subheader>
