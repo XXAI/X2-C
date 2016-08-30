@@ -12,6 +12,7 @@
                             grupo:false ,
                             lista: [
                                 { titulo: 'Actas', key: 'AFE7E7583A18C', path: '/actas', icono: 'file-document-box' },
+                                { titulo: 'Solicitudes', key: '6F5427E97863A', path: '/solicitudes', icono: 'file-document' },
                                 { titulo: 'Requisiciones', key: '4E4D8E11F6E4A', path: '/requisiciones', icono: 'file' }
                             ]
                          },
