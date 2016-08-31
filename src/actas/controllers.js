@@ -497,16 +497,17 @@
                 controller: function($scope, $mdDialog, insumo, index, acta, subtotales) {
                     console.log('inicia la aventura.');
 
-                    $scope.cargando = true;
-                    $scope.catalogo_insumos = [];
-
+                    //$scope.cargando = true;
+                    //$scope.catalogo_insumos = [];
+                    //var catalogo_insumos = [];
+                    /*
                     ActasDataApi.insumos(function(res){
-                        $scope.catalogo_insumos = res.data;
+                        catalogo_insumos = res.data;
                         $scope.cargando = false;
                     },function(e){
                         Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:'Ocurrió un error al intentar obtener los datos.'});
                         console.log(e);
-                    });
+                    });*/
 
                     if(insumo){
                         $scope.insumoAutoComplete = {insumo:insumo, searchText:insumo.clave};
@@ -647,16 +648,16 @@
                         console.log('--insumoAutoCompleteItemChange^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^');
                     };
 
-                    /*$scope.querySearchInsumo = function(query) {
+                    $scope.querySearchInsumo = function(query) {
                         return $http.get(URLS.BASE_API + '/insumos',{ params:{ query: query }})
                             .then(function(res){
                                 var resultados = [];
                                 return res.data.data;
                             });
-                    };*/
-
+                    };
+                    /*
                     $scope.querySearchInsumo = function(query){
-                        var results = query ? $scope.catalogo_insumos.filter( createFilterFor(query,['clave','descripcion','lote'])) : $scope.catalogo_insumos;
+                        var results = query ? catalogo_insumos.filter( createFilterFor(query,['clave','descripcion','lote'])) : catalogo_insumos;
                         return results;
                     };
 
@@ -670,7 +671,8 @@
                             }
                             return false;
                         };
-                    };
+                    };*/
+                    
                 },
                 templateUrl: 'src/actas/views/form-insumo.html',
                 parent: angular.element(document.body),
@@ -679,27 +681,7 @@
                 fullscreen: useFullScreen,
                 locals:locals
             })
-            .then(function(res) {
-                /*
-                if(res.index >= 0){
-                    var insumo_local = $scope.acta.insumos[res.index];
-                    $scope.acta.subtotal -= insumo_local.total;
-                    $scope.acta.insumos[res.index] = res.insumo;
-                    $scope.acta.subtotal += res.insumo.total;
-                }else{
-                    $scope.acta.insumos.push(res.insumo);
-                    $scope.acta.subtotal += res.insumo.total;
-                }
-                
-                if($scope.acta.iva){
-                    //
-                }else{
-                    $scope.acta.total = $scope.acta.subtotal;
-                }
-                */
-            }, function() {
-                //console.log('cancelado');
-            });
+            .then(function(res) {}, function() {});
             $scope.$watch(function() {
                 return $mdMedia('xs') || $mdMedia('sm');
             }, function(wantsFullScreen) {
@@ -931,7 +913,7 @@
                 window.open(URLS.BASE_API +'/requisiciones-pdf/'+$routeParams.id+'?token='+$localStorage.control_desabasto.access_token);
 				//console.log($scope.configuracion);
 				//console.log($scope.acta);
-				/*
+			/*
 				var detalleCauses = [];
 				var detalleNoCauses = [];
 				var detalleMaterialCuracion = [];
@@ -1324,7 +1306,7 @@
     			
     			pdfMake.createPdf(docDefinition).print();
                 $scope.cargando = false;
-                */
+            */
             }
         };
 

@@ -284,9 +284,9 @@
             $mdDialog.show({
                 controller: function($scope, $mdDialog, insumo, index, modulo,lista_insumos, RequisicionesDataApi) {
                     //console.log('inicia la aventura.');
-                    $scope.cargando = true;
-                    $scope.catalogo_insumos = [];
-
+                    //$scope.cargando = true;
+                    //$scope.catalogo_insumos = [];
+                    /*
                     RequisicionesDataApi.insumos(function(res){
                         $scope.catalogo_insumos = res.data;
                         $scope.cargando = false;
@@ -294,6 +294,7 @@
                         Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:'Ocurrió un error al intentar obtener los datos.'});
                         console.log(e);
                     });
+                    */
 
                     if(insumo){
                         $scope.insumoAutoComplete = {insumo:insumo, searchText:insumo.clave};
@@ -464,7 +465,7 @@
                         }
                         //console.log('--insumoAutoCompleteItemChange^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^');
                     };
-                    /*
+                    
                     $scope.querySearchInsumo = function(query) {
                         return $http.get(URLS.BASE_API + '/insumos',{ params:{ query: query }})
                             .then(function(res){
@@ -472,7 +473,8 @@
                                 return res.data.data;
                             });
                     };
-                    */
+                    
+                    /*
                     $scope.querySearchInsumo = function(query){
                         var results = query ? $scope.catalogo_insumos.filter( createFilterFor(query,['clave','descripcion','lote'])) : $scope.catalogo_insumos;
                         return results;
@@ -490,6 +492,7 @@
                             return false;
                         };
                     };
+                    */
                 },
                 templateUrl: 'src/requisiciones/views/form-insumo.html',
                 parent: angular.element(document.body),
