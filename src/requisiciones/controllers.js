@@ -83,12 +83,12 @@
                                 $scope.elementos.concentrado[$scope.elementos.concentrado_indices[insumo.insumo_id]].total += parseFloat(insumo.total);
                             }
 
-                            if(requisicion.tipo_requisicion == 1){
-                                $scope.subtotales.causes = requisicion.gran_total;
+                            if(requisicion.tipo_requisicion == 3){
+                                $scope.subtotales.material_curacion = requisicion.gran_total;
                             }else if(requisicion.tipo_requisicion == 2){
                                 $scope.subtotales.no_causes = requisicion.gran_total;
                             }else{
-                                $scope.subtotales.material_curacion = requisicion.gran_total;
+                                $scope.subtotales.causes = requisicion.gran_total;
                             }
                             $scope.totales.subtotal += parseFloat(requisicion.sub_total);
                             $scope.totales.iva += parseFloat(requisicion.iva);
@@ -455,6 +455,7 @@
                                 $scope.insumo.precio = $scope.insumoAutoComplete.insumo.precio;
                                 $scope.insumo.tipo = $scope.insumoAutoComplete.insumo.tipo;
                                 $scope.insumo.cause = $scope.insumoAutoComplete.insumo.cause;
+                                $scope.insumo.controlado = $scope.insumoAutoComplete.insumo.controlado;
                                 $scope.insumo.pedido = $scope.insumoAutoComplete.insumo.pedido;
                                 $scope.insumo.total = 0.00;
                             }
@@ -656,7 +657,9 @@
             for(var clues in clues_insumos){
                 var insumos = clues_insumos[clues].insumos;
                 for(var i in insumos){
-                    if(insumos[i].tipo == 1 && insumos[i].cause == 1){
+                    if(insumos[i].tipo == 1 && insumos[i].cause == 1 && insumos[i].controlado == 1){
+                        var tipo_req = 4; //Medicamentos - causes controlados
+                    }else if(insumos[i].tipo == 1 && insumos[i].cause == 1){
                         var tipo_req = 1; //Medicamentos - causes
                     }else if(insumos[i].tipo == 1 && insumos[i].cause == 0){
                         var tipo_req = 2; //Medicamentos - no causes
