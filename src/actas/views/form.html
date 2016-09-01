@@ -78,7 +78,7 @@
 	</md-content>
 	<md-divider></md-divider>
 	<md-content layout="row" flex="none" layout-wrap>
-		<md-button class="md-raised md-accent" ng-click="agregarInsumo($event)" ng-if="(acta.estatus < 2)">
+		<md-button class="md-raised md-accent" ng-click="agregarInsumo($event)" ng-if="(acta.estatus < 2)" ng-disabled="cargando">
 			<md-icon md-svg-icon="plus"></md-icon> Agregar Insumo
 		</md-button>
 		<div flex="none" ng-if="(acta.estatus > 1)" style="overflow:hidden;">

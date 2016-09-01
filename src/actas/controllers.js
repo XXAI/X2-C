@@ -269,10 +269,10 @@
     }])
     .controller('FormActaCtrl',
     ['$rootScope', '$scope', 'ActasDataApi', '$mdSidenav','$location','$mdBottomSheet','$routeParams','$filter','$localStorage',
-    '$http','$mdToast','Auth','Menu','URLS','UsuarioData','$mdDialog','$mdMedia','Mensajero',
+    '$http','$mdToast','Auth','Menu','URLS','UsuarioData','$mdDialog','$mdMedia','Mensajero','$window',
     function(
     $rootScope, $scope, ActasDataApi,$mdSidenav,$location,$mdBottomSheet,$routeParams,$filter,$localStorage,
-    $http,$mdToast,Auth,Menu,URLS,UsuarioData,$mdDialog,$mdMedia,Mensajero
+    $http,$mdToast,Auth,Menu,URLS,UsuarioData,$mdDialog,$mdMedia,Mensajero, $window
     ){
         $scope.menuSelected = "/actas";
         $scope.menu = Menu.getMenu();
@@ -641,6 +641,11 @@
                                 $scope.insumo.controlado = $scope.insumoAutoComplete.insumo.controlado;
                                 $scope.insumo.pedido = $scope.insumoAutoComplete.insumo.pedido;
                                 $scope.insumo.total = 0.00;
+                                //document.querySelector('#input-cantidad').focus();
+                                //document.querySelector('#input-cantidad').trigger('focus');
+                                //$document[0].querySelector('input#input-cantidad').focus();
+                                //document.getElementById("input-cantidad").click();
+                                //angular.element($document[0].querySelector('input#input-cantidad')).focus();
                             }
                         }else{
                             $scope.insumo = undefined;
