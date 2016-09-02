@@ -413,9 +413,9 @@
                 $scope.mostrarDialogo(ev);
             }
         };
-        $scope.editarInsumo = function(ev,index){
+        $scope.editarInsumo = function(ev,insumo){
             if($scope.acta.estatus < 2){
-                $scope.mostrarDialogo(ev,index);
+                $scope.mostrarDialogo(ev,insumo);
             }
         };
         $scope.eliminarInsumo = function(insumo){
@@ -479,7 +479,7 @@
             $scope.acta.total = $scope.acta.iva + $scope.acta.subtotal;
         };
         
-        $scope.mostrarDialogo = function(ev,index) {
+        $scope.mostrarDialogo = function(ev,insumo) {
             var useFullScreen = ($mdMedia('sm') || $mdMedia('xs'))  && $scope.customFullscreen;
             var locals = {
                 insumo: undefined,
@@ -487,9 +487,9 @@
                 acta: $scope.acta,
                 subtotales: $scope.subtotales
             };
-            if(index >= 0){
-                locals.insumo = JSON.parse(JSON.stringify($scope.acta.insumos[index]));;
-                locals.index = index;
+            if(insumo){
+                locals.insumo = JSON.parse(JSON.stringify(insumo));;
+                locals.index = $scope.acta.insumos.indexOf(insumo);
             }
 
             $mdDialog.show({

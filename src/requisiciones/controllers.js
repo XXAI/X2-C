@@ -183,9 +183,9 @@
                 $scope.mostrarDialogo(ev);
             }
         };
-        $scope.editarInsumo = function(ev,index){
+        $scope.editarInsumo = function(ev,insumo){
             if($scope.clues_seleccionada){
-                $scope.mostrarDialogo(ev,index);
+                $scope.mostrarDialogo(ev,insumo);
             }
         };
         $scope.eliminarInsumo = function(insumo){
@@ -267,7 +267,7 @@
             $scope.totales.total = $scope.totales.iva + $scope.totales.subtotal;
         };
         
-        $scope.mostrarDialogo = function(ev,index) {
+        $scope.mostrarDialogo = function(ev,insumo) {
             var useFullScreen = ($mdMedia('sm') || $mdMedia('xs'))  && $scope.customFullscreen;
             var locals = {
                 insumo: undefined,
@@ -276,9 +276,9 @@
                 lista_insumos: $scope.lista_insumos,
                 RequisicionesDataApi: RequisicionesDataApi
             };
-            if(index >= 0){
-                locals.insumo = JSON.parse(JSON.stringify($scope.lista_insumos[index]));
-                locals.index = index;
+            if(insumo){
+                locals.insumo = JSON.parse(JSON.stringify(insumo));;
+                locals.index = $scope.lista_insumos.indexOf(insumo);
             }
 
             $mdDialog.show({
@@ -344,37 +344,60 @@
                             $scope.concentrado.push(nuevo_insumo);
                         }
                         
-                        if($scope.index >= 0){
+                        if($scope.index != undefined){
                             //console.log('     Editando en insumos: '+$scope.insumo.lote);
                             var insumo_local = $scope.lista_insumos[$scope.index];
-                            $scope.totales.subtotal -= insumo_local.total;
+                            //$scope.totales.subtotal -= insumo_local.total;
 
                             //ACtualizamos el concentrado de insumos
-                            var insumo_concentrado = $scope.concentrado[$scope.concentrado_indices[insumo_local.insumo_id]];
-                            insumo_concentrado.cantidad -= insumo_local.cantidad;
-                            insumo_concentrado.total -= insumo_local.total;
+                            if(insumo_local.insumo_id == $scope.insumo.insumo_id){
+                                var diferencia_cantidad = insumo_local.cantidad - $scope.insumo.cantidad;
+                                var diferencia_total = insumo_local.total - $scope.insumo.total;
 
-                            if(insumo_concentrado.cantidad == 0){
-                                var insumo_concentrado_index = $scope.concentrado_indices[insumo_local.insumo_id];
-                                $scope.concentrado.splice(insumo_concentrado_index,1);
-                                for(var i in $scope.concentrado_indices){
-                                    var index = $scope.concentrado_indices[i];
-                                    if(index > insumo_concentrado_index){
-                                        $scope.concentrado_indices[i] -= 1;
+                                var insumo_concentrado = $scope.concentrado[$scope.concentrado_indices[insumo_local.insumo_id]];
+                                insumo_concentrado.cantidad -= diferencia_cantidad; 
+                                insumo_concentrado.total -= diferencia_total;
+
+                                if(insumo_concentrado.cantidad == 0){
+                                    var insumo_concentrado_index = $scope.concentrado_indices[insumo_concentrado.insumo_id];
+                                    $scope.concentrado.splice(insumo_concentrado_index,1);
+                                    for(var i in $scope.concentrado_indices){
+                                        var index = $scope.concentrado_indices[i];
+                                        if(index > insumo_concentrado_index){
+                                            $scope.concentrado_indices[i] -= 1;
+                                        }
                                     }
+                                    delete $scope.concentrado_indices[insumo_concentrado.insumo_id];
                                 }
-                                delete $scope.concentrado_indices[insumo_local.insumo_id];
-                            }
 
-                            if(insumo_local.insumo_id != $scope.insumo.insumo_id){
+                            }else if(insumo_local.insumo_id != $scope.insumo.insumo_id){
                                 delete $scope.insumos_seleccionados[insumo_local.insumo_id];
                                 $scope.insumos_seleccionados[$scope.insumo.id] = true;
+
+                                insumo_concentrado = $scope.concentrado[$scope.concentrado_indices[insumo_local.insumo_id]];
+                                //ACtualizamos el concentrado de insumos
+                                insumo_concentrado.cantidad -= insumo_local.cantidad;
+                                insumo_concentrado.total -= insumo_local.total;
+
+                                if(insumo_concentrado.cantidad == 0){
+                                    var insumo_concentrado_index = $scope.concentrado_indices[insumo_concentrado.insumo_id];
+                                    $scope.concentrado.splice(insumo_concentrado_index,1);
+                                    for(var i in $scope.concentrado_indices){
+                                        var index = $scope.concentrado_indices[i];
+                                        if(index > insumo_concentrado_index){
+                                            $scope.concentrado_indices[i] -= 1;
+                                        }
+                                    }
+                                    delete $scope.concentrado_indices[insumo_concentrado.insumo_id];
+                                }
+
                                 insumo_concentrado = $scope.concentrado[$scope.concentrado_indices[$scope.insumo.insumo_id]];
+                                //ACtualizamos el concentrado de insumos
+                                insumo_concentrado.cantidad += $scope.insumo.cantidad;
+                                insumo_concentrado.total += $scope.insumo.total;
                             }
 
-                            //ACtualizamos el concentrado de insumos
-                            insumo_concentrado.cantidad += $scope.insumo.cantidad;
-                            insumo_concentrado.total += $scope.insumo.total;
+                            
 
                             //Lo marcamos como editado, y reemplazamos el objeto en la lista
                             //$scope.insumo.editado = true;
