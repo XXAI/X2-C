@@ -104,7 +104,7 @@
 								<span ng-show="validacion.requisiciones">Es necesario capturar al menos un insumo</span>
 					    	</md-subheader>
 					    </md-list-item>
-						<md-list-item ng-repeat="insumo in lista_insumos | filter: filtroTipo" ng-click="editarInsumo($event,$index)">
+						<md-list-item ng-repeat="insumo in lista_insumos | filter: filtroTipo" ng-click="editarInsumo($event,insumo)">
 							<div flex layout="row" ng-class="(insumo.repetido)?'insumo-repetido':''" ng-style="(!insumos_estatus.nuevos[insumo.id])?((insumos_estatus.editados[insumo.id])?{'font-style':'italic'}:{'color':'black'}):{'font-weight':'bold'}">
 								<div flex="5" style="text-align:center;">{{insumo.lote}}</div>
 								<div flex="15" style="text-align:center;">{{insumo.clave}}</div>
