@@ -841,6 +841,7 @@
                     if(res.data.folio){
                         $scope.acta.folio = res.data.folio;
                     }
+                    $scope.acta.estatus_sincronizacion = res.data.estatus_sincronizacion;
                     if(!res.respuesta_code){
                         Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Alerta',mensaje:'Ocurrió un error al intentar almacenar los datos, por favor intente de nuevo.'});
                     }
@@ -1176,16 +1177,39 @@
 				}
 				pdfMake.createPdf(docDefinition).print();
     	        $scope.cargando = false;
-			},function(e){
-	        	$scope.cargando = false;
-    	    });*/
-		}
-	};
+			 },function(e){
+	        	  $scope.cargando = false;
+    	       });*/
+    		}
+    	};
 
 
-        $scope.exportar = function(){
+        /*$scope.exportar = function(){
             window.open(URLS.BASE_API +'/exportar-csv/'+$routeParams.id+'?token='+$localStorage.control_desabasto.access_token);
-        }
+        }*/
+
+        $scope.sincronizar = function(){
+            $scope.cargando = true;
+            ActasDataApi.sincronizar($scope.acta.id,function(res){
+                Mensajero.mostrarToast({contenedor:'#modulo-actas',mensaje:'Datos sincronizados con éxito.'});
+                $scope.acta.estatus_sincronizacion = res.data.estatus_sincronizacion;
+                $scope.cargando = false;
+            },function(e){
+                $scope.cargando = false;
+                if(e.error_type == 'form_validation'){
+                    Mensajero.mostrarToast({contenedor:'#modulo-actas',titulo:'Error:',mensaje:'Hay un error en los datos del formulario.'});
+                    var errors = e.error;
+                    for (var i in errors){
+                        var error = JSON.parse('{ "' + errors[i] + '" : true }');
+                        $scope.validacion[i] = error;
+                    }
+                }else if(e.error_type == 'data_validation'){
+                    Mensajero.mostrarToast({contenedor:'#modulo-actas',titulo:'Error:',mensaje:e.error});
+                }else{
+                    Mensajero.mostrarToast({contenedor:'#modulo-actas',titulo:'Error:',mensaje:'Ocurrió un error al intentar guardar los datos.'});
+                }
+            });
+        };
         
         $scope.menuCerrado = !UsuarioData.obtenerEstadoMenu();
         if(!$scope.menuCerrado){
