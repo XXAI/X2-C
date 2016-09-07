@@ -123,9 +123,9 @@
                     }
                 }, function (e, status) {
                     if(status == 403){
-                        Mensajero.mostrarToast({contenedor:'#modulo-actas',titulo:'Acceso Denegado:',mensaje:'No tiene permiso para listar estos elementos.'});
+                        Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Acceso Denegado:',mensaje:'No tiene permiso para listar estos elementos.'});
                     }else{
-                        Mensajero.mostrarToast({contenedor:'#modulo-actas',titulo:'Error:',mensaje:'Ocurrió un error al intentar listar los elementos.'});
+                        Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:'Ocurrió un error al intentar listar los elementos.'});
                     }
                     $scope.actasInfinitas.maxItems = 0;
                     $scope.cargandoLista = false;
@@ -163,9 +163,9 @@
                         $scope.cargando = false;
                         input.val(null);
                         if(e.error_type == 'data_validation'){
-                            Mensajero.mostrarToast({contenedor:'#modulo-actas',titulo:'Error:',mensaje:e.error});
+                            Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:e.error});
                         }else{
-                            Mensajero.mostrarToast({contenedor:'#modulo-actas',titulo:'Error:',mensaje:'Ocurrio un error al importar el achivo.'});
+                            Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:'Ocurrio un error al importar el achivo.'});
                         }
                         console.log(e);
                     });
@@ -221,9 +221,9 @@
                     $scope.cargando = false;
                 },function (e, status){
                     if(status == 403){
-                        Mensajero.mostrarToast({contenedor:'#modulo-actas',titulo:'Acceso Denegado:',mensaje:'No tiene permiso para eliminar este elemento.'});
+                        Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Acceso Denegado:',mensaje:'No tiene permiso para eliminar este elemento.'});
                     }else{
-                        Mensajero.mostrarToast({contenedor:'#modulo-actas',titulo:'Error:',mensaje:'Ocurrió un error al intentar eliminar el empleado.'});
+                        Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:'Ocurrió un error al intentar eliminar el empleado.'});
                     }
                     $scope.cargando = false;
                     console.log(e);
@@ -902,9 +902,9 @@
                     $location.path('actas');
                 },function (e, status){
                     if(status == 403){
-                        Mensajero.mostrarToast({contenedor:'#modulo-actas',titulo:'Acceso Denegado:',mensaje:'No tiene permiso para eliminar este elemento.'});
+                        Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Acceso Denegado:',mensaje:'No tiene permiso para eliminar este elemento.'});
                     }else{
-                        Mensajero.mostrarToast({contenedor:'#modulo-actas',titulo:'Error:',mensaje:'Ocurrió un error al intentar eliminar el empleado.'});
+                        Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:'Ocurrió un error al intentar eliminar el empleado.'});
                     }
                     $scope.cargando = false;
                     console.log(e);
@@ -1191,22 +1191,22 @@
         $scope.sincronizar = function(){
             $scope.cargando = true;
             ActasDataApi.sincronizar($scope.acta.id,function(res){
-                Mensajero.mostrarToast({contenedor:'#modulo-actas',mensaje:'Datos sincronizados con éxito.'});
+                Mensajero.mostrarToast({contenedor:'#modulo-contenedor',mensaje:'Datos sincronizados con éxito.'});
                 $scope.acta.estatus_sincronizacion = res.data.estatus_sincronizacion;
                 $scope.cargando = false;
             },function(e){
                 $scope.cargando = false;
                 if(e.error_type == 'form_validation'){
-                    Mensajero.mostrarToast({contenedor:'#modulo-actas',titulo:'Error:',mensaje:'Hay un error en los datos del formulario.'});
+                    Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:'Hay un error en los datos del formulario.'});
                     var errors = e.error;
                     for (var i in errors){
                         var error = JSON.parse('{ "' + errors[i] + '" : true }');
                         $scope.validacion[i] = error;
                     }
                 }else if(e.error_type == 'data_validation'){
-                    Mensajero.mostrarToast({contenedor:'#modulo-actas',titulo:'Error:',mensaje:e.error});
+                    Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:e.error});
                 }else{
-                    Mensajero.mostrarToast({contenedor:'#modulo-actas',titulo:'Error:',mensaje:'Ocurrió un error al intentar guardar los datos.'});
+                    Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:'Ocurrió un error al intentar guardar los datos.'});
                 }
             });
         };

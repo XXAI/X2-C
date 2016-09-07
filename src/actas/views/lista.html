@@ -58,7 +58,7 @@
 	<md-virtual-repeat-container style="height:880px;" id="modulo-actas">
 		<md-list layout="column">
       		<md-list-item class="md-3-line paciente-item" md-virtual-repeat="acta in actasInfinitas" md-on-demand ng-click="ir('actas/'+acta.id+'/editar')" ng-hide="!acta.id">
-      			<md-icon ng-if="acta.id" md-svg-icon="{{(acta.estatus == 1)?'file':((acta.estatus == 2)?'file-send':'file-check')}}" class="md-avatar-icon"></md-icon>
+      			<md-icon ng-if="acta.id" md-svg-icon="{{(acta.estatus == 1)?'file-outline':((acta.estatus == 2)?'file-send':'file-check')}}" class="md-avatar-icon"></md-icon>
 				<div class="md-list-item-text">
 		        	<h3>{{ acta.folio }}</h3>
 		        	<h4>
