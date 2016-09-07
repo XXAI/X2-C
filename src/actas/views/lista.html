@@ -37,10 +37,16 @@
 				<label>Buscar</label>
 				<md-icon md-svg-icon="magnify" class="buscar"></md-icon>
             	<input type="text" ng-model="textoBusqueda" ng-keyup="$event.keyCode==13?realizarBusqueda():null">
-            	<div class="hint" ng-if="mostrarAyuda"><small>La busqueda se realiza en los campos de folio, lugar, empresa o ciudad</small></div>
+            	<div class="hint" ng-if="mostrarAyuda"><small>La busqueda se realiza en los campos de folio, lugar y ciudad</small></div>
           	</md-input-container>
 			<div layout="column">
-				<div flex layout-padding></div>
+				<div flex layout-padding>
+					<md-radio-group ng-model="menuFiltro.estatus">
+				      <md-radio-button value="todos" class="md-primary">Todos</md-radio-button>
+				      <md-radio-button value="enviados">Enviados</md-radio-button>
+				      <md-radio-button value="validados">Validados</md-radio-button>
+				    </md-radio-group>
+				</div>
 				<div layout="row" flex>
 					<div flex>
 						<md-switch ng-model="mostrarAyuda" aria-label="Ver ayuda">Ayuda</md-switch>
@@ -58,7 +64,7 @@
 	<md-virtual-repeat-container style="height:880px;" id="modulo-actas">
 		<md-list layout="column">
       		<md-list-item class="md-3-line paciente-item" md-virtual-repeat="acta in actasInfinitas" md-on-demand ng-click="ir('actas/'+acta.id+'/editar')" ng-hide="!acta.id">
-      			<md-icon ng-if="acta.id" md-svg-icon="{{(acta.estatus == 1)?'file-outline':((acta.estatus == 2)?'file-send':'file-check')}}" class="md-avatar-icon"></md-icon>
+      			<md-icon ng-if="acta.id" md-svg-icon="{{acta.icono}}" class="md-avatar-icon"></md-icon>
 				<div class="md-list-item-text">
 		        	<h3>{{ acta.folio }}</h3>
 		        	<h4>
@@ -110,8 +116,8 @@
 					</small>
 				</div>
 			</div>
-			<md-button ng-permiso="permisoAgregar" class="md-fab md-fab-right" ng-click="ir('actas/nuevo')" aria-label="{{ 'NUEVA' | translate }}">
-				<md-icon md-svg-icon="plus"></md-icon>
+			<md-button ng-permiso="permisoAgregar" class="md-fab md-fab-right" ng-click="crearActa()" aria-label="{{ 'NUEVA' | translate }}">
+				<md-icon md-svg-icon="{{(actaNueva)?'pencil':'plus'}}"></md-icon>
 	  		</md-button>
 		</div>
 	</md-toolbar>

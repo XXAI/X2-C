@@ -12,6 +12,7 @@
         $scope.filtro = {aplicado:false};
         $scope.menuFiltro = {estatus:'todos'};
         $scope.textoBuscado = '';
+        $scope.actaNueva = undefined;
 
         $scope.permisoAgregar = '2EF18B5F2E2D7';
         $scope.permisoEliminar = 'FF915DEC2F235';
@@ -27,6 +28,7 @@
         //$scope.empleados = [];
 
         $scope.cargasIniciales.catalogos = true;
+
         if($scope.cargasIniciales.listaActas){
             $scope.cargando = false;
         }
@@ -46,6 +48,14 @@
             }
             return parametros;
         };
+
+        $scope.crearActa = function(){
+            if(!$scope.actaNueva){
+                $scope.ir('actas/nuevo');
+            }else{
+                $scope.ir('actas/'+$scope.actaNueva+'/editar');
+            }
+        }
 
         $scope.actasInfinitas = {
           numLoaded_: 0,
@@ -80,6 +90,10 @@
                 
                 var filtro = {};
 
+                if($scope.filtro.estatus != 'todos'){
+                    filtro.estatus = $scope.filtro.estatus;
+                }
+
                 var parametros = parametrosFiltro({filtro:filtro});
                 parametros.pagina = ((this.actas.length)/50) + 1;
                 if($scope.textoBuscado){
@@ -95,6 +109,7 @@
                         var obj = {
                             id: res.data[i].id,
                             folio: res.data[i].folio,
+                            icono: 'file-outline',
                             fecha: new Date(res.data[i].fecha + ' 00:00:00'),
                             fecha_validacion: undefined,
                             estatus: res.data[i].estatus,
@@ -102,6 +117,16 @@
                             total_requisitado: 0,
                             total_validado: 0
                         };
+
+                        if(res.data[i].estatus == 1){
+                            $scope.actaNueva = res.data[i].id;
+                        }else if(res.data[i].estatus_sincronizacion == 0){
+                            obj.icono = 'sync-alert';
+                        }else if(res.data[i].estatus == 2){
+                            obj.icono = 'file-send';
+                        }else if(res.data[i].estatus > 2){
+                            obj.icono = 'file-check';
+                        }
 
                         if(res.data[i].fecha_validacion){
                             obj.fecha_validacion = new Date(res.data[i].fecha_validacion);
@@ -193,6 +218,14 @@
         };
 
         $scope.realizarBusqueda = function(){
+            $scope.filtro.estatus = $scope.menuFiltro.estatus;
+
+            if($scope.filtro.estatus != 'todos'){
+                $scope.filtro.aplicado = true;
+            }else{
+                $scope.filtro.aplicado = false;
+            }
+
             $scope.textoBuscado = $scope.textoBusqueda;
             $mdSidenav('busqueda-filtro').close();
             
@@ -213,6 +246,10 @@
             $mdDialog.show(confirm).then(function() {
                 $scope.cargando = true;
                 ActasDataApi.eliminar(acta.id,function (res){
+                    if(acta.estatus == 1){
+                        $scope.actaNueva = undefined;
+                    }
+
                     var index = $scope.actasInfinitas.actas.indexOf(acta);
                     $scope.actasInfinitas.actas.splice(index,1);
                     $scope.actasInfinitas.numLoaded_ -= 1;

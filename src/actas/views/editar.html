@@ -45,12 +45,12 @@
 			  <md-icon md-svg-icon="content-save"></md-icon>
 			</md-button>
 
-			<md-button ng-if="(acta.estatus > 1 && acta.estatus_sincronizacion < 1)" hide-xs hide-sm ng-click="sincronizar()" class="md-raised md-accent" ng-disabled="cargando"  aria-label="{{ 'SINCRONIZAR' | translate }}">
-			  <md-icon md-svg-icon="sync"></md-icon>
-			  {{ 'SINCRONIZAR' | translate }}
+			<md-button ng-if="(acta.estatus > 1 && acta.estatus_sincronizacion < 1)" hide-xs hide-sm ng-click="sincronizar()" class="md-raised md-accent" ng-disabled="cargando"  aria-label="{{ 'ENVIAR' | translate }}">
+			  <md-icon md-svg-icon="send"></md-icon>
+			  {{ 'ENVIAR' | translate }}
 			</md-button>		 
-			<md-button ng-if="(acta.estatus > 1 && acta.estatus_sincronizacion < 1)" class="md-icon-button md-accent"  hide-gt-sm ng-disabled="cargando" ng-click="sincronizar()"  aria-label="{{ 'SINCRONIZAR' | translate }}">
-			  <md-icon md-svg-icon="sync"></md-icon>
+			<md-button ng-if="(acta.estatus > 1 && acta.estatus_sincronizacion < 1)" class="md-icon-button md-accent"  hide-gt-sm ng-disabled="cargando" ng-click="sincronizar()"  aria-label="{{ 'ENVIAR' | translate }}">
+			  <md-icon md-svg-icon="send"></md-icon>
 			</md-button>
 
 			<!--md-button ng-permiso="permisoExportar" ng-if="(acta.estatus > 1)" hide-xs hide-sm ng-click="exportar()" ng-disabled="cargando"  aria-label="{{ 'EXPORTAR' | translate }}">
