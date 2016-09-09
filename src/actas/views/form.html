@@ -123,14 +123,21 @@
 		<label>Material de Curación:</label>
 		<input value="$ {{subtotales.material_curacion | number:2}}" readonly>
 	</md-input-container>
+
+	<md-input-container flex="none" style="margin-bottom:0px; height:35px;">
+		<label>Controlados:</label>
+		<input value="$ {{subtotales.controlados | number:2}}" readonly>
+	</md-input-container>
+
 	<md-subheader class="md-primary md-hue-1">
 		Filtrar por tipo:
 	</md-subheader>
 	<md-radio-group ng-model="filtroTipo" class="md-primary md-padding" ng-change="cambiaFiltro(filtroTipo)">
 		<md-radio-button ng-value="1">Todos</md-radio-button>
-		<md-radio-button ng-value="{tipo:1,cause:1}">Causes</md-radio-button>
+		<md-radio-button ng-value="{tipo:1,cause:1,controlado:0}">Causes</md-radio-button>
 		<md-radio-button ng-value="{tipo:1,cause:0}">No Causes</md-radio-button>
 		<md-radio-button ng-value="{tipo:2,cause:0}">Material de Curación</md-radio-button>
+		<md-radio-button ng-value="{tipo:1,cause:1,controlado:1}">Controlados</md-radio-button>
 	</md-radio-group>
 	<div flex></div>
 	<md-divider></md-divider>

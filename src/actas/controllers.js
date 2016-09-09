@@ -317,7 +317,7 @@
         $scope.loggedUser = UsuarioData.getDatosUsuario();
         $scope.toggleDatosActa = true;
         $scope.filtroTipo = 1;
-        $scope.subtotales = {causes:0,no_causes:0,material_curacion:0};
+        $scope.subtotales = {causes:0,no_causes:0,material_curacion:0,controlados:0};
         
         $scope.permisoAgregar = '2EF18B5F2E2D7';
         $scope.permisoEditar = 'AC634E145647F';
@@ -386,6 +386,7 @@
                             insumo.insumo_id = requisicion.insumos[j].id;
 
                             if($scope.acta.estatus > 2){
+                                if(requisicion.insumos[j].pivot.cantidad_validada === null){ continue; }
                                 insumo.cantidad = requisicion.insumos[j].pivot.cantidad_validada;
                                 insumo.total = parseFloat(requisicion.insumos[j].pivot.total_validado);
                             }else{
@@ -402,6 +403,8 @@
                                 $scope.subtotales.material_curacion += insumo.total
                             }else if(requisicion.tipo_requisicion == 2){
                                 $scope.subtotales.no_causes += insumo.total
+                            }else if(requisicion.tipo_requisicion == 4){
+                                $scope.subtotales.controlados += insumo.total
                             }else{
                                 $scope.subtotales.causes += insumo.total
                             }
@@ -464,10 +467,12 @@
                 $scope.acta.iva -= iva;
             }
 
-            if(insumo.tipo == 1 && insumo.cause == 1){
+            if(insumo.tipo == 1 && insumo.cause == 1 && insumo.controlado == 0){
                 $scope.subtotales.causes -= insumo.total;
             }else if(insumo.tipo == 1 && insumo.cause == 0){
                 $scope.subtotales.no_causes -= insumo.total;
+            }else if(insumo.tipo == 1 && insumo.cause == 1 && insumo.controlado == 1){
+                $scope.subtotales.controlados -= insumo.total;
             }else{
                 $scope.subtotales.material_curacion -= (insumo.total+(insumo.total*16/100));
             }
@@ -482,12 +487,14 @@
             var tipo_requisicion = 0;
             if(tipo == 1){
                 tipo_requisicion = 0;
-            }else if(tipo.tipo == 1 && tipo.cause == 1){
+            }else if(tipo.tipo == 1 && tipo.cause == 1 && tipo.controlado == 0){
                 tipo_requisicion = 1;
             }else if(tipo.tipo == 1 && tipo.cause == 0){
                 tipo_requisicion = 2;
             }else if(tipo.tipo == 2 && tipo.cause == 0){
                 tipo_requisicion = 3;
+            }else if(tipo.tipo == 1 && tipo.cause == 1 && tipo.controlado == 1){
+                tipo_requisicion = 4;
             }
             recalcularTotales(tipo_requisicion);
         };
@@ -504,13 +511,15 @@
                     if(insumo.tipo == 2 && insumo.cause == 0){
                         $scope.acta.iva += (insumo.total*16/100);
                     }
-                }else if(insumo.tipo == 1 && insumo.cause == 1 && tipo == 1){
+                }else if(insumo.tipo == 1 && insumo.cause == 1 && insumo.controlado == 0 && tipo == 1){
                     $scope.acta.subtotal += insumo.total;
                 }else if(insumo.tipo == 1 && insumo.cause == 0 && tipo == 2){
                     $scope.acta.subtotal += insumo.total;
                 }else if(insumo.tipo == 2 && insumo.cause == 0 && tipo == 3){
                     $scope.acta.subtotal += insumo.total;
                     $scope.acta.iva += (insumo.total*16/100);
+                }else if(insumo.tipo == 1 && insumo.cause == 1 && insumo.controlado == 1 && tipo == 4){
+                    $scope.acta.subtotal += insumo.total;
                 }
             }
             $scope.acta.total = $scope.acta.iva + $scope.acta.subtotal;
@@ -604,12 +613,15 @@
                             $scope.acta.subtotal += $scope.insumo.total;
 
                             //Ajsutar Subtotales
-                            if(insumo_local.tipo == 1 && insumo_local.cause == 1){
+                            if(insumo_local.tipo == 1 && insumo_local.cause == 1 && insumo_local.controlado == 0){
                                 $scope.subtotales.causes -= insumo_local.total;
                                 $scope.subtotales.causes += $scope.insumo.total;
                             }else if(insumo_local.tipo == 1 && insumo_local.cause == 0){
                                 $scope.subtotales.no_causes -= insumo_local.total;
                                 $scope.subtotales.no_causes += $scope.insumo.total;
+                            }else if(insumo_local.tipo == 1 && insumo_local.cause == 1 && insumo_local.controlado == 1){
+                                $scope.subtotales.controlados -= insumo_local.total;
+                                $scope.subtotales.controlados += $scope.insumo.total;
                             }else{
                                 $scope.subtotales.material_curacion -= (insumo_local.total+(insumo_local.total*16/100));
                                 $scope.subtotales.material_curacion += ($scope.insumo.total+($scope.insumo.total*16/100));
@@ -624,10 +636,12 @@
                             $scope.insumos_seleccionados[$scope.insumo.id] = true;
 
                             //Ajsutar Subtotales
-                            if($scope.insumo.tipo == 1 && $scope.insumo.cause == 1){
+                            if($scope.insumo.tipo == 1 && $scope.insumo.cause == 1 && $scope.insumo.controlado == 0){
                                 $scope.subtotales.causes += $scope.insumo.total;
                             }else if($scope.insumo.tipo == 1 && $scope.insumo.cause == 0){
                                 $scope.subtotales.no_causes += $scope.insumo.total;
+                            }else if($scope.insumo.tipo == 1 && $scope.insumo.cause == 1 && $scope.insumo.controlado == 1){
+                                $scope.subtotales.controlados += $scope.insumo.total;
                             }else{
                                 $scope.subtotales.material_curacion += ($scope.insumo.total+($scope.insumo.total*16/100));
                             }
@@ -869,6 +883,8 @@
                                 $scope.subtotales.material_curacion += insumo.total;
                             }else if(requisicion.tipo_requisicion == 2){
                                 $scope.subtotales.no_causes += insumo.total;
+                            }else if(requisicion.tipo_requisicion == 4){
+                                $scope.subtotales.controlados += insumo.total;
                             }else{
                                 $scope.subtotales.causes += insumo.total;
                             }
