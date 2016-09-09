@@ -217,5 +217,409 @@
             $location.path(path);
         };
     }])
+    .controller('FormPedidoCtrl',
+    ['$rootScope', '$scope', 'PedidosDataApi', '$mdSidenav','$location','$mdBottomSheet','$routeParams','$filter','$localStorage',
+    '$http','$mdToast','Auth','Menu','URLS','UsuarioData','$mdDialog','$mdMedia','$window','Mensajero',
+    function(
+    $rootScope, $scope, PedidosDataApi,$mdSidenav,$location,$mdBottomSheet,$routeParams,$filter,$localStorage,
+    $http,$mdToast,Auth,Menu,URLS,UsuarioData,$mdDialog,$mdMedia,$window,Mensajero
+    ){
+        $scope.menuSelected = "/pedidos";
+        $scope.menu = Menu.getMenu();
+        $scope.menuIsOpen = false;
+        $scope.loggedUser = UsuarioData.getDatosUsuario();
+        $scope.toggleDatosActa = true;
+        $scope.insumos_por_clues = {};
+        $scope.cargando = true;
+        $scope.nombres_clues = {};
+
+        PedidosDataApi.ver($routeParams.id,function(res){
+            $scope.acta = res.data;
+            $scope.configuracion = res.configuracion;           
+            
+            //console.log(res);
+            
+            $scope.nombres_clues = [];
+            
+            for(var i in $scope.acta.requisiciones){
+                var requisicion = $scope.acta.requisiciones[i];
+                if(requisicion.estatus){
+                    requisicion.validado = true;
+                    requisicion.sub_total = requisicion.sub_total_validado;
+                    requisicion.gran_total = requisicion.gran_total_validado;
+                    requisicion.iva = requisicion.iva_validado;
+                }
+
+                for(var j in requisicion.insumos){
+                    var insumo = {};
+                    
+                    insumo.descripcion = requisicion.insumos[j].descripcion;
+                    insumo.clave = requisicion.insumos[j].clave;
+                    insumo.lote = requisicion.insumos[j].lote;
+                    insumo.unidad = requisicion.insumos[j].unidad;
+                    insumo.precio = requisicion.insumos[j].precio;
+
+                    insumo.insumo_id = requisicion.insumos[j].id;
+                    insumo.cantidad = requisicion.insumos[j].pivot.cantidad;
+                    insumo.total = parseFloat(requisicion.insumos[j].pivot.total);
+                    insumo.cantidad_validada = requisicion.insumos[j].pivot.cantidad_validada;
+                    insumo.total_validado = parseFloat(requisicion.insumos[j].pivot.total_validado);
+                    insumo.requisicion_id = requisicion.insumos[j].pivot.requisicion_id;
+
+                    requisicion.insumos[j] = insumo;
+                }
+
+                for(var j in requisicion.insumos_clues){
+                    var insumo = requisicion.insumos_clues[j];
+                    
+                    if(!$scope.insumos_por_clues[insumo.id]){
+                        $scope.insumos_por_clues[insumo.id] = {
+                            descripcion: insumo.descripcion,
+                            clave: insumo.clave,
+                            lote: insumo.lote,
+                            unidad: insumo.unidad,
+                            precio: parseFloat(insumo.precio),
+                            insumo_id: insumo.id,
+                            clues: []
+                        };
+                    }
+                    
+                    $scope.insumos_por_clues[insumo.id].clues.push({
+                        clues: insumo.pivot.clues,
+                        cantidad: insumo.pivot.cantidad,
+                        total: parseFloat(insumo.pivot.total),
+                        cantidad_validada: insumo.pivot.cantidad_validada,
+                        total_validado: parseFloat(insumo.pivot.total_validado),
+                        requisicion_id: insumo.pivot.requisicion_id
+                    });
+                }
+            }
+            //console.log($scope.insumos_por_clues);
+            $scope.cargando = false;
+        },function(e){
+            Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:'Ocurrió un error al intentar obtener los datos.'});
+            console.log(e);
+        });
+
+        $scope.cambiarValor = function(insumo){
+            insumo.total_validado = insumo.cantidad_validada * insumo.precio;
+            $scope.actualizarTotal($scope.selectedIndex);
+        };
+
+        $scope.validarPorClues = function(ev,insumo){
+            var useFullScreen = ($mdMedia('sm') || $mdMedia('xs'))  && $scope.customFullscreen;
+            var locals = {
+                insumo: insumo,
+                por_clues: $scope.insumos_por_clues[insumo.insumo_id],
+                nombres_clues: $scope.nombres_clues
+            };
+
+            $mdDialog.show({
+                controller: function($scope, $mdDialog, insumo, por_clues, nombres_clues) {
+                    $scope.insumo = insumo;
+                    $scope.lista_clues = por_clues;
+                    $scope.nombres_clues = nombres_clues;
+                    $scope.reset_clues = {};
+                    $scope.reset_insumo = {
+                        cantidad: insumo.cantidad_validada,
+                        total: insumo.total_validado
+                    };
+
+                    for(var i in por_clues.clues){
+                        $scope.reset_clues[por_clues.clues[i].clues] = {
+                            cantidad: por_clues.clues[i].cantidad_validada,
+                            total: por_clues.clues[i].total_validado
+                        };
+                    }
+
+                    $scope.cancel = function() {
+                        for(var i in $scope.lista_clues.clues){
+                            $scope.lista_clues.clues[i].cantidad_validada = $scope.reset_clues[$scope.lista_clues.clues[i].clues].cantidad;
+                            $scope.lista_clues.clues[i].total_validado = $scope.reset_clues[$scope.lista_clues.clues[i].clues].total;
+                        }
+                        $scope.insumo.cantidad_validada = $scope.reset_insumo.cantidad;
+                        $scope.insumo.total_validado = $scope.reset_insumo.total;
+                        $mdDialog.cancel();
+                    };
+
+                    $scope.calcularTotal = function(item){
+                        item.total_validado = item.cantidad_validada * $scope.lista_clues.precio;
+                        var total = 0;
+                        var cantidad = 0;
+                        for(var i in $scope.lista_clues.clues){
+                            cantidad += $scope.lista_clues.clues[i].cantidad_validada;
+                            total += $scope.lista_clues.clues[i].total_validado;
+                        }
+                        $scope.insumo.cantidad_validada = cantidad;
+                        $scope.insumo.total_validado = total;
+                    };
+
+                    $scope.answer = function() {
+                        $mdDialog.hide({yes:true});
+                    };
+                },
+                templateUrl: 'src/requisiciones/views/validar-clues.html',
+                parent: angular.element(document.body),
+                targetEvent: ev,
+                clickOutsideToClose:true,
+                fullscreen: useFullScreen,
+                locals:locals
+            })
+            .then(function(res) {
+                $scope.actualizarTotal($scope.selectedIndex);
+            }, function() {
+                console.log('cancelado');
+            });
+        }
+
+        $scope.guardarValidacion = function(ev){
+            if($scope.validandoRequisicion != undefined){
+                var confirm = $mdDialog.confirm()
+                    .title('Validar requisición?')
+                    .content('Las cantidades modificadas serán guardadas en la requisición.')
+                    .targetEvent(ev)
+                    .ok('Guardar')
+                    .cancel('Cancelar');
+                $mdDialog.show(confirm).then(function() {
+                    $scope.cargando = true;
+                    var requisicion = $scope.acta.requisiciones[$scope.selectedIndex];
+                    requisicion.estatus = 1;
+                    var insumos_clues = [];
+                    for(var i in $scope.insumos_por_clues){
+                        var insumo = $scope.insumos_por_clues[i];
+                        for(var j in insumo.clues){
+                            insumos_clues.push({
+                                insumo_id: insumo.insumo_id,
+                                requisicion_id: insumo.clues[j].requisicion_id,
+                                cantidad: insumo.clues[j].cantidad,
+                                cantidad_validada: insumo.clues[j].cantidad_validada,
+                                total: insumo.clues[j].total,
+                                total_validado: insumo.clues[j].total_validado,
+                                clues: insumo.clues[j].clues
+                            });
+                        }
+                    }
+                    requisicion.insumos_clues = insumos_clues;
+                    $scope.actualizarTotal($scope.selectedIndex);
+                    PedidosDataApi.editar(requisicion.id,requisicion,function(res){
+                        requisicion.validado = true;
+                        $scope.validandoRequisicion = undefined;
+                        $scope.cargando = false;
+                    },function(e){
+                        requisicion.estatus = undefined;
+                        $scope.cargando = false;
+                        console.log(e);
+                        Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:'Ocurrión un error al intentar validar la requisicion.'});
+                    });
+                }, function() {});
+            }
+        }
+
+        $scope.revisarRequisicion = function(){
+            if($scope.validandoRequisicion == undefined){
+                $scope.cargando = true;
+
+                var requisicion = $scope.acta.requisiciones[$scope.selectedIndex];
+                requisicion.estatus = undefined;
+
+                PedidosDataApi.editar(requisicion.id,requisicion,function(res){
+                    requisicion.estatus = res.data.estatus;
+                    requisicion.validado = false;
+
+                    requisicion.sub_total = res.data.sub_total;
+                    requisicion.gran_total = res.data.gran_total;
+                    requisicion.iva = res.data.iva;
+
+                    $scope.cargando = false;
+                },function(e){
+                    $scope.cargando = false;
+                    console.log(e);
+                    Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:'Ocurrión un error al intentar validar la requisicion.'});
+                });
+            }
+        };
+
+        $scope.enviarSolicitud = function(ev){
+            var confirm = $mdDialog.confirm()
+                .title('Enviar formato de requisicion?')
+                .content('El acta se enviará para realizar el pedido y ya no podrá editarse.')
+                .targetEvent(ev)
+                .ok('Enviar')
+                .cancel('Cancelar');
+            $mdDialog.show(confirm).then(function() {
+                $scope.acta.estatus = 3;
+                $scope.guardar();
+            }, function() {});
+        }
+
+        $scope.guardar = function(){
+            $scope.cargando = true;
+            $scope.validacion = {};
+            PedidosDataApi.editarActa($scope.acta.id,$scope.acta,function(res){
+                Mensajero.mostrarToast({contenedor:'#modulo-contenedor',mensaje:'Datos guardados con éxito.'});
+                if(res.data.estatus == 3){
+                    $scope.acta.num_oficio = res.data.num_oficio;
+                }
+                $scope.acta.estatus_sincronizacion = res.data.estatus_sincronizacion;
+                $scope.cargando = false;
+            },function(e){
+                $scope.cargando = false;
+                if($scope.acta.estatus == 3){
+                    $scope.acta.estatus = 2;
+                }
+                if(e.error_type == 'form_validation'){
+                    Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:'Hay un error en los datos del formulario.'});
+                    var errors = e.error;
+                    for (var i in errors){
+                        var error = JSON.parse('{ "' + errors[i] + '" : true }');
+                        $scope.validacion[i] = error;
+                    }
+                }else if(e.error_type == 'data_validation'){
+                    Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:e.error});
+                }else{
+                    Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:'Ocurrió un error al intentar guardar los datos.'});
+                }
+            });
+        };
+
+        $scope.iniciarValidacion = function(){
+            if(!$scope.acta.requisiciones[$scope.selectedIndex].validado){
+                $scope.validandoRequisicion = $scope.selectedIndex;
+                $scope.actualizarTotal($scope.selectedIndex);
+            }else{
+                Mensajero.mostrarToast({contenedor:'#modulo-contenedor',mensaje:'Esta requisición ya fue validada.'});
+            }
+        }
+
+        $scope.cancelarValidacion = function(){
+            $scope.validandoRequisicion = undefined;
+            $scope.actualizarTotal($scope.selectedIndex);
+        }
+
+        $scope.actualizarTotal = function(index){
+            var total = 0;
+            var requisicion = $scope.acta.requisiciones[index];
+            for(var i in requisicion.insumos){
+                if($scope.validandoRequisicion != undefined || requisicion.validado){
+                    total += requisicion.insumos[i].total_validado;
+                }else{
+                    total += requisicion.insumos[i].total;
+                }
+            }
+            requisicion.sub_total = total;
+
+            if(requisicion.tipo_requisicion == 3){
+                requisicion.iva = total*16/100;
+            }else{
+                requisicion.iva = 0;
+            }
+            requisicion.gran_total = requisicion.iva + total;
+        };
+
+        $scope.imprimirOficio = function(){
+            window.open(URLS.BASE_API +'/oficio-pdf/'+$routeParams.id);
+        }
+
+        $scope.sincronizar = function(){
+            $scope.cargando = true;
+            PedidosDataApi.sincronizar($scope.acta.id,function(res){
+                Mensajero.mostrarToast({contenedor:'#modulo-contenedor',mensaje:'Datos sincronizados con éxito.'});
+                $scope.acta.estatus_sincronizacion = res.data.estatus_sincronizacion;
+                $scope.cargando = false;
+            },function(e){
+                $scope.cargando = false;
+                if(e.error_type == 'form_validation'){
+                    Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:'Hay un error en los datos del formulario.'});
+                    var errors = e.error;
+                    for (var i in errors){
+                        var error = JSON.parse('{ "' + errors[i] + '" : true }');
+                        $scope.validacion[i] = error;
+                    }
+                }else if(e.error_type == 'data_validation'){
+                    Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:e.error});
+                }else{
+                    Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:'Ocurrió un error al intentar guardar los datos.'});
+                }
+            });
+        };
+        
+        function devuelveMes(mes){
+            if(mes==0) return 'ENERO';
+            else if(mes==1) return 'FEBRERO';
+            else if(mes==2) return 'MARZO';
+            else if(mes==3) return 'ABRIL';
+            else if(mes==4) return 'MAYO';
+            else if(mes==5) return 'JUNIO';
+            else if(mes==6) return 'JULIO';
+            else if(mes==7) return 'AGOSTO';
+            else if(mes==8) return 'SEPTIEMBRE';
+            else if(mes==9) return 'OCTUBRE';
+            else if(mes==10) return 'NOVIEMBRE';
+            else return 'DICIEMBRE';            
+        }
+        
+        function numberFormat(numero){
+           // Variable que contendra el resultado final
+            var resultado = "";
+            var decimales = "";             
+            // Tomamos el numero eliminando los posibles puntos que tenga
+            var nuevoNumero=numero.replace(/\./g,'');               
+            // Si tiene decimales, se los quitamos al numero                
+            if(numero.indexOf(".")>=0)
+            {
+                nuevoNumero = nuevoNumero.substring(0,numero.indexOf(".")); 
+                decimales = "."+numero.substring(numero.length,numero.indexOf(".")+1);
+            }
+           // Ponemos una coma cada 3 caracteres
+            for (var j, i = nuevoNumero.length - 1, j = 0; i >= 0; i--, j++)
+                resultado = nuevoNumero.charAt(i) + ((j > 0) && (j % 3 == 0)? ",": "") + resultado;
+ 
+            resultado = resultado + decimales; 
+
+            return resultado;
+        }
+        
+
+        $scope.imprimirSolicitudes = function(){
+            //PedidosDataApi.verPDF($routeParams.id,function(e){console.log(e)});
+            window.open(URLS.BASE_API +'/solicitudes-pdf/'+$routeParams.id);
+        };
+        
+        $scope.menuCerrado = !UsuarioData.obtenerEstadoMenu();
+        if(!$scope.menuCerrado){
+          $scope.menuIsOpen = true;
+        }
+
+        $scope.toggleMenu  = function(isSm) {
+          if(!$scope.menuCerrado && !isSm){
+            $mdSidenav('left').close();
+            $scope.menuIsOpen = false;
+            $scope.menuCerrado = true;
+          }else{
+            $mdSidenav('left').toggle();
+            $scope.menuIsOpen = $mdSidenav('left').isOpen();
+          }
+          UsuarioData.guardarEstadoMenu($scope.menuIsOpen);
+        };
+        
+        $scope.mostrarIdiomas = function($event){                
+            $mdBottomSheet.show({
+              templateUrl: './src/app/views/idiomas.html',
+              controller: 'ListaIdiomasCtrl',                 
+              targetEvent: $event
+            });
+        };
+        
+        $scope.logout = function () {
+           Auth.logout(function () {
+               $location.path("signin");
+           });
+        };
+        
+        $scope.ir = function(path){
+            $scope.menuSelected = path;
+            $location.path(path);
+        };
+    }])
 ;
 })();
