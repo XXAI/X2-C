@@ -937,13 +937,17 @@
                 window.open(URLS.BASE_API +'/acta-pdf/'+$routeParams.id+'?token='+$localStorage.control_desabasto.access_token);
             }else{
 
-                window.open(URLS.BASE_API +'/requisiciones-pdf/'+$routeParams.id+'?token='+$localStorage.control_desabasto.access_token);
-				/*				
+                //window.open(URLS.BASE_API +'/requisiciones-pdf/'+$routeParams.id+'?token='+$localStorage.control_desabasto.access_token);
+								
 				ActasDataApi.ver($routeParams.id,function(res){
                		var actalocal = res.data;
 					$scope.configuracion = res.configuracion;										
 										
 					console.log(actalocal);
+					
+					var folioActa = actalocal.folio;
+	       			folioActa=folioActa.replace('\/','-');
+					folioActa=folioActa.replace('\/','-');
 									
 					$scope.cargando = true;
 				
@@ -1174,11 +1178,13 @@
 					}
 					
 				}
-				pdfMake.createPdf(docDefinition).print();
+				var miPDF = pdfMake.createPdf(docDefinition);
+				miPDF.download('requisiciones'+folioActa+'.pdf');
+				//pdfMake.createPdf(docDefinition).print();
     	        $scope.cargando = false;
 			},function(e){
 	        	$scope.cargando = false;
-    	    });*/
+    	    });
 		}
 	};
 
