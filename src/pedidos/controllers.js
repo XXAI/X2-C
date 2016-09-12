@@ -13,7 +13,7 @@
         $scope.menuFiltro = {estatus:'todos'};
         $scope.textoBuscado = '';
 
-        $scope.permisoRecibir = '2EF18B5F2E2D7';
+        $scope.permisoRecibir = '721A42C7F4693';
 
         $scope.datosDelUsuario = {};
         $scope.cargasIniciales = {catalogos:false, listaPedidos:false};
@@ -232,10 +232,14 @@
         $scope.insumos_por_clues = {};
         $scope.cargando = true;
         $scope.nombres_clues = {};
+        $scope.aplicar_proveedor = {};
+
+        $scope.permisoRecibir = '721A42C7F4693';
 
         PedidosDataApi.ver($routeParams.id,function(res){
             $scope.acta = res.data;
-            $scope.configuracion = res.configuracion;           
+            $scope.configuracion = res.configuracion;
+            $scope.proveedores = res.proveedores;
             
             //console.log(res);
             
@@ -264,7 +268,11 @@
                     insumo.total = parseFloat(requisicion.insumos[j].pivot.total);
                     insumo.cantidad_validada = requisicion.insumos[j].pivot.cantidad_validada;
                     insumo.total_validado = parseFloat(requisicion.insumos[j].pivot.total_validado);
+                    insumo.cantidad_recibida = requisicion.insumos[j].pivot.cantidad_recibida || 0;
+                    insumo.total_recibido = parseFloat(requisicion.insumos[j].pivot.total_recibido) || 0;
                     insumo.requisicion_id = requisicion.insumos[j].pivot.requisicion_id;
+
+                    insumo.restante = insumo.cantidad_validada - insumo.cantidad_recibida;
 
                     requisicion.insumos[j] = insumo;
                 }
@@ -482,7 +490,24 @@
             });
         };
 
-        $scope.iniciarValidacion = function(){
+        $scope.cambiarProveedor = function(){
+            if($scope.aplicar_proveedor.id){
+                $scope.recepcionIniciada = true;
+            }else{
+                $scope.recepcionIniciada = false;
+            }
+            
+        };
+
+        $scope.iniciarRecepcion = function(){
+            $scope.recepcionIniciada = true;
+        };
+
+        $scope.cancelarRecepcion = function(){
+            $scope.recepcionIniciada = false;
+        };
+
+        /*$scope.iniciarValidacion = function(){
             if(!$scope.acta.requisiciones[$scope.selectedIndex].validado){
                 $scope.validandoRequisicion = $scope.selectedIndex;
                 $scope.actualizarTotal($scope.selectedIndex);
@@ -494,7 +519,7 @@
         $scope.cancelarValidacion = function(){
             $scope.validandoRequisicion = undefined;
             $scope.actualizarTotal($scope.selectedIndex);
-        }
+        }*/
 
         $scope.actualizarTotal = function(index){
             var total = 0;

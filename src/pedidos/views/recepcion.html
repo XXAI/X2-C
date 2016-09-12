@@ -25,11 +25,11 @@
 
 			<md-icon md-svg-icon="dots-vertical" style="color: #005DA7;"></md-icon>
 			
-			<md-button ng-if="(acta.estatus == 4)" ng-permiso="permisoEditar" class="md-accent md-raised" hide-xs hide-sm ng-click="finalizarRecepción($event)" ng-disabled="cargando"  aria-label="{{ 'FINALIZAR' | translate }}">
+			<md-button ng-if="(acta.estatus == 4)" ng-permiso="permisoRecibir" class="md-accent md-raised" hide-xs hide-sm ng-click="finalizarRecepcion($event)" ng-disabled="cargando"  aria-label="{{ 'FINALIZAR' | translate }}">
 			  <md-icon md-svg-icon="check"></md-icon>
 			  {{ 'FINALIZAR' | translate }}
 			</md-button>
-			<md-button class="md-icon-button md-accent" ng-permiso="permisoEditar" hide-gt-sm  ng-if="(acta.estatus == 4)" ng-disabled="cargando" ng-click="finalizarRecepción($event)"  aria-label="{{ 'FINALIZAR' | translate }}">
+			<md-button class="md-icon-button md-accent" ng-permiso="permisoRecibir" hide-gt-sm  ng-if="(acta.estatus == 4)" ng-disabled="cargando" ng-click="finalizarRecepcion($event)"  aria-label="{{ 'FINALIZAR' | translate }}">
 			  <md-icon md-svg-icon="check"></md-icon>
 			</md-button>
 
@@ -40,6 +40,16 @@
 			<md-button ng-if="(acta.estatus > 4)" class="md-icon-button md-accent"  hide-gt-sm ng-disabled="cargando" ng-click="sincronizar()"  aria-label="{{ 'ENVIAR' | translate }}">
 			  <md-icon md-svg-icon="send"></md-icon>
 			</md-button>
+
+			<md-button ng-if="(acta.estatus == 4)" ng-permiso="permisoRecibir" hide-xs hide-sm ng-click="guardarRecepcion($event)" ng-disabled="cargando"  aria-label="{{ 'GUARDAR' | translate }}">
+			  <md-icon md-svg-icon="content-save"></md-icon>
+			  {{ 'GUARDAR' | translate }}
+			</md-button>
+			<md-button class="md-icon-button" ng-permiso="permisoRecibir" hide-gt-sm  ng-if="(acta.estatus == 4)" ng-disabled="cargando" ng-click="guardarRecepcion($event)"  aria-label="{{ 'GUARDAR' | translate }}">
+			  <md-icon md-svg-icon="content-save"></md-icon>
+			</md-button>
+
+
 			
 			<md-menu md-position-mode="target-right target" >
 	          <md-button aria-label="Open demo menu" class="md-icon-button" ng-disabled="cargando" ng-click="$mdOpenMenu($event)">
@@ -73,13 +83,23 @@
 					<label>Lugar de Entrega</label>
 					<input value="{{acta.lugar_entrega}}" readonly>
 				</md-input-container>
+				<md-input-container flex class="md-block" style="margin-bottom:0px;" ng-if="acta.estatus == 4">
+					<label>Proveedor</label>
+					<md-select ng-model="aplicar_proveedor.id" aria-label="proveedor general" ng-change="cambiarProveedor()">
+						<md-option ng-value="">
+							Sin Proveedor
+						</md-option>
+						<md-option ng-repeat="proveedor in proveedores" ng-value="proveedor.id">
+							{{proveedor.nombre}}
+						</md-option>
+					</md-select>
+				</md-input-container>
 			</md-content>
 			<md-divider></md-divider>
 			<md-tabs  flex layout="column"  md-stretch-tabs="always"  md-border-bottom class="md-hue-1" md-selected="selectedIndex">
-				<md-tab ng-repeat="requisicion in acta.requisiciones track by $index" ng-disabled="(validandoRequisicion != $index && validandoRequisicion != undefined)">
+				<md-tab ng-repeat="requisicion in acta.requisiciones track by $index">
 					<md-tab-label>
-						<md-icon md-svg-icon="checkbox-marked" ng-if="requisicion.validado"></md-icon>
-						<md-icon md-svg-icon="pencil-box" ng-if="validandoRequisicion == $index"></md-icon>
+						<md-icon md-svg-icon="checkbox-marked"></md-icon>
 						<span>{{(requisicion.tipo_requisicion == 1)?'Causes':((requisicion.tipo_requisicion == 2)?'No Causes':((requisicion.tipo_requisicion == 4)?'Controlados':'Materiales de curación'))}}</span>
 					</md-tab-label>
 					<md-tab-body>
@@ -88,11 +108,10 @@
 								<div layout="row">
 									<div flex="15" style="text-align:center;">Clave</div>
 									<div flex style="text-align:center;">Descripción</div>
-									<div flex="15" style="text-align:center;">Unidad de Medida</div>
-									<div flex="15" style="text-align:center;">Precio Unitario</div>
+									<div flex="15" style="text-align:center;">Pedido</div>
 									<div flex="10" style="text-align:center;">Recibido</div>
 									<div flex="10" style="text-align:center;">Restante</div>
-									<div flex="5" style="text-align:center;"></div>
+									<div flex="10" style="text-align:center;"></div>
 								</div>
 							</md-subheader>
 							<md-content flex>
@@ -101,16 +120,22 @@
 									<md-list-item ng-repeat="insumo in requisicion.insumos">
 										<div flex layout="row">
 											<div flex="15" style="text-align:center;">{{insumo.clave}}</div>
-											<div flex style="text-align:center;"><p style="line-height:14px; margin:0px;"><small>{{insumo.descripcion}}</small></p></div>
-											<div flex="15" style="text-align:center;">{{insumo.unidad}}</div>
-											<div flex="15" style="text-align:center;">$ {{insumo.precio | number:2}}
+											<div flex style="text-align:center;">
+												<p style="line-height:14px; margin:0px;">
+													<small>{{insumo.descripcion}}</small>
+												</p>
 											</div>
-											<div flex="10" style="text-align:center;">{{insumo.recibido | number:2}}
+											<div flex="15" style="text-align:center;">
+												{{insumo.cantidad_validada | number}}
 											</div>
-											<div flex="10" style="text-align:center;">{{insumo.restante | number:2}}
+											<div flex="10" style="text-align:center;">
+												{{insumo.cantidad_recibida | number}}
 											</div>
-											<div flex="5">
-												<md-button class="md-raised" ng-click="recepcion($event,insumo)">
+											<div flex="10" style="text-align:center;">
+												{{insumo.restante | number}}
+											</div>
+											<div flex="10">
+												<md-button ng-if="recepcionIniciada" class="md-raised" ng-click="recibirInsumo($event,insumo)">
 													Recibir
 												</md-button>
 											</div>
@@ -124,15 +149,6 @@
 				</md-tab>
 			</md-tabs>
 			<md-content layout="row" flex="none" layout-wrap>
-				<md-button ng-disabled="cargando" ng-show="validandoRequisicion != selectedIndex && !acta.requisiciones[selectedIndex].validado" class="md-raised md-primary" ng-click="iniciarValidacion()">
-					<md-icon md-svg-icon="check" ></md-icon> Recibir {{(acta.requisiciones[selectedIndex].tipo_requisicion == 1)?'Causes':((acta.requisiciones[selectedIndex].tipo_requisicion == 2)?'No Causes':((acta.requisiciones[selectedIndex].tipo_requisicion == 3)?'Materiales de curación':'Controlados'))}}
-				</md-button>
-				<md-button ng-disabled="cargando" ng-show="validandoRequisicion != undefined" class="md-raised md-accent" ng-click="guardarRecepcion($event)">
-					<md-icon md-svg-icon="save-content" ></md-icon> Guardar
-				</md-button>
-				<md-button ng-disabled="cargando" ng-show="validandoRequisicion != undefined" class="md-raised" ng-click="cancelarRecepcion()">
-					<md-icon md-svg-icon="close" ></md-icon> Cancelar
-				</md-button>
 				<div flex></div>
 				<div flex="none" layout="row" style="overflow:hidden;">
 					<md-input-container flex style="margin-bottom:0px;height:35px;">
