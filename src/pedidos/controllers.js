@@ -244,9 +244,16 @@
         PedidosDataApi.ver($routeParams.id,function(res){
             $scope.acta = res.data;
             $scope.configuracion = res.configuracion;
-            $scope.proveedores = res.proveedores;
+            $scope.proveedores = [];
+            var proveedores = {};
             var insumos_entregados = {};
 
+            //para poder activar y desactivar proveedores
+            for(var i in res.proveedores){
+                var proveedor = res.proveedores[i];
+                proveedores[i] = {nombre:proveedor,activo:false};
+            }
+            
             $scope.entregas_guardadas = {};
             $scope.entregas_imprimir = {};
             if($scope.acta.entregas.length){
@@ -313,6 +320,9 @@
                     insumo.requisicion_id = requisicion.insumos[j].pivot.requisicion_id;
                     insumo.proveedor_id = requisicion.insumos[j].pivot.proveedor_id;
 
+                    //activamos el proveedor en el select de proveedores
+                    proveedores[insumo.proveedor_id].activo = true;
+
                     if(!requisicion.insumos_proveedor[insumo.proveedor_id]){
                         requisicion.insumos_proveedor[insumo.proveedor_id] = [];
                         requisicion.entrega_proveedor[insumo.proveedor_id] = {};
@@ -323,6 +333,7 @@
                     if(insumos_entregados[insumo.proveedor_id]){
                         if(insumos_entregados[insumo.proveedor_id][insumo.insumo_id]){
                             requisicion.entrega_proveedor[insumo.proveedor_id][insumo.insumo_id] = insumos_entregados[insumo.proveedor_id][insumo.insumo_id].cantidad;
+                            $scope.totales.recibido += requisicion.entrega_proveedor[insumo.proveedor_id][insumo.insumo_id];
                             if(!$scope.ingresos_requisicion[requisicion.tipo_requisicion][insumo.proveedor_id]){
                                 $scope.ingresos_requisicion[requisicion.tipo_requisicion][insumo.proveedor_id] = {};
                             }
@@ -338,11 +349,18 @@
 
                     $scope.totales.pedido += insumo.cantidad_validada;
                     $scope.totales.recibido += insumo.cantidad_recibida;
-                    $scope.totales.restante += insumo.restante;
+                    //$scope.totales.restante += insumo.restante;
                 }
                 $scope.lista_insumos_requisicion[requisicion.tipo_requisicion] = requisicion.insumos;
             }
+            $scope.totales.restante += $scope.totales.pedido - $scope.totales.recibido;
             //console.log($scope.insumos_por_clues);
+            for(var i in proveedores){
+                if(proveedores[i].activo){
+                    $scope.proveedores.push({id:i,nombre:proveedores[i].nombre})
+                }
+            }
+
             $scope.cargando = false;
         },function(e){
             Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:'Ocurrió un error al intentar obtener los datos.'});
@@ -383,7 +401,11 @@
                     $scope.total_insumos = lista_insumos.length;
 
                     if($scope.index_actual === 0){
-                        $scope.index_siguiente = 1;
+                        if($scope.total_insumos == 1){
+                            $scope.index_siguiente = undefined;
+                        }else{
+                            $scope.index_siguiente = 1;
+                        }
                         $scope.index_anterior = undefined;
                     }else if($scope.index_actual == ($scope.total_insumos-1)){
                         $scope.index_siguiente = undefined;
@@ -546,6 +568,9 @@
                 Mensajero.mostrarToast({contenedor:'#modulo-contenedor',mensaje:'Datos guardados con éxito.'});
                 $scope.recepcion.estatus = res.data.estatus;
                 $scope.recepcion.id = res.data.id;
+                if(!$scope.entregas_guardadas[$scope.recepcion.proveedor_id]){
+                    $scope.entregas_guardadas[$scope.recepcion.proveedor_id] = $scope.recepcion;
+                }
                 $scope.cargando = false;
             },function(e){
                 $scope.cargando = false;
@@ -585,6 +610,14 @@
                     $scope.recepcion = $scope.entregas_guardadas[$scope.aplicar_proveedor.id];
                 }else{
                     $scope.recepcion.proveedor_id = $scope.aplicar_proveedor.id;
+
+                    var fecha_actual = new Date();
+                    fecha_actual = new Date(fecha_actual.getFullYear(), fecha_actual.getMonth(), fecha_actual.getDate(), fecha_actual.getHours(), fecha_actual.getMinutes(), 0);
+                    
+                    $scope.recepcion.fecha_entrega = fecha_actual;
+                    $scope.recepcion.hora_entrega_date = fecha_actual;
+
+                    $scope.recepcion.nombre_recibe = $scope.configuracion.encargado_almacen;
                 }
 
                 if($scope.entregas_imprimir[$scope.aplicar_proveedor.id]){

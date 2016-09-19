@@ -156,7 +156,7 @@
 								    		<span>No hay insumos asignados a esta requisición</span>
 								    	</md-subheader>
 								    </md-list-item>
-									<md-list-item ng-repeat="insumo in lista_insumos_requisicion[requisicion.tipo_requisicion]" ng-click="recibirInsumo($event,insumo)">
+									<md-list-item ng-repeat="insumo in lista_insumos_requisicion[requisicion.tipo_requisicion]" ng-click="recibirInsumo($event,insumo)" ng-disabled="(insumo.cantidad_recibida >= insumo.cantidad_validada)">
 										<div flex layout="row">
 											<div flex="15" style="text-align:center;">{{insumo.clave}}</div>
 											<div flex style="text-align:center;">
