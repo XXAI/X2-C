@@ -534,7 +534,7 @@
                 subtotales: $scope.subtotales
             };
             if(insumo){
-                locals.insumo = JSON.parse(JSON.stringify(insumo));;
+                locals.insumo = JSON.parse(JSON.stringify(insumo));
                 locals.index = $scope.acta.insumos.indexOf(insumo);
             }
 

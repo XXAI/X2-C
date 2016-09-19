@@ -231,8 +231,13 @@
         $scope.toggleDatosActa = true;
         $scope.insumos_por_clues = {};
         $scope.cargando = true;
-        $scope.nombres_clues = {};
         $scope.aplicar_proveedor = {};
+        $scope.totales = {pedido:0, recibido:0, restante:0, porcentaje:0.00};
+        $scope.lista_insumos_requisicion = {1:[],2:[],3:[],4:[]};
+        $scope.ingresos_requisicion = {1:{},2:{},3:{},4:{}};
+        $scope.recepcion = {estatus:1};
+        $scope.entregas_guardadas = {};
+        $scope.reportes_imprimir = [];
 
         $scope.permisoRecibir = '721A42C7F4693';
 
@@ -240,19 +245,54 @@
             $scope.acta = res.data;
             $scope.configuracion = res.configuracion;
             $scope.proveedores = res.proveedores;
-            
-            //console.log(res);
-            
-            $scope.nombres_clues = [];
+            var insumos_entregados = {};
+
+            $scope.entregas_guardadas = {};
+            $scope.entregas_imprimir = {};
+            if($scope.acta.entregas.length){
+                for(var i in $scope.acta.entregas){
+                    var entrega = $scope.acta.entregas[i];
+                    if(entrega.fecha_entrega){
+                        entrega.fecha_entrega = new Date(entrega.fecha_entrega + ' 00:00:00');
+                    }
+
+                    if(entrega.fecha_proxima_entrega){
+                        entrega.fecha_proxima_entrega = new Date(entrega.fecha_proxima_entrega + ' 00:00:00');
+                    }
+
+                    if(entrega.hora_entrega){
+                        var horaEntrega = entrega.hora_entrega.split(':')
+                        entrega.hora_entrega_date =  new Date(1970, 0, 1, horaEntrega[0], horaEntrega[1], 0);
+                    }
+
+                    if(entrega.estatus <= 2){
+                        $scope.entregas_guardadas[entrega.proveedor_id] = entrega;
+                    }else{
+                        if(!$scope.entregas_imprimir[entrega.proveedor_id]){
+                            $scope.entregas_imprimir[entrega.proveedor_id] = [];
+                        }
+                        $scope.entregas_imprimir[entrega.proveedor_id].push(entrega);
+                    }
+
+                    if(entrega.estatus == 1){
+                        insumos_entregados[entrega.proveedor_id] = {};
+                        for(var j in entrega.stock){
+                            insumos_entregados[entrega.proveedor_id][entrega.stock[j].insumo_id] = {
+                                insumo_id: entrega.stock[j].insumo_id,
+                                cantidad: entrega.stock[j].cantidad_entregada,
+                                fecha_caducidad: new Date(entrega.stock[j].fecha_caducidad + ' 00:00:00'),
+                                lote: entrega.stock[j].lote
+                            };
+                        }
+                    }
+                }
+                $scope.acta.entregas = undefined;
+            }
             
             for(var i in $scope.acta.requisiciones){
                 var requisicion = $scope.acta.requisiciones[i];
-                if(requisicion.estatus){
-                    requisicion.validado = true;
-                    requisicion.sub_total = requisicion.sub_total_validado;
-                    requisicion.gran_total = requisicion.gran_total_validado;
-                    requisicion.iva = requisicion.iva_validado;
-                }
+                requisicion.insumos_proveedor = {};
+                requisicion.entrega_proveedor = {};
 
                 for(var j in requisicion.insumos){
                     var insumo = {};
@@ -271,36 +311,36 @@
                     insumo.cantidad_recibida = requisicion.insumos[j].pivot.cantidad_recibida || 0;
                     insumo.total_recibido = parseFloat(requisicion.insumos[j].pivot.total_recibido) || 0;
                     insumo.requisicion_id = requisicion.insumos[j].pivot.requisicion_id;
+                    insumo.proveedor_id = requisicion.insumos[j].pivot.proveedor_id;
 
-                    insumo.restante = insumo.cantidad_validada - insumo.cantidad_recibida;
-
-                    requisicion.insumos[j] = insumo;
-                }
-
-                for(var j in requisicion.insumos_clues){
-                    var insumo = requisicion.insumos_clues[j];
-                    
-                    if(!$scope.insumos_por_clues[insumo.id]){
-                        $scope.insumos_por_clues[insumo.id] = {
-                            descripcion: insumo.descripcion,
-                            clave: insumo.clave,
-                            lote: insumo.lote,
-                            unidad: insumo.unidad,
-                            precio: parseFloat(insumo.precio),
-                            insumo_id: insumo.id,
-                            clues: []
-                        };
+                    if(!requisicion.insumos_proveedor[insumo.proveedor_id]){
+                        requisicion.insumos_proveedor[insumo.proveedor_id] = [];
+                        requisicion.entrega_proveedor[insumo.proveedor_id] = {};
                     }
                     
-                    $scope.insumos_por_clues[insumo.id].clues.push({
-                        clues: insumo.pivot.clues,
-                        cantidad: insumo.pivot.cantidad,
-                        total: parseFloat(insumo.pivot.total),
-                        cantidad_validada: insumo.pivot.cantidad_validada,
-                        total_validado: parseFloat(insumo.pivot.total_validado),
-                        requisicion_id: insumo.pivot.requisicion_id
-                    });
+                    requisicion.insumos_proveedor[insumo.proveedor_id].push(insumo);
+                    requisicion.insumos[j] = insumo;
+                    if(insumos_entregados[insumo.proveedor_id]){
+                        if(insumos_entregados[insumo.proveedor_id][insumo.insumo_id]){
+                            requisicion.entrega_proveedor[insumo.proveedor_id][insumo.insumo_id] = insumos_entregados[insumo.proveedor_id][insumo.insumo_id].cantidad;
+                            if(!$scope.ingresos_requisicion[requisicion.tipo_requisicion][insumo.proveedor_id]){
+                                $scope.ingresos_requisicion[requisicion.tipo_requisicion][insumo.proveedor_id] = {};
+                            }
+                            $scope.ingresos_requisicion[requisicion.tipo_requisicion][insumo.proveedor_id][insumo.insumo_id] = insumos_entregados[insumo.proveedor_id][insumo.insumo_id];
+                        }else{
+                            requisicion.entrega_proveedor[insumo.proveedor_id][insumo.insumo_id] = 0;
+                        }
+                    }else{
+                        requisicion.entrega_proveedor[insumo.proveedor_id][insumo.insumo_id] = 0;
+                    }
+
+                    insumo.restante = insumo.cantidad_validada - insumo.cantidad_recibida - requisicion.entrega_proveedor[insumo.proveedor_id][insumo.insumo_id];
+
+                    $scope.totales.pedido += insumo.cantidad_validada;
+                    $scope.totales.recibido += insumo.cantidad_recibida;
+                    $scope.totales.restante += insumo.restante;
                 }
+                $scope.lista_insumos_requisicion[requisicion.tipo_requisicion] = requisicion.insumos;
             }
             //console.log($scope.insumos_por_clues);
             $scope.cargando = false;
@@ -309,171 +349,208 @@
             console.log(e);
         });
 
-        $scope.cambiarValor = function(insumo){
-            insumo.total_validado = insumo.cantidad_validada * insumo.precio;
-            $scope.actualizarTotal($scope.selectedIndex);
-        };
+        $scope.recibirInsumo = function(ev,insumo){
+            if(!$scope.recepcionIniciada){ return false; }
+            if($scope.recepcion.estatus > 1){ return false; }
 
-        $scope.validarPorClues = function(ev,insumo){
+            var tipo_requisicion = $scope.acta.requisiciones[$scope.selectedIndex].tipo_requisicion;
             var useFullScreen = ($mdMedia('sm') || $mdMedia('xs'))  && $scope.customFullscreen;
+
+            if(!$scope.ingresos_requisicion[tipo_requisicion][insumo.proveedor_id]){
+                $scope.ingresos_requisicion[tipo_requisicion][insumo.proveedor_id] = {};
+            }
+
             var locals = {
                 insumo: insumo,
-                por_clues: $scope.insumos_por_clues[insumo.insumo_id],
-                nombres_clues: $scope.nombres_clues
+                lista_insumos: $scope.lista_insumos_requisicion[tipo_requisicion],
+                lista_ingresos: $scope.ingresos_requisicion[tipo_requisicion][insumo.proveedor_id],
+                entrega_proveedor: $scope.acta.requisiciones[$scope.selectedIndex].entrega_proveedor[insumo.proveedor_id],
+                totales: $scope.totales
             };
 
             $mdDialog.show({
-                controller: function($scope, $mdDialog, insumo, por_clues, nombres_clues) {
+                controller: function($scope, $mdDialog, insumo, lista_insumos, lista_ingresos, entrega_proveedor, totales) {
                     $scope.insumo = insumo;
-                    $scope.lista_clues = por_clues;
-                    $scope.nombres_clues = nombres_clues;
-                    $scope.reset_clues = {};
-                    $scope.reset_insumo = {
-                        cantidad: insumo.cantidad_validada,
-                        total: insumo.total_validado
-                    };
+                    $scope.lista_insumos = lista_insumos;
+                    $scope.lista_ingresos = lista_ingresos;
+                    $scope.entrega_proveedor = entrega_proveedor;
+                    $scope.totales = totales;
+                    $scope.validacion = {};
+                    
+                    $scope.index_siguiente = undefined;
+                    $scope.index_anterior = undefined;
+                    $scope.index_actual = lista_insumos.indexOf(insumo);
+                    $scope.total_insumos = lista_insumos.length;
 
-                    for(var i in por_clues.clues){
-                        $scope.reset_clues[por_clues.clues[i].clues] = {
-                            cantidad: por_clues.clues[i].cantidad_validada,
-                            total: por_clues.clues[i].total_validado
-                        };
+                    if($scope.index_actual === 0){
+                        $scope.index_siguiente = 1;
+                        $scope.index_anterior = undefined;
+                    }else if($scope.index_actual == ($scope.total_insumos-1)){
+                        $scope.index_siguiente = undefined;
+                        $scope.index_anterior = $scope.index_actual-1;
+                    }else{
+                        $scope.index_siguiente = $scope.index_actual+1;
+                        $scope.index_anterior = $scope.index_actual-1;
                     }
 
-                    $scope.cancel = function() {
-                        for(var i in $scope.lista_clues.clues){
-                            $scope.lista_clues.clues[i].cantidad_validada = $scope.reset_clues[$scope.lista_clues.clues[i].clues].cantidad;
-                            $scope.lista_clues.clues[i].total_validado = $scope.reset_clues[$scope.lista_clues.clues[i].clues].total;
+                    var regresarRespaldo = function(){
+                        if($scope.ingreso_respaldo){
+                            $scope.ingreso.lote = $scope.ingreso_respaldo.lote;
+                            $scope.ingreso.fecha_caducidad = new Date($scope.ingreso_respaldo.fecha_caducidad);
+                            $scope.ingreso.cantidad = $scope.ingreso_respaldo.cantidad;
                         }
-                        $scope.insumo.cantidad_validada = $scope.reset_insumo.cantidad;
-                        $scope.insumo.total_validado = $scope.reset_insumo.total;
+                    };
+
+                    var cargarIngreso = function(){
+                        if($scope.lista_ingresos[$scope.insumo.insumo_id]){
+                            $scope.ingreso = $scope.lista_ingresos[$scope.insumo.insumo_id]
+                            $scope.ingreso_respaldo = JSON.parse(JSON.stringify($scope.ingreso));
+                        }else{
+                            $scope.ingreso = {insumo_id:$scope.insumo.insumo_id};
+                            $scope.ingreso_respaldo = undefined;
+                        }
+                    };
+
+                    cargarIngreso();
+
+                    $scope.siguiente = function(){
+                        if($scope.index_siguiente != undefined){
+                            $scope.index_anterior = $scope.index_actual;
+                            $scope.index_actual = $scope.index_siguiente;
+                            $scope.index_siguiente += 1;
+                            if($scope.index_siguiente == $scope.total_insumos){
+                                $scope.index_siguiente = undefined;
+                            }
+                        }
+                        $scope.validacion = {};
+                        regresarRespaldo();
+                        $scope.insumo = $scope.lista_insumos[$scope.index_actual];
+                        cargarIngreso();
+                    };
+
+                    $scope.anterior = function(){
+                        if($scope.index_anterior != undefined){
+                            $scope.index_siguiente = $scope.index_actual;
+                            $scope.index_actual = $scope.index_anterior;
+                            $scope.index_anterior -= 1;
+                            if($scope.index_anterior < 0){
+                                $scope.index_anterior = undefined;
+                            }
+                        }
+                        $scope.validacion = {};
+                        regresarRespaldo();
+                        $scope.insumo = $scope.lista_insumos[$scope.index_actual];
+                        cargarIngreso();
+                    };
+                    
+                    $scope.cancel = function() {
+                        regresarRespaldo();
                         $mdDialog.cancel();
                     };
 
-                    $scope.calcularTotal = function(item){
-                        item.total_validado = item.cantidad_validada * $scope.lista_clues.precio;
-                        var total = 0;
-                        var cantidad = 0;
-                        for(var i in $scope.lista_clues.clues){
-                            cantidad += $scope.lista_clues.clues[i].cantidad_validada;
-                            total += $scope.lista_clues.clues[i].total_validado;
-                        }
-                        $scope.insumo.cantidad_validada = cantidad;
-                        $scope.insumo.total_validado = total;
-                    };
+                    $scope.answer = function(cerrar) {
+                        $scope.validacion = {};
+                        var errores = false;
 
-                    $scope.answer = function() {
-                        $mdDialog.hide({yes:true});
+                        if(!$scope.ingreso.lote){
+                            $scope.validacion.lote = {required:true};
+                            errores = true;
+                        }
+
+                        if(!$scope.ingreso.fecha_caducidad){
+                            $scope.validacion.fecha_caducidad = {required:true};
+                            errores = true;
+                        }
+
+                        if($scope.ingreso.cantidad == undefined){
+                            $scope.validacion.cantidad = {required:true};
+                            errores = true;
+                        }else if($scope.ingreso.cantidad < 0){
+                            $scope.validacion.cantidad = {min:true};
+                            errores = true;
+                        }else if($scope.ingreso.cantidad > ($scope.insumo.cantidad_validada - $scope.insumo.cantidad_recibida)){
+                            $scope.validacion.cantidad = {max:true};
+                            errores = true;
+                        }
+
+                        if(errores){
+                            return false;
+                        }
+
+                        if(!$scope.lista_ingresos[$scope.insumo.insumo_id]){
+                            $scope.lista_ingresos[$scope.insumo.insumo_id] = $scope.ingreso;
+                        }
+                        if($scope.ingreso_respaldo){
+                            $scope.insumo.restante += $scope.ingreso_respaldo.cantidad;
+                            $scope.totales.recibido -= $scope.ingreso_respaldo.cantidad;
+                        }
+                        $scope.entrega_proveedor[$scope.insumo.insumo_id] = $scope.ingreso.cantidad;
+                        $scope.insumo.restante -= $scope.ingreso.cantidad;
+
+                        $scope.totales.recibido += $scope.ingreso.cantidad;
+                        $scope.totales.restante = $scope.totales.pedido - $scope.totales.recibido;
+                        
+                        $scope.ingreso_respaldo = undefined;
+
+                        if(cerrar){
+                            $mdDialog.hide({yes:true});
+                        }else{
+                            $scope.siguiente();
+                            var element = $window.document.getElementById('ingreso_lote');
+                            element.focus();
+                        }
                     };
                 },
-                templateUrl: 'src/requisiciones/views/validar-clues.html',
+                templateUrl: 'src/pedidos/views/recepcion-insumo.html',
                 parent: angular.element(document.body),
                 targetEvent: ev,
-                clickOutsideToClose:true,
+                clickOutsideToClose:false,
+                escapeToClose:false,
                 fullscreen: useFullScreen,
                 locals:locals
             })
             .then(function(res) {
-                $scope.actualizarTotal($scope.selectedIndex);
+                //$scope.actualizarTotal($scope.selectedIndex);
             }, function() {
                 console.log('cancelado');
             });
-        }
-
-        $scope.guardarValidacion = function(ev){
-            if($scope.validandoRequisicion != undefined){
-                var confirm = $mdDialog.confirm()
-                    .title('Validar requisición?')
-                    .content('Las cantidades modificadas serán guardadas en la requisición.')
-                    .targetEvent(ev)
-                    .ok('Guardar')
-                    .cancel('Cancelar');
-                $mdDialog.show(confirm).then(function() {
-                    $scope.cargando = true;
-                    var requisicion = $scope.acta.requisiciones[$scope.selectedIndex];
-                    requisicion.estatus = 1;
-                    var insumos_clues = [];
-                    for(var i in $scope.insumos_por_clues){
-                        var insumo = $scope.insumos_por_clues[i];
-                        for(var j in insumo.clues){
-                            insumos_clues.push({
-                                insumo_id: insumo.insumo_id,
-                                requisicion_id: insumo.clues[j].requisicion_id,
-                                cantidad: insumo.clues[j].cantidad,
-                                cantidad_validada: insumo.clues[j].cantidad_validada,
-                                total: insumo.clues[j].total,
-                                total_validado: insumo.clues[j].total_validado,
-                                clues: insumo.clues[j].clues
-                            });
-                        }
-                    }
-                    requisicion.insumos_clues = insumos_clues;
-                    $scope.actualizarTotal($scope.selectedIndex);
-                    PedidosDataApi.editar(requisicion.id,requisicion,function(res){
-                        requisicion.validado = true;
-                        $scope.validandoRequisicion = undefined;
-                        $scope.cargando = false;
-                    },function(e){
-                        requisicion.estatus = undefined;
-                        $scope.cargando = false;
-                        console.log(e);
-                        Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:'Ocurrión un error al intentar validar la requisicion.'});
-                    });
-                }, function() {});
-            }
-        }
-
-        $scope.revisarRequisicion = function(){
-            if($scope.validandoRequisicion == undefined){
-                $scope.cargando = true;
-
-                var requisicion = $scope.acta.requisiciones[$scope.selectedIndex];
-                requisicion.estatus = undefined;
-
-                PedidosDataApi.editar(requisicion.id,requisicion,function(res){
-                    requisicion.estatus = res.data.estatus;
-                    requisicion.validado = false;
-
-                    requisicion.sub_total = res.data.sub_total;
-                    requisicion.gran_total = res.data.gran_total;
-                    requisicion.iva = res.data.iva;
-
-                    $scope.cargando = false;
-                },function(e){
-                    $scope.cargando = false;
-                    console.log(e);
-                    Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:'Ocurrión un error al intentar validar la requisicion.'});
-                });
-            }
         };
 
-        $scope.enviarSolicitud = function(ev){
+        $scope.finalizarEntrega = function(ev){
             var confirm = $mdDialog.confirm()
-                .title('Enviar formato de requisicion?')
-                .content('El acta se enviará para realizar el pedido y ya no podrá editarse.')
+                .title('Finalizar entrega?')
+                .content('La entrega se cerrará y ya no podrá editarse.')
                 .targetEvent(ev)
-                .ok('Enviar')
+                .ok('Finalizar')
                 .cancel('Cancelar');
             $mdDialog.show(confirm).then(function() {
-                $scope.acta.estatus = 3;
-                $scope.guardar();
+                $scope.recepcion.estatus = 2;
+                $scope.guardarEntrega();
             }, function() {});
         }
 
-        $scope.guardar = function(){
+        $scope.guardarEntrega = function(){
             $scope.cargando = true;
             $scope.validacion = {};
-            PedidosDataApi.editarActa($scope.acta.id,$scope.acta,function(res){
+            var entrega = $scope.recepcion;
+            entrega.hora_entrega = $filter('date')(entrega.hora_entrega_date,'HH:mm:ss');
+            entrega.acta_id = $scope.acta.id;
+            entrega.lista_insumos_requisicion = $scope.lista_insumos_requisicion;
+            entrega.ingresos_requisicion = {};
+            for(var i in $scope.ingresos_requisicion){
+                var ingresos = $scope.ingresos_requisicion[i];
+                entrega.ingresos_requisicion[i] = $scope.ingresos_requisicion[i][$scope.recepcion.proveedor_id];
+            }
+
+            PedidosDataApi.guardarEntrega(entrega,function(res){
                 Mensajero.mostrarToast({contenedor:'#modulo-contenedor',mensaje:'Datos guardados con éxito.'});
-                if(res.data.estatus == 3){
-                    $scope.acta.num_oficio = res.data.num_oficio;
-                }
-                $scope.acta.estatus_sincronizacion = res.data.estatus_sincronizacion;
+                $scope.recepcion.estatus = res.data.estatus;
+                $scope.recepcion.id = res.data.id;
                 $scope.cargando = false;
             },function(e){
                 $scope.cargando = false;
-                if($scope.acta.estatus == 3){
-                    $scope.acta.estatus = 2;
+                if($scope.recepcion.estatus == 2){
+                    $scope.recepcion.estatus = 1;
                 }
                 if(e.error_type == 'form_validation'){
                     Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:'Hay un error en los datos del formulario.'});
@@ -491,54 +568,38 @@
         };
 
         $scope.cambiarProveedor = function(){
+            $scope.recepcion = {estatus:1};
+            $scope.reportes_imprimir = [];
+            
             if($scope.aplicar_proveedor.id){
                 $scope.recepcionIniciada = true;
+                $scope.lista_insumos_requisicion = {1:[],2:[],3:[],4:[]};
+
+                for(var i in $scope.acta.requisiciones){
+                    var requisicion = $scope.acta.requisiciones[i];
+                    if(requisicion.insumos_proveedor[$scope.aplicar_proveedor.id]){
+                        $scope.lista_insumos_requisicion[requisicion.tipo_requisicion] = requisicion.insumos_proveedor[$scope.aplicar_proveedor.id];
+                    }
+                }
+                if($scope.entregas_guardadas[$scope.aplicar_proveedor.id]){
+                    $scope.recepcion = $scope.entregas_guardadas[$scope.aplicar_proveedor.id];
+                }else{
+                    $scope.recepcion.proveedor_id = $scope.aplicar_proveedor.id;
+                }
+
+                if($scope.entregas_imprimir[$scope.aplicar_proveedor.id]){
+                    $scope.reportes_imprimir = $scope.entregas_imprimir[$scope.aplicar_proveedor.id];
+                }
+                //console.log($scope.lista_insumos_requisicion);
             }else{
                 $scope.recepcionIniciada = false;
-            }
-            
-        };
-
-        $scope.iniciarRecepcion = function(){
-            $scope.recepcionIniciada = true;
-        };
-
-        $scope.cancelarRecepcion = function(){
-            $scope.recepcionIniciada = false;
-        };
-
-        /*$scope.iniciarValidacion = function(){
-            if(!$scope.acta.requisiciones[$scope.selectedIndex].validado){
-                $scope.validandoRequisicion = $scope.selectedIndex;
-                $scope.actualizarTotal($scope.selectedIndex);
-            }else{
-                Mensajero.mostrarToast({contenedor:'#modulo-contenedor',mensaje:'Esta requisición ya fue validada.'});
-            }
-        }
-
-        $scope.cancelarValidacion = function(){
-            $scope.validandoRequisicion = undefined;
-            $scope.actualizarTotal($scope.selectedIndex);
-        }*/
-
-        $scope.actualizarTotal = function(index){
-            var total = 0;
-            var requisicion = $scope.acta.requisiciones[index];
-            for(var i in requisicion.insumos){
-                if($scope.validandoRequisicion != undefined || requisicion.validado){
-                    total += requisicion.insumos[i].total_validado;
-                }else{
-                    total += requisicion.insumos[i].total;
+                $scope.lista_insumos_requisicion = {1:[],2:[],3:[],4:[]};
+                for(var i in $scope.acta.requisiciones){
+                    var requisicion = $scope.acta.requisiciones[i];
+                    $scope.lista_insumos_requisicion[requisicion.tipo_requisicion] = requisicion.insumos;
                 }
+                $scope.recepcion.proveedor_id = undefined;
             }
-            requisicion.sub_total = total;
-
-            if(requisicion.tipo_requisicion == 3){
-                requisicion.iva = total*16/100;
-            }else{
-                requisicion.iva = 0;
-            }
-            requisicion.gran_total = requisicion.iva + total;
         };
 
         $scope.imprimirOficio = function(){
@@ -547,9 +608,9 @@
 
         $scope.sincronizar = function(){
             $scope.cargando = true;
-            PedidosDataApi.sincronizar($scope.acta.id,function(res){
+            PedidosDataApi.sincronizar($scope.recepcion.id,function(res){
                 Mensajero.mostrarToast({contenedor:'#modulo-contenedor',mensaje:'Datos sincronizados con éxito.'});
-                $scope.acta.estatus_sincronizacion = res.data.estatus_sincronizacion;
+                $scope.recepcion.estatus = res.data.estatus;
                 $scope.cargando = false;
             },function(e){
                 $scope.cargando = false;
@@ -604,12 +665,6 @@
             return resultado;
         }
         
-
-        $scope.imprimirSolicitudes = function(){
-            //PedidosDataApi.verPDF($routeParams.id,function(e){console.log(e)});
-            window.open(URLS.BASE_API +'/solicitudes-pdf/'+$routeParams.id);
-        };
-        
         $scope.menuCerrado = !UsuarioData.obtenerEstadoMenu();
         if(!$scope.menuCerrado){
           $scope.menuIsOpen = true;
@@ -627,7 +682,7 @@
           UsuarioData.guardarEstadoMenu($scope.menuIsOpen);
         };
         
-        $scope.mostrarIdiomas = function($event){                
+        $scope.mostrarIdiomas = function($event){
             $mdBottomSheet.show({
               templateUrl: './src/app/views/idiomas.html',
               controller: 'ListaIdiomasCtrl',                 

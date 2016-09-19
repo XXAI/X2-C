@@ -12,11 +12,11 @@
 				cargarConfiguracion: function (id, success, error) {
 					$http.get(URLS.BASE_API + '/configuracion/' + id).success(success).error(error)
 				},
-				recibir: function (data, success, error) {
+				guardarEntrega: function (data, success, error) {
 					$http.post(URLS.BASE_API + '/pedidos', data).success(success).error(error)
 				},
 				sincronizar: function (id, success, error) {
-	               $http.get(URLS.BASE_API + '/sincronizar-validacion/' + id).success(success).error(error)
+	               $http.get(URLS.BASE_API + '/sincronizar-entrega/' + id).success(success).error(error)
 	           	},
 	           	insumos: function (success, error) {
 	           		$http.get(URLS.BASE_API + '/insumos').success(success).error(error)
