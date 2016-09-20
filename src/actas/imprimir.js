@@ -123,7 +123,7 @@
 						encabezadoRequisicion = 'REQUISICIÓN DE MEDICAMENTOS CONTROLADOS';
 					//console.log(requisi.tipo_requisicion);
 					
-					var cantidadLineas = 8+requisi.insumos.length;
+					var cantidadLineas = 11+requisi.insumos.length;
 					
 					docDefinition.content.table.body.push([
 						{text: '', style: 'parabordes', rowSpan: cantidadLineas},
@@ -258,7 +258,33 @@
 							{text: '$ '+numberFormat(parseFloat(subTotal).toFixed(2)), style: 'footer', alignment: 'center'},
 							{text: '', style: 'parabordes'}
 						]);
-					}					
+					}		
+					
+					
+					docDefinition.content.table.body.push([
+						{text: '', style: 'parabordes'},
+						{colSpan: 3, text: 'SOLICITA', style: 'footer', alignment: 'center'},{},{},
+						{colSpan: 3, text: 'DIRECCIÓN O UNIDAD', style: 'footer', alignment: 'center'},{},{},
+						{colSpan: 4, rowSpan: 3, text: '', style: 'footer', alignment: 'center'},{},{},{},
+						{text: '', style: 'parabordes'}
+					]);
+					docDefinition.content.table.body.push([
+						{text: '', style: 'parabordes'},
+						{colSpan: 3, text: '\n\n\n\n'+actalocal.administrador, style: 'footer', alignment: 'center'},{},{},
+						{colSpan: 3, text: '\n\n\n\n'+actalocal.director_unidad, style: 'footer', alignment: 'center'},{},{},
+						{colSpan: 4, text: '', style: 'footer', alignment: 'center'},{},{},{},
+						{text: '', style: 'parabordes'}
+					]);
+					docDefinition.content.table.body.push([
+						{text: '', style: 'parabordes'},
+						{colSpan: 3, text: 'ADMINISTRADOR', style: 'footer', alignment: 'center'},{},{},
+						{colSpan: 3, text: 'DIRECTOR DE LA JURISDICCIÓN O UNIDAD MÉDICA', style: 'footer', alignment: 'center'},{},{},
+						{colSpan: 4, text: '', style: 'footer', alignment: 'center'},{},{},{},
+						{text: '', style: 'parabordes'}
+					]);	
+					
+					
+								
 				}
 				
 				if(actalocal.estatus<=2)

@@ -990,6 +990,8 @@
             if(tipo == 'acta'){
                 window.open(URLS.BASE_API +'/acta-pdf/'+$routeParams.id+'?token='+$localStorage.control_desabasto.access_token);
             }else{
+				
+				//console.log($scope.acta);
 
                 //window.open(URLS.BASE_API +'/requisiciones-pdf/'+$routeParams.id+'?token='+$localStorage.control_desabasto.access_token);
 								
