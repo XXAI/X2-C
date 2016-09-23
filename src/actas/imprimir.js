@@ -104,7 +104,27 @@
 						}
 					}
 				};
-				
+
+				var CantidadesLineas = [];
+
+
+				if(actalocal.estatus>2)
+				{
+					for(var i in actalocal.requisiciones)
+					{
+						var contador=0;
+						var requisi = actalocal.requisiciones[i];
+						for(var j in requisi.insumos)
+						{
+							var insum = requisi.insumos[j];	
+							if(insum.pivot.cantidad_validada>0)
+								contador++;
+						}
+						CantidadesLineas[i]=contador;
+					}							
+				}
+
+
 				for(var i in actalocal.requisiciones)
 				{
 					var requisi = actalocal.requisiciones[i];
@@ -124,6 +144,9 @@
 					//console.log(requisi.tipo_requisicion);
 					
 					var cantidadLineas = 11+requisi.insumos.length;
+
+					if(actalocal.estatus>2)
+						cantidadLineas = CantidadesLineas[i]+11;
 					
 					docDefinition.content.table.body.push([
 						{text: '', style: 'parabordes', rowSpan: cantidadLineas},
@@ -181,18 +204,21 @@
 						var insum = requisi.insumos[j];																		
 						if(actalocal.estatus>2)
 						{
-							docDefinition.content.table.body.push([
-								{text: '', style: 'parabordes'},
-								{text: insum.lote.toString(), style: 'normal', alignment: 'center'},
-								{text: insum.clave, style: 'normal', alignment: 'center'},
-								{colSpan: 3, text: insum.descripcion, style: 'normal', alignment: 'center'},{},{},
-								{colSpan: 2, text: insum.pivot.cantidad_validada.toString(), style: 'normal', alignment: 'center'},{},
-								{text: insum.unidad, style: 'normal', alignment: 'center'},
-								{text: '$ '+numberFormat(parseFloat(insum.precio).toFixed(2)), style: 'normal', alignment: 'center'},
-								{text: '$ '+numberFormat(parseFloat(insum.pivot.total_validado).toFixed(2)), style: 'normal', alignment: 'center'},
-								{text: '', style: 'parabordes'}						
-							]);
-							subTotal = subTotal + parseFloat(insum.pivot.total_validado);
+							if(insum.pivot.cantidad_validada>0)
+							{
+								docDefinition.content.table.body.push([
+									{text: '', style: 'parabordes'},
+									{text: insum.lote.toString(), style: 'normal', alignment: 'center'},
+									{text: insum.clave, style: 'normal', alignment: 'center'},
+									{colSpan: 3, text: insum.descripcion, style: 'normal', alignment: 'center'},{},{},
+									{colSpan: 2, text: insum.pivot.cantidad_validada.toString(), style: 'normal', alignment: 'center'},{},
+									{text: insum.unidad, style: 'normal', alignment: 'center'},
+									{text: '$ '+numberFormat(parseFloat(insum.precio).toFixed(2)), style: 'normal', alignment: 'center'},
+									{text: '$ '+numberFormat(parseFloat(insum.pivot.total_validado).toFixed(2)), style: 'normal', alignment: 'center'},
+									{text: '', style: 'parabordes'}						
+								]);
+								subTotal = subTotal + parseFloat(insum.pivot.total_validado);
+							}
 						}
 						else
 						{

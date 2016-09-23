@@ -990,13 +990,9 @@
             if(tipo == 'acta'){
                 window.open(URLS.BASE_API +'/acta-pdf/'+$routeParams.id+'?token='+$localStorage.control_desabasto.access_token);
             }else{
-				
-				//console.log($scope.acta);
-
-                //window.open(URLS.BASE_API +'/requisiciones-pdf/'+$routeParams.id+'?token='+$localStorage.control_desabasto.access_token);
-								
+                window.open(URLS.BASE_API +'/requisiciones-pdf/'+$routeParams.id+'?token='+$localStorage.control_desabasto.access_token);
+				/*				
 				ActasDataApi.ver($routeParams.id,function(res){
-
                		var actalocal = res.data;
 					var configuracion = res.configuracion;
 										
@@ -1011,12 +1007,12 @@
 					ImprimirSolicitud.imprimir(actalocal, folioActa, configuracion);
 	
     	        	$scope.cargando = false;
-
-			},function(e){
-	        	$scope.cargando = false;
-    	    });
-		}
-	};
+    			},function(e){
+    	        	$scope.cargando = false;
+                });
+                */
+            }
+        };
 
 
 
