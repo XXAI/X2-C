@@ -57,7 +57,7 @@
           </md-input-container>
           <md-input-container flex md-is-error="validacion.cantidad">
             <label>Cantidad</label>
-            <input type="number" ng-model="ingreso.cantidad" tabindex="3" md-autofocus="(ingreso_respaldo != undefined)" ng-keyup="$event.keyCode == 13 ? answer(false) : null">
+            <input type="number" ng-model="ingreso.cantidad" tabindex="3" md-autofocus="(ingreso_respaldo != undefined)" ng-keyup="$event.keyCode == 13 ? answer(true) : null">
             <div class="errors" ng-messages="validacion.cantidad" md-auto-hide="false">
               <div ng-message="required">{{ 'CAMPO_REQUERIDO' | translate }}</div>
               <div ng-message="min">La cantidad no debe ser menor que 0</div>
@@ -68,18 +68,18 @@
       </div>
     </md-dialog-content>
     <md-dialog-actions layout="row">
-      <md-button class="md-raised" ng-click="anterior()" ng-disabled="(index_anterior == undefined)" aria-label="anterior">
+      <!--md-button class="md-raised" ng-click="anterior()" ng-disabled="(index_anterior == undefined)" aria-label="anterior">
         <md-icon md-svg-icon="chevron-left"></md-icon>
       </md-button>
       <md-button class="md-raised" ng-click="siguiente()" ng-disabled="(index_siguiente == undefined)" aria-label="siguiente">
         <md-icon md-svg-icon="chevron-right"></md-icon>
-      </md-button>
+      </md-button-->
       <span flex></span>
-      <md-button class="md-raised md-primary" ng-click="answer(false)" ng-disabled="(index_siguiente == undefined)" tabindex="4">
+      <!--md-button class="md-raised md-primary" ng-click="answer(false)" ng-disabled="(index_siguiente == undefined)" tabindex="4">
         <md-icon md-svg-icon="content-save-all"></md-icon> Guardar y Seguir
-      </md-button>
+      </md-button-->
       <md-button class="md-raised md-primary" ng-click="answer(true)" tabindex="5">
-        <md-icon md-svg-icon="content-save"></md-icon> Guardar y Cerrar
+        <md-icon md-svg-icon="check"></md-icon> Aceptar
       </md-button>
     </md-dialog-actions>
   </form>

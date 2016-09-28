@@ -75,7 +75,7 @@
 		</div>
 	</md-toolbar>
 	<md-content id="modulo-contenedor" ng-show="toggleDatosActa" layout="row" flex="none" layout-wrap layout-padding style="overflow:visible;">
-		<md-input-container flex="50" class="md-block"  md-is-error="validacion.proveedor_id" style="margin-bottom:0px;" ng-disabled="(acta.estatus != 4 || cargando)">
+		<md-input-container flex="60" class="md-block"  md-is-error="validacion.proveedor_id" style="margin-bottom:0px;" ng-disabled="(acta.estatus != 4 || cargando)">
 			<label>Proveedor</label>
 			<md-select ng-model="aplicar_proveedor.id" aria-label="proveedor general" ng-change="cambiarProveedor()">
 				<md-option ng-value="">
@@ -89,27 +89,19 @@
               <div ng-message="required">{{ 'CAMPO_REQUERIDO' | translate }}</div>
             </div>
 		</md-input-container>
-		<md-input-container flex="15" md-is-error="validacion.fecha_entrega" style="margin-bottom:0px;">
+		<md-input-container flex="20" md-is-error="validacion.fecha_entrega" style="margin-bottom:0px;">
 			<label>Fecha de Entrega</label>
 			<input type="date" ng-model="recepcion.fecha_entrega">
 			<div class="errors" ng-messages="validacion.fecha_entrega" >
               <div ng-message="required">{{ 'CAMPO_REQUERIDO' | translate }}</div>
             </div>
 		</md-input-container>
-		<md-input-container flex="15" md-is-error="validacion.hora_entrega" style="margin-bottom:0px;">
+		<md-input-container flex="20" md-is-error="validacion.hora_entrega" style="margin-bottom:0px;">
 			<label>Hora de Entrega</label>
 			<input type="time" ng-model="recepcion.hora_entrega_date">
 			<div class="errors" ng-messages="validacion.hora_entrega" >
               <div ng-message="required">{{ 'CAMPO_REQUERIDO' | translate }}</div>
             </div>
-		</md-input-container>
-		<md-input-container flex="20" md-is-error="validacion.fecha_proxima_entrega" class="md-block" style="margin-bottom:0px;">
-			<label>Fecha de la Proxima Entrega</label>
-			<input type="date" ng-model="recepcion.fecha_proxima_entrega">
-			<div class="errors" ng-messages="validacion.fecha_proxima_entrega" >
-              <div ng-message="required">{{ 'CAMPO_REQUERIDO' | translate }}</div>
-            </div>
-			<div class="hint"><small>En caso de requerir una segunda entrega para este pedido</small></div>
 		</md-input-container>
 		<md-input-container flex="50" md-is-error="validacion.nombre_recibe" class="md-block" style="margin-bottom:0px;">
 			<label>Nombre de Quien Recibe</label>
@@ -129,24 +121,33 @@
 
 	<md-divider></md-divider>
 
-	<md-tabs flex="none" layout="column"  md-stretch-tabs="always"  md-border-bottom class="md-hue-1" md-selected="selectedIndex">
-		<md-tab ng-repeat="requisicion in acta.requisiciones track by $index">
-			<md-tab-label>
-				<md-icon md-svg-icon="checkbox-marked"></md-icon>
-				<span>{{(requisicion.tipo_requisicion == 1)?'Causes':((requisicion.tipo_requisicion == 2)?'No Causes':((requisicion.tipo_requisicion == 4)?'Controlados':'Materiales de curación'))}}</span>
-				<small><strong>({{lista_insumos_requisicion[requisicion.tipo_requisicion].length | number}})</strong></small>
-			</md-tab-label>
-		</md-tab>
-	</md-tabs>
+	<md-content layout="row" flex="none">
+	    <md-input-container md-no-float flex="50" class="md-block" style="margin-bottom:0px;">
+	    	<md-icon md-svg-icon="magnify"></md-icon>
+	    	<input ng-model="filtro_insumos.busqueda" placeholder="Buscar" ng-keyup="$event.keyCode == 13 ? cambiar_filtro_insumos() : null">
+	    </md-input-container>
+	    <md-input-container flex="30" style="margin-bottom:0px;">
+	    	<md-select aria-label="filtro-tipo-requisicion" ng-model="filtro_insumos.tipo_insumo" ng-model-options="{trackBy: '$value.clave'}" ng-change="cambiar_filtro_insumos()">
+	    		<md-option ng-value="tipo" ng-repeat="tipo in tipos_requisiciones">{{ tipo.descripcion }}</md-option>
+	    	</md-select>
+	    </md-input-container>
+	    <md-input-container flex="20">
+			<md-checkbox ng-change="cambiar_filtro_insumos()" ng-model="filtro_insumos.ocultar_completos" aria-label="Checkbox 1">
+				Ocultar completos
+			</md-checkbox>
+	    </md-input-container>
+	</md-content>
+
+	<md-divider></md-divider>
 
 	<md-content flex="none">
-		<div layout="row" layout-padding>
-			<div flex="15" style="text-align:center;"><strong>Clave</strong></div>
-			<div flex style="text-align:center;"><strong>Descripción</strong></div>
-			<div flex="15" style="text-align:center;"><strong>Pedido</strong></div>
-			<div flex="10" style="text-align:center;"><strong>Recibido</strong></div>
-			<div flex="10" style="text-align:center;"><strong>Entrega</strong></div>
-			<div flex="10" style="text-align:center;"><strong>Restante</strong></div>
+		<div layout="row" layout-padding style="font-size: 14px;font-weight: 500;line-height: 1em;color: rgb(33,150,243);">
+			<div flex="15" style="text-align:center;padding-left:0px;padding-right:0px;">Clave</div>
+			<div flex style="text-align:center;padding-left:0px;padding-right:0px;">Descripción</div>
+			<div flex="15" style="text-align:center;padding-left:0px;padding-right:0px;">Pedido</div>
+			<div flex="10" style="text-align:center;padding-left:0px;padding-right:0px;">Recibido</div>
+			<div flex="10" style="text-align:center;padding-left:0px;padding-right:0px;">Entrega</div>
+			<div flex="10" style="text-align:center;padding-left:0px;padding-right:0px;">Restante</div>
 		</div>
 		<md-divider></md-divider>
 	</md-content>
@@ -154,13 +155,13 @@
 
 	<md-virtual-repeat-container style="height:880px;" id="lista-insumos">
 		<md-list layout="column">
-			<md-list-item ng-if="lista_insumos_requisicion[acta.requisiciones[selectedIndex].tipo_requisicion].length == 0">
+			<md-list-item ng-if="lista_insumos_con_filtro.length == 0">
 		    	<md-subheader>
 		    		<span>No hay insumos asignados a esta requisición</span>
 		    	</md-subheader>
 		    </md-list-item>
-			<md-list-item class="md-2-line paciente-item" md-virtual-repeat="insumo in lista_insumos_requisicion[acta.requisiciones[selectedIndex].tipo_requisicion]" ng-click="recibirInsumo($event,insumo)" ng-disabled="(insumo.cantidad_recibida >= insumo.cantidad_validada)">
-				<div flex layout="row">
+			<md-list-item class="md-2-line paciente-item" md-virtual-repeat="insumo in lista_insumos_con_filtro" ng-click="recibirInsumo($event,insumo)" ng-disabled="(insumo.completo)">
+				<div flex layout="row" ng-style="(entrega_proveedor[aplicar_proveedor.id])?((entrega_proveedor[aplicar_proveedor.id][insumo.insumo_id])?{'font-weight':'bold'}:{}):{}">
 					<div flex="15" style="text-align:center;">{{insumo.clave}}</div>
 					<div flex style="text-align:center;">
 						<p style="line-height:14px; margin:0px;">
@@ -174,10 +175,10 @@
 						{{insumo.cantidad_recibida | number}}
 					</div>
 					<div flex="10" style="text-align:center;">
-						<span ng-if="acta.requisiciones[selectedIndex].entrega_proveedor[aplicar_proveedor.id]">
-							{{acta.requisiciones[selectedIndex].entrega_proveedor[aplicar_proveedor.id][insumo.insumo_id] | number}}
+						<span ng-if="entrega_proveedor[aplicar_proveedor.id]">
+							{{entrega_proveedor[aplicar_proveedor.id][insumo.insumo_id] | number}}
 						</span>
-						<span ng-if="!acta.requisiciones[selectedIndex].entrega_proveedor[aplicar_proveedor.id]">
+						<span ng-if="!entrega_proveedor[aplicar_proveedor.id]">
 							-
 						</span>
 					</div>
@@ -190,7 +191,13 @@
 		</md-list>
 	</md-virtual-repeat-container>
 
-	<md-content layout="row" flex="none" layout-wrap>
+	<md-content layout="row" flex="none" layout-wrap style="overflow:hidden;">
+		<div flex="none">
+			<md-input-container flex style="margin-bottom:0px;height:35px;">
+				<label>Total Claves</label>
+				<input value="{{lista_insumos_con_filtro.length | number}}" readonly>
+			</md-input-container>
+		</div>
 		<div flex></div>
 		<div flex="none" layout="row" style="overflow:hidden;">
 			<md-input-container flex style="margin-bottom:0px;height:35px;">

@@ -233,13 +233,77 @@
         $scope.cargando = true;
         $scope.aplicar_proveedor = {};
         $scope.totales = {pedido:0, recibido:0, restante:0, porcentaje:0.00};
-        $scope.lista_insumos_requisicion = {1:[],2:[],3:[],4:[]};
-        $scope.ingresos_requisicion = {1:{},2:{},3:{},4:{}};
+        $scope.lista_insumos_requisicion = {0:[],1:[],2:[],3:[],4:[]};
+        //$scope.ingresos_requisicion = {1:{},2:{},3:{},4:{}};
+        $scope.ingresos_requisicion = {};
         $scope.recepcion = {estatus:1};
         $scope.entregas_guardadas = {};
         $scope.reportes_imprimir = [];
+        $scope.tipos_requisiciones = [];
+        
+
+        //nuevo esquema
+        $scope.filtro_insumos = {busqueda:'',tipo_insumo:{clave:0}};
+        $scope.lista_insumos = [];
+        $scope.lista_insumos_con_filtro = [];
+        $scope.entrega_proveedor = {};
 
         $scope.permisoRecibir = '721A42C7F4693';
+
+        $scope.tipos_requisiciones.push({
+            'clave': 0,
+            'descripcion': 'Todos'
+        });
+
+        $scope.cambiar_filtro_insumos = function(){
+            var lista_entregados_proveedor = {};
+            var nuevo_filtro = {};
+            if($scope.filtro_insumos.tipo_insumo.clave){
+                nuevo_filtro.tipo_requisicion = $scope.filtro_insumos.tipo_insumo.clave;
+            }
+
+            if($scope.aplicar_proveedor.id){
+                nuevo_filtro.proveedor_id = $scope.aplicar_proveedor.id;
+                lista_entregados_proveedor = $scope.entrega_proveedor[$scope.aplicar_proveedor.id];
+            }
+
+            if($scope.filtro_insumos.ocultar_completos){
+                nuevo_filtro.completo = false;
+            }
+
+            var lista_filtrada = $filter('filter')($scope.lista_insumos,nuevo_filtro);
+
+            if($scope.filtro_insumos.busqueda){
+                var busqueda_query = $scope.filtro_insumos.busqueda;
+                //nuevo_filtro.clave          = $scope.filtro_insumos.busqueda;
+                $scope.lista_insumos_con_filtro = lista_filtrada.filter( createFilterFor(busqueda_query,['clave','descripcion','lote']));
+            }else{
+                $scope.lista_insumos_con_filtro = lista_filtrada;
+            }
+
+            $scope.totales.pedido = 0;
+            $scope.totales.recibido = 0;
+            for(var i in $scope.lista_insumos_con_filtro){
+                $scope.totales.pedido += $scope.lista_insumos_con_filtro[i].cantidad_validada;
+                $scope.totales.recibido += $scope.lista_insumos_con_filtro[i].cantidad_recibida;
+                if(lista_entregados_proveedor[$scope.lista_insumos_con_filtro[i].insumo_id]){
+                    $scope.totales.recibido += lista_entregados_proveedor[$scope.lista_insumos_con_filtro[i].insumo_id];
+                }
+            }
+            $scope.totales.restante = $scope.totales.pedido - $scope.totales.recibido;
+        };
+
+        function createFilterFor(query,searchValues) {
+            var lowercaseQuery = angular.lowercase(query);
+            return function filterFn(item) {
+                for(var i in searchValues){
+                    if(angular.lowercase(item[searchValues[i]]+'').indexOf(lowercaseQuery) >= 0){
+                        return true;
+                    }
+                }
+                return false;
+            };
+        };
 
         PedidosDataApi.ver($routeParams.id,function(res){
             $scope.acta = res.data;
@@ -256,15 +320,13 @@
             
             $scope.entregas_guardadas = {};
             $scope.entregas_imprimir = {};
+
             if($scope.acta.entregas.length){
                 for(var i in $scope.acta.entregas){
                     var entrega = $scope.acta.entregas[i];
+
                     if(entrega.fecha_entrega){
                         entrega.fecha_entrega = new Date(entrega.fecha_entrega + ' 00:00:00');
-                    }
-
-                    if(entrega.fecha_proxima_entrega){
-                        entrega.fecha_proxima_entrega = new Date(entrega.fecha_proxima_entrega + ' 00:00:00');
                     }
 
                     if(entrega.hora_entrega){
@@ -299,8 +361,23 @@
             for(var i in $scope.acta.requisiciones){
                 var requisicion = $scope.acta.requisiciones[i];
                 requisicion.insumos_proveedor = {};
-                requisicion.entrega_proveedor = {};
+                //requisicion.entrega_proveedor = {};
 
+                var descripcion_requisicion = 'Causes';
+                if(requisicion.tipo_requisicion == 2){
+                    descripcion_requisicion = 'No Causes';
+                }else if(requisicion.tipo_requisicion == 3){
+                    descripcion_requisicion = 'Material de Curación';
+                }else if(requisicion.tipo_requisicion == 4){
+                    descripcion_requisicion = 'Controlados';
+                }
+
+                $scope.tipos_requisiciones.push({
+                    'clave': requisicion.tipo_requisicion,
+                    'descripcion': descripcion_requisicion,
+                    'index': i
+                });
+                
                 for(var j in requisicion.insumos){
                     var insumo = {};
                     
@@ -320,38 +397,56 @@
                     insumo.requisicion_id = requisicion.insumos[j].pivot.requisicion_id;
                     insumo.proveedor_id = requisicion.insumos[j].pivot.proveedor_id;
 
+                    insumo.tipo_requisicion = requisicion.tipo_requisicion;
+
+                    if(insumo.cantidad_recibida >= insumo.cantidad_validada){
+                        insumo.completo = true;
+                    }else{
+                        insumo.completo = false;
+                    }
+
                     //activamos el proveedor en el select de proveedores
                     proveedores[insumo.proveedor_id].activo = true;
 
                     if(!requisicion.insumos_proveedor[insumo.proveedor_id]){
                         requisicion.insumos_proveedor[insumo.proveedor_id] = [];
-                        requisicion.entrega_proveedor[insumo.proveedor_id] = {};
+                        //requisicion.entrega_proveedor[insumo.proveedor_id] = {};
+                    }
+
+                    if(!$scope.entrega_proveedor[insumo.proveedor_id]){
+                        $scope.entrega_proveedor[insumo.proveedor_id] = {};
                     }
                     
                     requisicion.insumos_proveedor[insumo.proveedor_id].push(insumo);
                     requisicion.insumos[j] = insumo;
                     if(insumos_entregados[insumo.proveedor_id]){
                         if(insumos_entregados[insumo.proveedor_id][insumo.insumo_id]){
-                            requisicion.entrega_proveedor[insumo.proveedor_id][insumo.insumo_id] = insumos_entregados[insumo.proveedor_id][insumo.insumo_id].cantidad;
-                            $scope.totales.recibido += requisicion.entrega_proveedor[insumo.proveedor_id][insumo.insumo_id];
-                            if(!$scope.ingresos_requisicion[requisicion.tipo_requisicion][insumo.proveedor_id]){
-                                $scope.ingresos_requisicion[requisicion.tipo_requisicion][insumo.proveedor_id] = {};
+                            $scope.entrega_proveedor[insumo.proveedor_id][insumo.insumo_id] = insumos_entregados[insumo.proveedor_id][insumo.insumo_id].cantidad;
+                            $scope.totales.recibido += $scope.entrega_proveedor[insumo.proveedor_id][insumo.insumo_id];
+                            //if(!$scope.ingresos_requisicion[requisicion.tipo_requisicion][insumo.proveedor_id]){
+                            if(!$scope.ingresos_requisicion[insumo.proveedor_id]){
+                                //$scope.ingresos_requisicion[requisicion.tipo_requisicion][insumo.proveedor_id] = {};
+                                $scope.ingresos_requisicion[insumo.proveedor_id] = {};
                             }
-                            $scope.ingresos_requisicion[requisicion.tipo_requisicion][insumo.proveedor_id][insumo.insumo_id] = insumos_entregados[insumo.proveedor_id][insumo.insumo_id];
+                            //$scope.ingresos_requisicion[requisicion.tipo_requisicion][insumo.proveedor_id][insumo.insumo_id] = insumos_entregados[insumo.proveedor_id][insumo.insumo_id];
+                            $scope.ingresos_requisicion[insumo.proveedor_id][insumo.insumo_id] = insumos_entregados[insumo.proveedor_id][insumo.insumo_id];
                         }else{
-                            requisicion.entrega_proveedor[insumo.proveedor_id][insumo.insumo_id] = 0;
+                            $scope.entrega_proveedor[insumo.proveedor_id][insumo.insumo_id] = 0;
                         }
                     }else{
-                        requisicion.entrega_proveedor[insumo.proveedor_id][insumo.insumo_id] = 0;
+                        $scope.entrega_proveedor[insumo.proveedor_id][insumo.insumo_id] = 0;
                     }
 
-                    insumo.restante = insumo.cantidad_validada - insumo.cantidad_recibida - requisicion.entrega_proveedor[insumo.proveedor_id][insumo.insumo_id];
+                    insumo.restante = insumo.cantidad_validada - insumo.cantidad_recibida - $scope.entrega_proveedor[insumo.proveedor_id][insumo.insumo_id];
 
                     $scope.totales.pedido += insumo.cantidad_validada;
                     $scope.totales.recibido += insumo.cantidad_recibida;
                     //$scope.totales.restante += insumo.restante;
+
+                    //$scope.lista_insumos_requisicion[0].push(insumo);
+                    $scope.lista_insumos.push(insumo);
                 }
-                $scope.lista_insumos_requisicion[requisicion.tipo_requisicion] = requisicion.insumos;
+                //$scope.lista_insumos_requisicion[requisicion.tipo_requisicion] = requisicion.insumos;
             }
             $scope.totales.restante += $scope.totales.pedido - $scope.totales.recibido;
             //console.log($scope.insumos_por_clues);
@@ -360,6 +455,8 @@
                     $scope.proveedores.push({id:i,nombre:proveedores[i].nombre})
                 }
             }
+
+            $scope.lista_insumos_con_filtro = $scope.lista_insumos;
 
             $scope.cargando = false;
         },function(e){
@@ -371,18 +468,22 @@
             if(!$scope.recepcionIniciada){ return false; }
             if($scope.recepcion.estatus > 1){ return false; }
 
-            var tipo_requisicion = $scope.acta.requisiciones[$scope.selectedIndex].tipo_requisicion;
+            //var tipo_requisicion = $scope.acta.requisiciones[$scope.selectedIndex].tipo_requisicion;
+            var tipo_requisicion = $scope.filtro_insumos.tipo_insumo.clave;
             var useFullScreen = ($mdMedia('sm') || $mdMedia('xs'))  && $scope.customFullscreen;
-
-            if(!$scope.ingresos_requisicion[tipo_requisicion][insumo.proveedor_id]){
-                $scope.ingresos_requisicion[tipo_requisicion][insumo.proveedor_id] = {};
+            //console.log($scope.ingresos_requisicion);console.log(tipo_requisicion);
+            //if(!$scope.ingresos_requisicion[tipo_requisicion][insumo.proveedor_id]){
+            if(!$scope.ingresos_requisicion[insumo.proveedor_id]){
+                //$scope.ingresos_requisicion[tipo_requisicion][insumo.proveedor_id] = {};
+                $scope.ingresos_requisicion[insumo.proveedor_id] = {};
             }
 
             var locals = {
                 insumo: insumo,
-                lista_insumos: $scope.lista_insumos_requisicion[tipo_requisicion],
-                lista_ingresos: $scope.ingresos_requisicion[tipo_requisicion][insumo.proveedor_id],
-                entrega_proveedor: $scope.acta.requisiciones[$scope.selectedIndex].entrega_proveedor[insumo.proveedor_id],
+                lista_insumos: $scope.lista_insumos_con_filtro,
+                //lista_ingresos: $scope.ingresos_requisicion[tipo_requisicion][insumo.proveedor_id],
+                lista_ingresos: $scope.ingresos_requisicion[insumo.proveedor_id],
+                entrega_proveedor: $scope.entrega_proveedor[insumo.proveedor_id],
                 totales: $scope.totales
             };
 
@@ -557,12 +658,13 @@
             var entrega = $scope.recepcion;
             entrega.hora_entrega = $filter('date')(entrega.hora_entrega_date,'HH:mm:ss');
             entrega.acta_id = $scope.acta.id;
-            entrega.lista_insumos_requisicion = $scope.lista_insumos_requisicion;
+            //entrega.lista_insumos_requisicion = $scope.lista_insumos_requisicion;
             entrega.ingresos_requisicion = {};
-            for(var i in $scope.ingresos_requisicion){
+            /*for(var i in $scope.ingresos_requisicion){
                 var ingresos = $scope.ingresos_requisicion[i];
-                entrega.ingresos_requisicion[i] = $scope.ingresos_requisicion[i][$scope.recepcion.proveedor_id];
-            }
+                entrega.ingresos_requisicion[i] = $scope.ingresos_requisicion[$scope.recepcion.proveedor_id];
+            }*/
+            entrega.ingresos_requisicion = $scope.ingresos_requisicion[$scope.recepcion.proveedor_id];
 
             PedidosDataApi.guardarEntrega(entrega,function(res){
                 Mensajero.mostrarToast({contenedor:'#modulo-contenedor',mensaje:'Datos guardados con éxito.'});
@@ -598,14 +700,15 @@
             
             if($scope.aplicar_proveedor.id){
                 $scope.recepcionIniciada = true;
-                $scope.lista_insumos_requisicion = {1:[],2:[],3:[],4:[]};
+                //$scope.lista_insumos_requisicion = {1:[],2:[],3:[],4:[]};
 
-                for(var i in $scope.acta.requisiciones){
+                /*for(var i in $scope.acta.requisiciones){
                     var requisicion = $scope.acta.requisiciones[i];
-                    if(requisicion.insumos_proveedor[$scope.aplicar_proveedor.id]){
-                        $scope.lista_insumos_requisicion[requisicion.tipo_requisicion] = requisicion.insumos_proveedor[$scope.aplicar_proveedor.id];
-                    }
-                }
+                    //if(requisicion.insumos_proveedor[$scope.aplicar_proveedor.id]){
+                        //$scope.lista_insumos_requisicion[requisicion.tipo_requisicion] = requisicion.insumos_proveedor[$scope.aplicar_proveedor.id];
+                    //}
+                }*/
+
                 if($scope.entregas_guardadas[$scope.aplicar_proveedor.id]){
                     $scope.recepcion = $scope.entregas_guardadas[$scope.aplicar_proveedor.id];
                 }else{
@@ -626,13 +729,14 @@
                 //console.log($scope.lista_insumos_requisicion);
             }else{
                 $scope.recepcionIniciada = false;
-                $scope.lista_insumos_requisicion = {1:[],2:[],3:[],4:[]};
+                /*$scope.lista_insumos_requisicion = {1:[],2:[],3:[],4:[]};
                 for(var i in $scope.acta.requisiciones){
                     var requisicion = $scope.acta.requisiciones[i];
                     $scope.lista_insumos_requisicion[requisicion.tipo_requisicion] = requisicion.insumos;
-                }
+                }*/
                 $scope.recepcion.proveedor_id = undefined;
             }
+            $scope.cambiar_filtro_insumos();
         };
 
         $scope.imprimirOficio = function(){
