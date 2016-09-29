@@ -55,7 +55,7 @@
 	          </md-button>
 	          <md-menu-content width="4" >
 	            <md-menu-item>
-		            <md-button ng-click="imprimir(recepcion.id)" ng-disabled="(recepcion.estatus < 2)">
+		            <md-button ng-click="imprimirEntrega(recepcion.id)" ng-disabled="(recepcion.estatus < 2)">
 		                <div layout="row">
 		                    <p flex>Entrega actual: {{recepcion.fecha_entrega | date:'yyyy-MM-dd'}}</p>
 		                    <md-icon md-menu-align-target md-svg-icon="file" style="margin: auto 3px auto 0;"></md-icon>
@@ -63,7 +63,7 @@
 		            </md-button>
 	            </md-menu-item>
 	            <md-menu-item ng-repeat="reporte in reportes_imprimir">
-	            	<md-button ng-click="imprimir(reporte.id)">
+	            	<md-button ng-click="imprimirEntrega(reporte.id)">
 		                <div layout="row">
 		                	<p flex>Entrega previa: {{reporte.fecha_entrega | date:'yyyy-MM-dd'}}</p>
 		                    <md-icon md-menu-align-target md-svg-icon="file" style="margin: auto 3px auto 0;"></md-icon>
@@ -144,8 +144,7 @@
 		<div layout="row" layout-padding style="font-size: 14px;font-weight: 500;line-height: 1em;color: rgb(33,150,243);">
 			<div flex="15" style="text-align:center;padding-left:0px;padding-right:0px;">Clave</div>
 			<div flex style="text-align:center;padding-left:0px;padding-right:0px;">Descripción</div>
-			<div flex="15" style="text-align:center;padding-left:0px;padding-right:0px;">Pedido</div>
-			<div flex="10" style="text-align:center;padding-left:0px;padding-right:0px;">Recibido</div>
+			<div flex="25" style="text-align:center;padding-left:0px;padding-right:0px;">Cantidad</div>
 			<div flex="10" style="text-align:center;padding-left:0px;padding-right:0px;">Entrega</div>
 			<div flex="10" style="text-align:center;padding-left:0px;padding-right:0px;">Restante</div>
 		</div>
@@ -168,11 +167,8 @@
 							<small>{{insumo.descripcion}}</small>
 						</p>
 					</div>
-					<div flex="15" style="text-align:center;">
-						{{insumo.cantidad_validada | number}}
-					</div>
-					<div flex="10" style="text-align:center;">
-						{{insumo.cantidad_recibida | number}}
+					<div flex="25" style="text-align:center;">
+						{{insumo.cantidad_recibida | number}} / {{insumo.cantidad_validada | number}}
 					</div>
 					<div flex="10" style="text-align:center;">
 						<span ng-if="entrega_proveedor[aplicar_proveedor.id]">

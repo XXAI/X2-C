@@ -124,8 +124,10 @@
                             obj.icono = 'sync-alert';
                         }else if(res.data[i].estatus == 2){
                             obj.icono = 'file-send';
-                        }else if(res.data[i].estatus > 2){
+                        }else if(res.data[i].estatus == 3){
                             obj.icono = 'file-check';
+                        }else if(res.data[i].estatus > 3){
+                            obj.icono = 'file-lock';
                         }
 
                         if(res.data[i].fecha_validacion){

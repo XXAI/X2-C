@@ -112,8 +112,10 @@
                             obj.icono = 'sync-alert';
                         }else if(res.data[i].estatus == 2){
                             obj.icono = 'file-send';
-                        }else if(res.data[i].estatus > 2){
+                        }else if(res.data[i].estatus == 3){
                             obj.icono = 'file-check';
+                        }else if(res.data[i].estatus > 3){
+                            obj.icono = 'file-lock';
                         }
 
                         if(res.data[i].fecha_pedido){
@@ -233,8 +235,6 @@
         $scope.cargando = true;
         $scope.aplicar_proveedor = {};
         $scope.totales = {pedido:0, recibido:0, restante:0, porcentaje:0.00};
-        $scope.lista_insumos_requisicion = {0:[],1:[],2:[],3:[],4:[]};
-        //$scope.ingresos_requisicion = {1:{},2:{},3:{},4:{}};
         $scope.ingresos_requisicion = {};
         $scope.recepcion = {estatus:1};
         $scope.entregas_guardadas = {};
@@ -275,8 +275,7 @@
 
             if($scope.filtro_insumos.busqueda){
                 var busqueda_query = $scope.filtro_insumos.busqueda;
-                //nuevo_filtro.clave          = $scope.filtro_insumos.busqueda;
-                $scope.lista_insumos_con_filtro = lista_filtrada.filter( createFilterFor(busqueda_query,['clave','descripcion','lote']));
+                $scope.lista_insumos_con_filtro = lista_filtrada.filter( createFilterFor(busqueda_query,['clave','descripcion']));
             }else{
                 $scope.lista_insumos_con_filtro = lista_filtrada;
             }
@@ -410,7 +409,6 @@
 
                     if(!requisicion.insumos_proveedor[insumo.proveedor_id]){
                         requisicion.insumos_proveedor[insumo.proveedor_id] = [];
-                        //requisicion.entrega_proveedor[insumo.proveedor_id] = {};
                     }
 
                     if(!$scope.entrega_proveedor[insumo.proveedor_id]){
@@ -423,12 +421,9 @@
                         if(insumos_entregados[insumo.proveedor_id][insumo.insumo_id]){
                             $scope.entrega_proveedor[insumo.proveedor_id][insumo.insumo_id] = insumos_entregados[insumo.proveedor_id][insumo.insumo_id].cantidad;
                             $scope.totales.recibido += $scope.entrega_proveedor[insumo.proveedor_id][insumo.insumo_id];
-                            //if(!$scope.ingresos_requisicion[requisicion.tipo_requisicion][insumo.proveedor_id]){
                             if(!$scope.ingresos_requisicion[insumo.proveedor_id]){
-                                //$scope.ingresos_requisicion[requisicion.tipo_requisicion][insumo.proveedor_id] = {};
                                 $scope.ingresos_requisicion[insumo.proveedor_id] = {};
                             }
-                            //$scope.ingresos_requisicion[requisicion.tipo_requisicion][insumo.proveedor_id][insumo.insumo_id] = insumos_entregados[insumo.proveedor_id][insumo.insumo_id];
                             $scope.ingresos_requisicion[insumo.proveedor_id][insumo.insumo_id] = insumos_entregados[insumo.proveedor_id][insumo.insumo_id];
                         }else{
                             $scope.entrega_proveedor[insumo.proveedor_id][insumo.insumo_id] = 0;
@@ -441,15 +436,12 @@
 
                     $scope.totales.pedido += insumo.cantidad_validada;
                     $scope.totales.recibido += insumo.cantidad_recibida;
-                    //$scope.totales.restante += insumo.restante;
 
-                    //$scope.lista_insumos_requisicion[0].push(insumo);
                     $scope.lista_insumos.push(insumo);
                 }
-                //$scope.lista_insumos_requisicion[requisicion.tipo_requisicion] = requisicion.insumos;
             }
             $scope.totales.restante += $scope.totales.pedido - $scope.totales.recibido;
-            //console.log($scope.insumos_por_clues);
+            
             for(var i in proveedores){
                 if(proveedores[i].activo){
                     $scope.proveedores.push({id:i,nombre:proveedores[i].nombre})
@@ -468,20 +460,16 @@
             if(!$scope.recepcionIniciada){ return false; }
             if($scope.recepcion.estatus > 1){ return false; }
 
-            //var tipo_requisicion = $scope.acta.requisiciones[$scope.selectedIndex].tipo_requisicion;
             var tipo_requisicion = $scope.filtro_insumos.tipo_insumo.clave;
             var useFullScreen = ($mdMedia('sm') || $mdMedia('xs'))  && $scope.customFullscreen;
-            //console.log($scope.ingresos_requisicion);console.log(tipo_requisicion);
-            //if(!$scope.ingresos_requisicion[tipo_requisicion][insumo.proveedor_id]){
+            
             if(!$scope.ingresos_requisicion[insumo.proveedor_id]){
-                //$scope.ingresos_requisicion[tipo_requisicion][insumo.proveedor_id] = {};
                 $scope.ingresos_requisicion[insumo.proveedor_id] = {};
             }
 
             var locals = {
                 insumo: insumo,
                 lista_insumos: $scope.lista_insumos_con_filtro,
-                //lista_ingresos: $scope.ingresos_requisicion[tipo_requisicion][insumo.proveedor_id],
                 lista_ingresos: $scope.ingresos_requisicion[insumo.proveedor_id],
                 entrega_proveedor: $scope.entrega_proveedor[insumo.proveedor_id],
                 totales: $scope.totales
@@ -658,12 +646,7 @@
             var entrega = $scope.recepcion;
             entrega.hora_entrega = $filter('date')(entrega.hora_entrega_date,'HH:mm:ss');
             entrega.acta_id = $scope.acta.id;
-            //entrega.lista_insumos_requisicion = $scope.lista_insumos_requisicion;
-            entrega.ingresos_requisicion = {};
-            /*for(var i in $scope.ingresos_requisicion){
-                var ingresos = $scope.ingresos_requisicion[i];
-                entrega.ingresos_requisicion[i] = $scope.ingresos_requisicion[$scope.recepcion.proveedor_id];
-            }*/
+            
             entrega.ingresos_requisicion = $scope.ingresos_requisicion[$scope.recepcion.proveedor_id];
 
             PedidosDataApi.guardarEntrega(entrega,function(res){
@@ -676,7 +659,9 @@
                 $scope.cargando = false;
             },function(e){
                 $scope.cargando = false;
-                if($scope.recepcion.estatus == 2){
+                if(e.data){
+                    $scope.recepcion.estatus = e.data.estatus;
+                }else if($scope.recepcion.estatus == 2){
                     $scope.recepcion.estatus = 1;
                 }
                 if(e.error_type == 'form_validation'){
@@ -700,14 +685,6 @@
             
             if($scope.aplicar_proveedor.id){
                 $scope.recepcionIniciada = true;
-                //$scope.lista_insumos_requisicion = {1:[],2:[],3:[],4:[]};
-
-                /*for(var i in $scope.acta.requisiciones){
-                    var requisicion = $scope.acta.requisiciones[i];
-                    //if(requisicion.insumos_proveedor[$scope.aplicar_proveedor.id]){
-                        //$scope.lista_insumos_requisicion[requisicion.tipo_requisicion] = requisicion.insumos_proveedor[$scope.aplicar_proveedor.id];
-                    //}
-                }*/
 
                 if($scope.entregas_guardadas[$scope.aplicar_proveedor.id]){
                     $scope.recepcion = $scope.entregas_guardadas[$scope.aplicar_proveedor.id];
@@ -726,22 +703,31 @@
                 if($scope.entregas_imprimir[$scope.aplicar_proveedor.id]){
                     $scope.reportes_imprimir = $scope.entregas_imprimir[$scope.aplicar_proveedor.id];
                 }
-                //console.log($scope.lista_insumos_requisicion);
+                
             }else{
                 $scope.recepcionIniciada = false;
-                /*$scope.lista_insumos_requisicion = {1:[],2:[],3:[],4:[]};
-                for(var i in $scope.acta.requisiciones){
-                    var requisicion = $scope.acta.requisiciones[i];
-                    $scope.lista_insumos_requisicion[requisicion.tipo_requisicion] = requisicion.insumos;
-                }*/
                 $scope.recepcion.proveedor_id = undefined;
             }
             $scope.cambiar_filtro_insumos();
         };
 
-        $scope.imprimirOficio = function(){
-            window.open(URLS.BASE_API +'/oficio-pdf/'+$routeParams.id);
-        }
+        $scope.imprimirEntrega = function(id){
+            //RequisicionesDataApi.verPDF($routeParams.id,function(e){console.log(e)});
+            //window.open(URLS.BASE_API +'/solicitudes-pdf/'+$routeParams.id);
+            $scope.cargando = true;
+            PedidosDataApi.verEntrega(id,function(res){
+                ImprimirEntrega.imprimir(res.data, res.configuracion).then(
+                            function(res){
+                                $scope.cargando = false
+                            },function(err){
+                                console.log('error');
+                                Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:err});
+                                $scope.cargando = false
+                            });
+            },function(e){
+                $scope.cargando = false;
+            });
+        };
 
         $scope.sincronizar = function(){
             $scope.cargando = true;
@@ -765,42 +751,6 @@
                 }
             });
         };
-        
-        function devuelveMes(mes){
-            if(mes==0) return 'ENERO';
-            else if(mes==1) return 'FEBRERO';
-            else if(mes==2) return 'MARZO';
-            else if(mes==3) return 'ABRIL';
-            else if(mes==4) return 'MAYO';
-            else if(mes==5) return 'JUNIO';
-            else if(mes==6) return 'JULIO';
-            else if(mes==7) return 'AGOSTO';
-            else if(mes==8) return 'SEPTIEMBRE';
-            else if(mes==9) return 'OCTUBRE';
-            else if(mes==10) return 'NOVIEMBRE';
-            else return 'DICIEMBRE';            
-        }
-        
-        function numberFormat(numero){
-           // Variable que contendra el resultado final
-            var resultado = "";
-            var decimales = "";             
-            // Tomamos el numero eliminando los posibles puntos que tenga
-            var nuevoNumero=numero.replace(/\./g,'');               
-            // Si tiene decimales, se los quitamos al numero                
-            if(numero.indexOf(".")>=0)
-            {
-                nuevoNumero = nuevoNumero.substring(0,numero.indexOf(".")); 
-                decimales = "."+numero.substring(numero.length,numero.indexOf(".")+1);
-            }
-           // Ponemos una coma cada 3 caracteres
-            for (var j, i = nuevoNumero.length - 1, j = 0; i >= 0; i--, j++)
-                resultado = nuevoNumero.charAt(i) + ((j > 0) && (j % 3 == 0)? ",": "") + resultado;
- 
-            resultado = resultado + decimales; 
-
-            return resultado;
-        }
         
         $scope.menuCerrado = !UsuarioData.obtenerEstadoMenu();
         if(!$scope.menuCerrado){
