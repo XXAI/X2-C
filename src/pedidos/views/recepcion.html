@@ -1,7 +1,7 @@
  <md-sidenav ng-class="(menuCerrado)?'menu-principal-izq':''" layout="column"   class="md-sidenav-left md-whiteframe-z2" md-component-id="left" md-is-locked-open="$mdMedia('gt-sm')"   ng-include="'src/app/views/menu.html'"></md-sidenav>
 <div layout="column" class="relative" layout-fill role="main" id="modulo-nuevo">
 	<md-progress-linear  ng-if="cargando" class="md-accent" style="position:fixed; top:-3px; left:0px; z-index:999"  md-mode="indeterminate"></md-progress-linear>
-	<md-toolbar layout="column" class="md-whiteframe-z2">
+	<md-toolbar  id="modulo-contenedor" layout="column" class="md-whiteframe-z2">
 		<div class="md-toolbar-tools">    
 			<md-button hide-gt-sm class="md-icon-button " ng-click="toggleMenu(true)" aria-label="Menu">
 		        <md-icon md-svg-icon="menu" ></md-icon>
@@ -74,7 +74,7 @@
 	        </md-menu>
 		</div>
 	</md-toolbar>
-	<md-content id="modulo-contenedor" ng-show="toggleDatosActa" layout="row" flex="none" layout-wrap layout-padding style="overflow:visible;">
+	<md-content ng-show="toggleDatosActa" layout="row" flex="none" layout-wrap layout-padding style="overflow:visible;">
 		<md-input-container flex="60" class="md-block"  md-is-error="validacion.proveedor_id" style="margin-bottom:0px;" ng-disabled="(acta.estatus != 4 || cargando)">
 			<label>Proveedor</label>
 			<md-select ng-model="aplicar_proveedor.id" aria-label="proveedor general" ng-change="cambiarProveedor()">
@@ -82,7 +82,7 @@
 					Sin Proveedor
 				</md-option>
 				<md-option ng-repeat="proveedor in proveedores" ng-value="proveedor.id">
-					{{(entregas_guardadas[proveedor.id])?'* ':''}}{{proveedor.nombre}}
+					{{(entregas_guardadas[proveedor.id])?'* ':''}}{{proveedor.nombre}} [ Entregas: {{(entregas_imprimir[proveedor.id].length || 0)}} ]
 				</md-option>
 			</md-select>
 			<div class="errors" ng-messages="validacion.proveedor_id" >
@@ -100,20 +100,6 @@
 			<label>Hora de Entrega</label>
 			<input type="time" ng-model="recepcion.hora_entrega_date">
 			<div class="errors" ng-messages="validacion.hora_entrega" >
-              <div ng-message="required">{{ 'CAMPO_REQUERIDO' | translate }}</div>
-            </div>
-		</md-input-container>
-		<md-input-container flex="50" md-is-error="validacion.nombre_recibe" class="md-block" style="margin-bottom:0px;">
-			<label>Nombre de Quien Recibe</label>
-			<input ng-model="recepcion.nombre_recibe">
-			<div class="errors" ng-messages="validacion.nombre_recibe" >
-              <div ng-message="required">{{ 'CAMPO_REQUERIDO' | translate }}</div>
-            </div>
-		</md-input-container>
-		<md-input-container flex="50" md-is-error="validacion.nombre_entrega" class="md-block" style="margin-bottom:0px;">
-			<label>Nombre de Quien Entrega</label>
-			<input ng-model="recepcion.nombre_entrega">
-			<div class="errors" ng-messages="validacion.nombre_entrega" >
               <div ng-message="required">{{ 'CAMPO_REQUERIDO' | translate }}</div>
             </div>
 		</md-input-container>
@@ -144,8 +130,8 @@
 		<div layout="row" layout-padding style="font-size: 14px;font-weight: 500;line-height: 1em;color: rgb(33,150,243);">
 			<div flex="15" style="text-align:center;padding-left:0px;padding-right:0px;">Clave</div>
 			<div flex style="text-align:center;padding-left:0px;padding-right:0px;">Descripción</div>
-			<div flex="25" style="text-align:center;padding-left:0px;padding-right:0px;">Cantidad</div>
-			<div flex="10" style="text-align:center;padding-left:0px;padding-right:0px;">Entrega</div>
+			<div flex="25" style="text-align:center;padding-left:0px;padding-right:0px;">Cantidad Total</div>
+			<div flex="10" style="text-align:center;padding-left:0px;padding-right:0px;">Recibido</div>
 			<div flex="10" style="text-align:center;padding-left:0px;padding-right:0px;">Restante</div>
 		</div>
 		<md-divider></md-divider>

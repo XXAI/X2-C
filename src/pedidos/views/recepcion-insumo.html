@@ -9,63 +9,74 @@
         </md-button>
       </div>
     </md-toolbar>
-    <md-dialog-content>
-      <div class="md-dialog-content" layout="column">
-        <div flex layout="row" layout-wrap>
-          <div flex="100">
-            <div class="hint">{{insumo.clave}}</div>
-          </div>
-          <div flex="100">
-            <div class="hint">{{insumo.descripcion}}</div>
-          </div>
-          <md-input-container flex style="margin-bottom:0px;height:46px;">
-            <label>Lote</label>
-            <input value="{{insumo.lote}}" readonly>
-          </md-input-container>
-          <md-input-container flex style="margin-bottom:0px;height:46px;">
-            <label>Unidad</label>
-            <input value="{{insumo.unidad}}" readonly>
-          </md-input-container>
-          <md-input-container flex style="margin-bottom:0px;height:46px;">
-            <label>Precio</label>
-            <input value="$ {{insumo.precio | number:2}}" readonly>
-          </md-input-container>
-          <md-input-container flex style="margin-bottom:0px;height:46px;">
-            <label>Cantidad</label>
-            <input value="{{insumo.cantidad_recibida | number}} / {{insumo.cantidad_validada | number}}" readonly>
-          </md-input-container>
-          <md-input-container flex style="margin-bottom:0px;height:46px;">
-            <label>Total</label>
-            <input value="$ {{insumo.total_validado | number:2}}" readonly>
-          </md-input-container>
+    <md-subheader class="md-primary md-hue-1">
+      <div flex layout="row" layout-wrap>
+        <div flex="100">
+          {{insumo.clave}}
         </div>
-        <md-divider></md-divider>
-        <div flex layout="row" layout-wrap ng-show="(insumo.cantidad_recibida != insumo.cantidad_validada)">
-          <md-input-container flex md-is-error="validacion.lote">
-            <label>Lote</label>
-            <input id="ingreso_lote" ng-model="ingreso.lote" tabindex="1" md-autofocus="(ingreso_respaldo == undefined)">
-            <div class="errors" ng-messages="validacion.lote" >
-              <div ng-message="required">{{ 'CAMPO_REQUERIDO' | translate }}</div>
-            </div>
-          </md-input-container>
-          <md-input-container flex md-is-error="validacion.fecha_caducidad">
-            <label>Fecha de Caducidad</label>
-            <input type="date" ng-model="ingreso.fecha_caducidad" tabindex="2">
-            <div class="errors" ng-messages="validacion.fecha_caducidad" >
-              <div ng-message="required">{{ 'CAMPO_REQUERIDO' | translate }}</div>
-            </div>
-          </md-input-container>
-          <md-input-container flex md-is-error="validacion.cantidad">
-            <label>Cantidad</label>
-            <input type="number" ng-model="ingreso.cantidad" tabindex="3" md-autofocus="(ingreso_respaldo != undefined)" ng-keyup="$event.keyCode == 13 ? answer(true) : null">
-            <div class="errors" ng-messages="validacion.cantidad" md-auto-hide="false">
-              <div ng-message="required">{{ 'CAMPO_REQUERIDO' | translate }}</div>
-              <div ng-message="min">La cantidad no debe ser menor que 0</div>
-              <div ng-message="max">La cantidad recibida no debe reabasar la cantidad pedida</div>
-            </div>
-          </md-input-container>
+        <div flex="100">
+          {{insumo.descripcion}}
         </div>
+        <md-input-container flex="none" style="margin-bottom:0px;height:46px;">
+          <label>Lote</label>
+          <input value="{{insumo.lote}}" readonly>
+        </md-input-container>
+        <md-input-container flex style="margin-bottom:0px;height:46px;">
+          <label>Unidad</label>
+          <input value="{{insumo.unidad}}" readonly>
+        </md-input-container>
+        <md-input-container flex="none" style="margin-bottom:0px;height:46px;">
+          <label>Precio</label>
+          <input value="$ {{insumo.precio | number:2}}" readonly>
+        </md-input-container>
+        <md-input-container flex="none" style="margin-bottom:0px;height:46px;">
+          <label>Cantidad</label>
+          <input value="{{insumo.cantidad_recibida | number}} / {{insumo.cantidad_validada | number}}" readonly>
+        </md-input-container>
+        <md-input-container flex="none" style="margin-bottom:0px;height:46px;">
+          <label>Total</label>
+          <input value="$ {{insumo.total_validado | number:2}}" readonly>
+        </md-input-container>
       </div>
+    </md-subheader><!--You can use md-no-sticky class-->
+    <md-dialog-content>
+      <md-list layout="column" ng-show="(insumo.cantidad_recibida != insumo.cantidad_validada)">
+        <md-list-item ng-repeat="ingreso_lote in ingreso.lotes track by $index">
+          <div flex layout="row" layout-wrap layout-padding>
+            <md-input-container style="margin-bottom:0px;" flex md-is-error="ingreso_lote.validacion.lote">
+              <label>Lote</label>
+              <input id="ingreso_lote_{{$index}}" ng-model="ingreso_lote.lote">
+              <div class="errors" ng-messages="ingreso_lote.validacion.lote" >
+                <div ng-message="required">{{ 'CAMPO_REQUERIDO' | translate }}</div>
+              </div>
+            </md-input-container>
+            <md-input-container style="margin-bottom:0px;" flex md-is-error="ingreso_lote.validacion.fecha_caducidad">
+              <label>Fecha de Caducidad</label>
+              <input type="date" ng-model="ingreso_lote.fecha_caducidad">
+              <div class="errors" ng-messages="ingreso_lote.validacion.fecha_caducidad" md-auto-hide="false">
+                <div ng-message="required">{{ 'CAMPO_REQUERIDO' | translate }}</div>
+                <div ng-message="min">El medicamento ya está caducado</div>
+              </div>
+            </md-input-container>
+            <md-input-container style="margin-bottom:0px;" flex md-is-error="ingreso_lote.validacion.cantidad">
+              <label>Cantidad</label>
+              <input type="number" ng-model="ingreso_lote.cantidad" ng-keyup="$event.keyCode == 13 ? answer(true) : null">
+              <div class="errors" ng-messages="ingreso_lote.validacion.cantidad" md-auto-hide="false">
+                <div ng-message="required">{{ 'CAMPO_REQUERIDO' | translate }}</div>
+                <div ng-message="min">La cantidad no debe ser menor que 0</div>
+                <div ng-message="max">La cantidad recibida no debe reabasar la cantidad pedida</div>
+              </div>
+            </md-input-container>
+            <div flex="none">
+              <md-icon></md-icon>
+            </div>
+          </div>
+          <md-icon md-svg-icon="delete" ng-if="(ingreso.lotes.length > 1)" ng-click="quitarLote($index)" aria-label="Borrar acta" class="md-secondary md-hue-3">
+          </md-icon>
+          <md-divider></md-divider>
+        </md-list-item>
+      </md-list>
+      <div class="md-dialog-content" layout="column"></div>
     </md-dialog-content>
     <md-dialog-actions layout="row">
       <!--md-button class="md-raised" ng-click="anterior()" ng-disabled="(index_anterior == undefined)" aria-label="anterior">
@@ -75,10 +86,13 @@
         <md-icon md-svg-icon="chevron-right"></md-icon>
       </md-button-->
       <span flex></span>
+      <md-button class="md-raised" ng-click="agregarLote()">
+        <md-icon md-svg-icon="plus-circle"></md-icon> Agregar Lote
+      </md-button>
       <!--md-button class="md-raised md-primary" ng-click="answer(false)" ng-disabled="(index_siguiente == undefined)" tabindex="4">
         <md-icon md-svg-icon="content-save-all"></md-icon> Guardar y Seguir
       </md-button-->
-      <md-button class="md-raised md-primary" ng-click="answer(true)" tabindex="5">
+      <md-button class="md-raised md-primary" ng-click="answer(true)">
         <md-icon md-svg-icon="check"></md-icon> Aceptar
       </md-button>
     </md-dialog-actions>
