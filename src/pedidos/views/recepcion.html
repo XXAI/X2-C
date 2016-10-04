@@ -54,7 +54,7 @@
 	            <md-icon md-menu-origin md-svg-icon="printer"></md-icon>
 	          </md-button>
 	          <md-menu-content width="4" >
-	            <md-menu-item>
+	            <md-menu-item ng-if="(recepcion.estatus >= 2)">
 		            <md-button ng-click="imprimirEntrega(recepcion.id)" ng-disabled="(recepcion.estatus < 2)">
 		                <div layout="row">
 		                    <p flex>Entrega actual: {{recepcion.fecha_entrega | date:'yyyy-MM-dd'}}</p>
@@ -62,10 +62,10 @@
 		                </div>
 		            </md-button>
 	            </md-menu-item>
-	            <md-menu-item ng-repeat="reporte in reportes_imprimir">
-	            	<md-button ng-click="imprimirEntrega(reporte.id)">
+	            <md-menu-item ng-if="(reporte_imprimir && recepcion.estatus < 2)">
+	            	<md-button ng-click="imprimirEntrega(reporte_imprimir.id)">
 		                <div layout="row">
-		                	<p flex>Entrega previa: {{reporte.fecha_entrega | date:'yyyy-MM-dd'}}</p>
+		                	<p flex>Entrega previa: {{reporte_imprimir.fecha_entrega | date:'yyyy-MM-dd'}}</p>
 		                    <md-icon md-menu-align-target md-svg-icon="file" style="margin: auto 3px auto 0;"></md-icon>
 		                </div>
 		            </md-button>
@@ -82,7 +82,7 @@
 					Sin Proveedor
 				</md-option>
 				<md-option ng-repeat="proveedor in proveedores" ng-value="proveedor.id">
-					{{(entregas_guardadas[proveedor.id])?'* ':''}}{{proveedor.nombre}} [ Entregas: {{(entregas_imprimir[proveedor.id].length || 0)}} ]
+					{{(entregas_guardadas[proveedor.id])?'* ':''}}{{proveedor.nombre}} [ Ultima Entrega: {{((entregas_imprimir[proveedor.id])?(entregas_imprimir[proveedor.id].fecha_entrega | date:'dd/MM/yyyy'):'Ninguna')}} ]
 				</md-option>
 			</md-select>
 			<div class="errors" ng-messages="validacion.proveedor_id" >

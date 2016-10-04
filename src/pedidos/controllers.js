@@ -221,10 +221,10 @@
     }])
     .controller('FormPedidoCtrl',
     ['$rootScope', '$scope', 'PedidosDataApi', '$mdSidenav','$location','$mdBottomSheet','$routeParams','$filter','$localStorage',
-    '$http','$mdToast','Auth','Menu','URLS','UsuarioData','$mdDialog','$mdMedia','$window','Mensajero',
+    '$http','$mdToast','Auth','Menu','URLS','UsuarioData','$mdDialog','$mdMedia','$window','Mensajero','ImprimirEntrega',
     function(
     $rootScope, $scope, PedidosDataApi,$mdSidenav,$location,$mdBottomSheet,$routeParams,$filter,$localStorage,
-    $http,$mdToast,Auth,Menu,URLS,UsuarioData,$mdDialog,$mdMedia,$window,Mensajero
+    $http,$mdToast,Auth,Menu,URLS,UsuarioData,$mdDialog,$mdMedia,$window,Mensajero,ImprimirEntrega
     ){
         $scope.menuSelected = "/pedidos";
         $scope.menu = Menu.getMenu();
@@ -238,7 +238,7 @@
         $scope.ingresos_requisicion = {};
         $scope.recepcion = {estatus:1};
         $scope.entregas_guardadas = {};
-        $scope.reportes_imprimir = [];
+        $scope.reporte_imprimir = undefined;
         $scope.tipos_requisiciones = [];
         
 
@@ -337,9 +337,9 @@
                         $scope.entregas_guardadas[entrega.proveedor_id] = entrega;
                     }else{
                         if(!$scope.entregas_imprimir[entrega.proveedor_id]){
-                            $scope.entregas_imprimir[entrega.proveedor_id] = [];
+                            $scope.entregas_imprimir[entrega.proveedor_id] = entrega;
                         }
-                        $scope.entregas_imprimir[entrega.proveedor_id].push(entrega);
+                        //$scope.entregas_imprimir[entrega.proveedor_id].push(entrega);
                     }
 
                     if(entrega.estatus == 1){
@@ -803,7 +803,7 @@
 
         $scope.cambiarProveedor = function(){
             $scope.recepcion = {estatus:1};
-            $scope.reportes_imprimir = [];
+            $scope.reporte_imprimir = undefined;
             
             if($scope.aplicar_proveedor.id){
                 $scope.recepcionIniciada = true;
@@ -823,7 +823,7 @@
                 }
 
                 if($scope.entregas_imprimir[$scope.aplicar_proveedor.id]){
-                    $scope.reportes_imprimir = $scope.entregas_imprimir[$scope.aplicar_proveedor.id];
+                    $scope.reporte_imprimir = $scope.entregas_imprimir[$scope.aplicar_proveedor.id];
                 }
                 
             }else{
@@ -838,7 +838,7 @@
             //window.open(URLS.BASE_API +'/solicitudes-pdf/'+$routeParams.id);
             $scope.cargando = true;
             PedidosDataApi.verEntrega(id,function(res){
-                ImprimirEntrega.imprimir(res.data, res.configuracion).then(
+                ImprimirEntrega.imprimir(res.data, res.configuracion, res.proveedor).then(
                             function(res){
                                 $scope.cargando = false
                             },function(err){
