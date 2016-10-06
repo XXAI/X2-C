@@ -94,6 +94,7 @@
 					$localStorage.control_desabasto = {};
 					$localStorage.samm_modulo_requisiciones = undefined;
 					$localStorage.samm_modulo_actas = undefined;
+					$localStorage.samm_modulo_unidades = undefined;
 					success();
 				}
 			};
