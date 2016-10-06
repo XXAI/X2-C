@@ -1020,9 +1020,9 @@
 
 
 
-        /*$scope.exportar = function(){
+        $scope.exportar = function(){
             window.open(URLS.BASE_API +'/exportar-csv/'+$routeParams.id+'?token='+$localStorage.control_desabasto.access_token);
-        }*/
+        }
 
         $scope.sincronizar = function(){
             $scope.cargando = true;
