@@ -57,7 +57,7 @@
 	            <md-menu-item ng-if="(recepcion.estatus >= 2)">
 		            <md-button ng-click="imprimirEntrega(recepcion.id)" ng-disabled="(recepcion.estatus < 2)">
 		                <div layout="row">
-		                    <p flex>Entrega actual: {{recepcion.fecha_entrega | date:'yyyy-MM-dd'}}</p>
+		                    <p flex>Recepción actual: {{recepcion.fecha_entrega | date:'yyyy-MM-dd'}}</p>
 		                    <md-icon md-menu-align-target md-svg-icon="file" style="margin: auto 3px auto 0;"></md-icon>
 		                </div>
 		            </md-button>
@@ -65,10 +65,15 @@
 	            <md-menu-item ng-if="(reporte_imprimir && recepcion.estatus < 2)">
 	            	<md-button ng-click="imprimirEntrega(reporte_imprimir.id)">
 		                <div layout="row">
-		                	<p flex>Entrega previa: {{reporte_imprimir.fecha_entrega | date:'yyyy-MM-dd'}}</p>
+		                	<p flex>Recepción previa: {{reporte_imprimir.fecha_entrega | date:'yyyy-MM-dd'}}</p>
 		                    <md-icon md-menu-align-target md-svg-icon="file" style="margin: auto 3px auto 0;"></md-icon>
 		                </div>
 		            </md-button>
+	            </md-menu-item>
+	            <md-menu-item ng-if="(!reporte_imprimir && recepcion.estatus == 1)">
+	            	<md-button ng-click="imprimirEntrega(reporte_imprimir.id)" ng-disabled="true">
+	            		Sin Recepciones
+	            	</md-button>
 	            </md-menu-item>
 	          </md-menu-content>
 	        </md-menu>
@@ -82,7 +87,7 @@
 					Sin Proveedor
 				</md-option>
 				<md-option ng-repeat="proveedor in proveedores" ng-value="proveedor.id">
-					{{(entregas_guardadas[proveedor.id])?'* ':''}}{{proveedor.nombre}} [ Ultima Entrega: {{((entregas_imprimir[proveedor.id])?(entregas_imprimir[proveedor.id].fecha_entrega | date:'dd/MM/yyyy'):'Ninguna')}} ]
+					{{(entregas_guardadas[proveedor.id])?'* ':''}}{{proveedor.nombre}} [ Ultima Recepción: {{((entregas_imprimir[proveedor.id])?(entregas_imprimir[proveedor.id].fecha_entrega | date:'dd/MM/yyyy'):'Ninguna')}} ]
 				</md-option>
 			</md-select>
 			<div class="errors" ng-messages="validacion.proveedor_id" >
