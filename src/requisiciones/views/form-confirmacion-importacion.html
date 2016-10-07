@@ -1,0 +1,31 @@
+<sd-dialog aria-label="form confirmacion" flex ng-cloak>
+    <form>
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2>Confirmación</h2>
+                <span flex></span>
+                <md-button class="md-icon-button" ng-click="cancel()">
+                    <md-icon md-svg-icon="close" aria-label="Close dialog"></md-icon>
+                </md-button>
+            </div>
+        </md-toolbar>
+        <sd-dialog-content>
+              <span class="item-title">
+                <div layout="row" layout-padding>
+                    <div flex="none"> <strong>Se ha detectado que existen registros para la clues a importar, ¿Qué desea hacer?</strong></div>
+                    <div flex></div>
+                </div>
+              </span>
+
+        </sd-dialog-content>
+        <sd-dialog-actions layout="row">
+            <span flex></span>
+            <md-button ng-disabled="cargando" class="md-raised md-primary" ng-click="sustituir()" style="margin-right:20px;">
+                <md-icon md-svg-icon="cached"></md-icon> Actualizar Información
+            </md-button>
+            <md-button ng-disabled="cargando" class="md-raised md-primary" ng-click="agregar_solicitud()" style="margin-right:20px;">
+                <md-icon md-svg-icon="plus-circle-outline"></md-icon> Añadir Información sin sustituir
+            </md-button>
+        </sd-dialog-actions>
+    </form>
+</sd-dialog>

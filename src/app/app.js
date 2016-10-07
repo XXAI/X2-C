@@ -15,6 +15,7 @@
 									'UsuariosModule',
 									'RolesModule',
 									'ActasModule',
+                                    'RequisicionesUnidadesModule',
 									'RequisicionesModule',
 									'SolicitudesModule',
 									'PedidosModule',

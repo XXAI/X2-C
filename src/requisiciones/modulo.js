@@ -4,7 +4,7 @@
 	requisicionesModule.config(['$mdThemingProvider','$mdIconProvider','$routeProvider','$httpProvider','$translateProvider',function($mdThemingProvider,$mdIconProvider,$routeProvider,$httpProvider,$translateProvider){
 		$routeProvider.when('/requisiciones',{
 			templateUrl: 'src/requisiciones/views/requisicion.html',
-			controller: 'RequisicionesCtrl',
+			controller: 'RequisicionesCtrl'
 		});
 	}]);
 })();
