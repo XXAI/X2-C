@@ -102,7 +102,12 @@
                             fecha: new Date(res.data[i].fecha + ' 00:00:00'),
                             fecha_pedido: undefined,
                             estatus: res.data[i].estatus,
+                            requisiciones:'',
                             numero_requisiciones: res.data[i].requisiciones.length,
+                            total_claves_recibidas:res.data[i].total_claves_recibidas,
+                            total_claves_validadas:res.data[i].total_claves_validadas,
+                            total_cantidad_recibida: res.data[i].total_cantidad_recibida,
+                            total_cantidad_validada: res.data[i].total_cantidad_validada,
                             total_validado: 0
                         };
 
@@ -122,10 +127,17 @@
                             obj.fecha_pedido = new Date(res.data[i].fecha_pedido);
                         }
 
+                        var requisiciones_arreglo = [];
+                        var repetidos = {};
                         for(var j in res.data[i].requisiciones){
                             var requisicion = res.data[i].requisiciones[j];
                             obj.total_validado +=  parseFloat(requisicion.gran_total_validado) || 0;
+                            if(!repetidos[requisicion.numero]){
+                                repetidos[requisicion.numero] = true;
+                                requisiciones_arreglo.push(requisicion.numero);
+                            }
                         }
+                        obj.requisiciones = requisiciones_arreglo.join(' - ');
                         
                         $scope.pedidosInfinitos.pedidos.push(obj);
                         $scope.pedidosInfinitos.numLoaded_++;

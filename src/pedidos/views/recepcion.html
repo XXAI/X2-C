@@ -87,7 +87,7 @@
 					Sin Proveedor
 				</md-option>
 				<md-option ng-repeat="proveedor in proveedores" ng-value="proveedor.id">
-					{{(entregas_guardadas[proveedor.id])?'* ':''}}{{proveedor.nombre}} [ Ultima Recepción: {{((entregas_imprimir[proveedor.id])?(entregas_imprimir[proveedor.id].fecha_entrega | date:'dd/MM/yyyy'):'Ninguna')}} ]
+					{{(entregas_guardadas[proveedor.id])?'* ':''}}{{proveedor.nombre}} [ Ultima Recepción: {{((entregas_imprimir[proveedor.id])?(entregas_imprimir[proveedor.id].fecha_entrega | date:'dd/MM/yyyy') + ' | ' + (entregas_imprimir[proveedor.id].porcentaje_cantidad | number:2) + ' % completado':'Ninguna')}} ]
 				</md-option>
 			</md-select>
 			<div class="errors" ng-messages="validacion.proveedor_id" >

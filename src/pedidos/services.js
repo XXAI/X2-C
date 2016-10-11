@@ -99,12 +99,14 @@
 
 					for(var i in entrega.acta.requisiciones){
 						var requisicion = entrega.acta.requisiciones[i];
-						for(var j in requisicion.insumos){
-							var insumo = requisicion.insumos[j];
-							if(insumos[requisicion.tipo_requisicion].items[insumo.id]){
-								insumos[requisicion.tipo_requisicion].items[insumo.id].autorizado	= insumo.pivot.cantidad_validada;
-								insumos[requisicion.tipo_requisicion].items[insumo.id].acumulado	= insumo.pivot.cantidad_recibida - insumos[requisicion.tipo_requisicion].items[insumo.id].total_cantidad;
-								insumos[requisicion.tipo_requisicion].items[insumo.id].restante		= insumo.pivot.cantidad_validada - insumo.pivot.cantidad_recibida;
+						if(insumos[requisicion.tipo_requisicion]){
+							for(var j in requisicion.insumos){
+								var insumo = requisicion.insumos[j];
+								if(insumos[requisicion.tipo_requisicion].items[insumo.id]){
+									insumos[requisicion.tipo_requisicion].items[insumo.id].autorizado	= insumo.pivot.cantidad_validada;
+									insumos[requisicion.tipo_requisicion].items[insumo.id].acumulado	= insumo.pivot.cantidad_recibida - insumos[requisicion.tipo_requisicion].items[insumo.id].total_cantidad;
+									insumos[requisicion.tipo_requisicion].items[insumo.id].restante		= insumo.pivot.cantidad_validada - insumo.pivot.cantidad_recibida;
+								}
 							}
 						}
 					}
