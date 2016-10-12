@@ -8,7 +8,7 @@
 			<md-button hide-gt-sm class="md-icon-button " ng-click="toggleMenu(true)" aria-label="Menu">
 		        <md-icon md-svg-icon="menu" ></md-icon>
 		    </md-button>   
-			<h2><span ng-hide="textoBuscado">Pedidos</span><span ng-show="textoBuscado">Resultados para: "{{textoBuscado}}"</span></h2>
+			<h2><span ng-hide="textoBuscado">Recepción de Pedidos</span><span ng-show="textoBuscado">Resultados para: "{{textoBuscado}}"</span></h2>
 			<span flex></span>
 			
 			<md-button class="md-icon-button" aria-label="buscar" ng-click="prepararBusqueda()" >
@@ -53,9 +53,9 @@
 		</md-content>
 	</md-sidenav>
 
-	<md-virtual-repeat-container style="height:880px;" id="modulo-pedidos">
+	<md-virtual-repeat-container style="height:880px;" id="modulo-recepcion">
 		<md-list layout="column">
-      		<md-list-item class="md-3-line paciente-item" md-virtual-repeat="acta in pedidosInfinitos" md-on-demand ng-click="ir('pedidos/'+acta.id+'/recepcion')" ng-hide="!acta.id">
+      		<md-list-item class="md-3-line paciente-item" md-virtual-repeat="acta in pedidosInfinitos" md-on-demand ng-click="ir('recepcion/'+acta.id+'/entrada')" ng-hide="!acta.id">
       			<md-icon ng-if="acta.id" md-svg-icon="{{acta.icono}}" class="md-avatar-icon"></md-icon>
 				<div class="md-list-item-text">
 		        	<h3>

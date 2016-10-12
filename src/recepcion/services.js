@@ -1,25 +1,25 @@
 (function(){
 	'use strict';
-	angular.module('PedidosModule')
-		.factory('PedidosDataApi', ['$http', 'URLS', function ($http, URLS) {
+	angular.module('RecepcionModule')
+		.factory('RecepcionDataApi', ['$http', 'URLS', function ($http, URLS) {
 	    	return {
 				lista: function (params,success, error) {
-	               $http.get(URLS.BASE_API + '/pedidos',{params:params}).success(success).error(error)
+	               $http.get(URLS.BASE_API + '/recepcion',{params:params}).success(success).error(error)
 				},
 				ver: function (id, success, error) {
-					$http.get(URLS.BASE_API + '/pedidos/' + id).success(success).error(error)
+					$http.get(URLS.BASE_API + '/recepcion/' + id).success(success).error(error)
 				},
 				verEntrega: function (id, success, error) {
-					$http.get(URLS.BASE_API + '/ver-entrega/' + id).success(success).error(error)
+					$http.get(URLS.BASE_API + '/ver-entrada/' + id).success(success).error(error)
 				},
 				cargarConfiguracion: function (id, success, error) {
 					$http.get(URLS.BASE_API + '/configuracion/' + id).success(success).error(error)
 				},
 				guardarEntrega: function (data, success, error) {
-					$http.post(URLS.BASE_API + '/pedidos', data).success(success).error(error)
+					$http.post(URLS.BASE_API + '/recepcion', data).success(success).error(error)
 				},
 				sincronizar: function (id, success, error) {
-	               $http.get(URLS.BASE_API + '/sincronizar-entrega/' + id).success(success).error(error)
+	               $http.get(URLS.BASE_API + '/sincronizar-entrada/' + id).success(success).error(error)
 	           	},
 	           	insumos: function (success, error) {
 	           		$http.get(URLS.BASE_API + '/insumos').success(success).error(error)
@@ -28,8 +28,8 @@
 		}
 	]);
 
-	angular.module('PedidosModule')
-		.service('ImprimirEntrega',['$filter','$q',function($filter,$q){
+	angular.module('RecepcionModule')
+		.service('ImprimirEntrada',['$filter','$q',function($filter,$q){
         return {
             imprimir: function(entrega, configuracion, proveedor) {
 				var defer = $q.defer();

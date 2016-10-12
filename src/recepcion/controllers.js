@@ -1,9 +1,9 @@
 (function(){
 	'use strict';
-    angular.module('PedidosModule')
-    .controller('PedidosCtrl',
-    ['$rootScope', '$scope', 'PedidosDataApi', '$mdSidenav','$location','$http','URLS','$timeout','$mdBottomSheet','Auth','Menu','UsuarioData','$mdMedia','$mdDialog','$document','Mensajero', 
-    function($rootScope, $scope, PedidosDataApi,$mdSidenav,$location,$http,URLS,$timeout,$mdBottomSheet,Auth, Menu, UsuarioData,$mdMedia,$mdDialog,$document,Mensajero){
+    angular.module('RecepcionModule')
+    .controller('RecepcionCtrl',
+    ['$rootScope', '$scope', 'RecepcionDataApi', '$mdSidenav','$location','$http','URLS','$timeout','$mdBottomSheet','Auth','Menu','UsuarioData','$mdMedia','$mdDialog','$document','Mensajero', 
+    function($rootScope, $scope, RecepcionDataApi,$mdSidenav,$location,$http,URLS,$timeout,$mdBottomSheet,Auth, Menu, UsuarioData,$mdMedia,$mdDialog,$document,Mensajero){
         $scope.menuSelected = $location.path();
         $scope.menu = Menu.getMenu();
         $scope.menuIsOpen = false;
@@ -89,7 +89,7 @@
                     parametros.query = $scope.textoBuscado;
                 }
 
-                PedidosDataApi.lista(parametros,function (res) {
+                RecepcionDataApi.lista(parametros,function (res) {
                     if($scope.pedidosInfinitos.maxItems != res.totales){
                         $scope.pedidosInfinitos.maxItems = res.totales;
                     }
@@ -149,9 +149,9 @@
                     }
                 }, function (e, status) {
                     if(status == 403){
-                        Mensajero.mostrarToast({contenedor:'#modulo-pedidos',titulo:'Acceso Denegado:',mensaje:'No tiene permiso para listar estos elementos.'});
+                        Mensajero.mostrarToast({contenedor:'#modulo-recepcion',titulo:'Acceso Denegado:',mensaje:'No tiene permiso para listar estos elementos.'});
                     }else{
-                        Mensajero.mostrarToast({contenedor:'#modulo-pedidos',titulo:'Error:',mensaje:'Ocurrió un error al intentar listar los elementos.'});
+                        Mensajero.mostrarToast({contenedor:'#modulo-recepcion',titulo:'Error:',mensaje:'Ocurrió un error al intentar listar los elementos.'});
                     }
                     $scope.pedidosInfinitos.maxItems = 0;
                     $scope.cargandoLista = false;
@@ -231,12 +231,12 @@
             $location.path(path);
         };
     }])
-    .controller('FormPedidoCtrl',
-    ['$rootScope', '$scope', 'PedidosDataApi', '$mdSidenav','$location','$mdBottomSheet','$routeParams','$filter','$localStorage',
-    '$http','$mdToast','Auth','Menu','URLS','UsuarioData','$mdDialog','$mdMedia','$window','Mensajero','ImprimirEntrega',
+    .controller('FormRecepcionCtrl',
+    ['$rootScope', '$scope', 'RecepcionDataApi', '$mdSidenav','$location','$mdBottomSheet','$routeParams','$filter','$localStorage',
+    '$http','$mdToast','Auth','Menu','URLS','UsuarioData','$mdDialog','$mdMedia','$window','Mensajero','ImprimirEntrada',
     function(
-    $rootScope, $scope, PedidosDataApi,$mdSidenav,$location,$mdBottomSheet,$routeParams,$filter,$localStorage,
-    $http,$mdToast,Auth,Menu,URLS,UsuarioData,$mdDialog,$mdMedia,$window,Mensajero,ImprimirEntrega
+    $rootScope, $scope, RecepcionDataApi,$mdSidenav,$location,$mdBottomSheet,$routeParams,$filter,$localStorage,
+    $http,$mdToast,Auth,Menu,URLS,UsuarioData,$mdDialog,$mdMedia,$window,Mensajero,ImprimirEntrada
     ){
         $scope.menuSelected = "/pedidos";
         $scope.menu = Menu.getMenu();
@@ -317,7 +317,7 @@
             };
         };
 
-        PedidosDataApi.ver($routeParams.id,function(res){
+        RecepcionDataApi.ver($routeParams.id,function(res){
             $scope.acta = res.data;
             $scope.configuracion = res.configuracion;
             $scope.proveedores = [];
@@ -668,7 +668,7 @@
                         }
                     };
                 },
-                templateUrl: 'src/pedidos/views/recepcion-insumo.html',
+                templateUrl: 'src/recepcion/views/recepcion-insumo.html',
                 parent: angular.element(document.body),
                 targetEvent: ev,
                 clickOutsideToClose:false,
@@ -730,7 +730,7 @@
                         
                         entrega.estatus = 2;
 
-                        PedidosDataApi.guardarEntrega(entrega,function(res){
+                        RecepcionDataApi.guardarEntrega(entrega,function(res){
                             $scope.recepcion.estatus = res.data.estatus;
                             $scope.recepcion.id = res.data.id;
                             if(!$scope.entregas_guardadas[$scope.recepcion.proveedor_id]){
@@ -762,7 +762,7 @@
                         });
                     };
                 },
-                templateUrl: 'src/pedidos/views/finalizar-recepcion.html',
+                templateUrl: 'src/recepcion/views/finalizar-recepcion.html',
                 parent: angular.element(document.body),
                 targetEvent: ev,
                 clickOutsideToClose:false,
@@ -783,7 +783,7 @@
             
             var entrega = prepararGuardado();
 
-            PedidosDataApi.guardarEntrega(entrega,function(res){
+            RecepcionDataApi.guardarEntrega(entrega,function(res){
                 Mensajero.mostrarToast({contenedor:'#modulo-contenedor',mensaje:'Datos guardados con éxito.'});
                 $scope.recepcion.estatus = res.data.estatus;
                 $scope.recepcion.id = res.data.id;
@@ -849,8 +849,8 @@
             //RequisicionesDataApi.verPDF($routeParams.id,function(e){console.log(e)});
             //window.open(URLS.BASE_API +'/solicitudes-pdf/'+$routeParams.id);
             $scope.cargando = true;
-            PedidosDataApi.verEntrega(id,function(res){
-                ImprimirEntrega.imprimir(res.data, res.configuracion, res.proveedor).then(
+            RecepcionDataApi.verEntrega(id,function(res){
+                ImprimirEntrada.imprimir(res.data, res.configuracion, res.proveedor).then(
                             function(res){
                                 $scope.cargando = false
                             },function(err){
@@ -865,7 +865,7 @@
 
         $scope.sincronizar = function(){
             $scope.cargando = true;
-            PedidosDataApi.sincronizar($scope.recepcion.id,function(res){
+            RecepcionDataApi.sincronizar($scope.recepcion.id,function(res){
                 Mensajero.mostrarToast({contenedor:'#modulo-contenedor',mensaje:'Datos sincronizados con éxito.'});
                 $scope.recepcion.estatus = res.data.estatus;
                 $scope.cargando = false;

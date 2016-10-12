@@ -18,7 +18,7 @@
                                     'RequisicionesUnidadesModule',
 									'RequisicionesModule',
 									'SolicitudesModule',
-									'PedidosModule',
+									'RecepcionModule',
 									'ConfiguracionModule']);
 	   
 	app.config(['$mdThemingProvider','$mdIconProvider','$routeProvider','$httpProvider','$translateProvider','$mdDateLocaleProvider',function($mdThemingProvider,$mdIconProvider,$routeProvider,$httpProvider,$translateProvider,$mdDateLocaleProvider){
