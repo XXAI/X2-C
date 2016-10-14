@@ -17,14 +17,14 @@
         $scope.filtroTipo = 1;
         $scope.usuario_id = $scope.loggedUser.id;
 
-        console.log($localStorage.samm_modulo_requisiciones);
+        //console.log($localStorage.samm_modulo_requisiciones);
         if(!$localStorage.samm_modulo_requisiciones){
             $localStorage.samm_modulo_requisiciones = {cambios:false};
         }
         
         $scope.modulo = $localStorage.samm_modulo_requisiciones;
 
-        $scope.subtotales = {causes:0,no_causes:0,material_curacion:0};
+        $scope.subtotales = {causes:0,no_causes:0,material_curacion:0,controlados:0};
         $scope.configuracion = {};
         $scope.insumos_estatus = {
             nuevos:{},
@@ -36,7 +36,7 @@
             por_clues:{}
         };
         $scope.clues_seleccionada = undefined;
-        $scope.requisiciones = undefined;
+        //$scope.requisiciones = undefined;
         $scope.totales = {
             iva:0,
             total:0,
@@ -50,44 +50,62 @@
                 function(res){
                     $scope.lista_clues = res.clues;
                     $scope.configuracion = res.configuracion;
-                    if(res.data.length){
-                        $scope.requisiciones = {};
-                        for(var i in res.data){
-                            var requisicion = res.data[i];
 
+                    if(res.data.length){
+                        //$scope.requisiciones = {};
+                        for(var i in res.data){
+                            //var requisicion = res.data[i];
+                            var insumo = res.data[i];
+
+                            /*
                             $scope.requisiciones[requisicion.tipo_requisicion] = {
                                 id: requisicion.id,
                                 pedido: requisicion.pedido,
                                 tipo_requisicion: requisicion.tipo_requisicion,
                                 insumos: []
                             };
+                            */
 
-                            for(var j in requisicion.insumos_clues){
-                                var insumo = requisicion.insumos_clues[j];
-                                insumo.insumo_id = insumo.id;
-                                insumo.requisicion_id = insumo.pivot.requisicion_id;
-                                insumo.cantidad = parseInt(insumo.pivot.cantidad);
-                                insumo.total = parseFloat(insumo.pivot.total);
-                                insumo.clues = insumo.pivot.clues;
+                            //for(var j in requisicion.insumos_clues){
+                                //var insumo = requisicion.insumos_clues[j];
+                            /*insumo.insumo_id = insumo.id;
+                            insumo.requisicion_id = insumo.requisicion_id;
+                            insumo.clues = insumo.clues;
+                            insumo.usuario = insumo.usuario;*/
+                            insumo.cantidad = parseInt(insumo.cantidad);
+                            insumo.total = parseFloat(insumo.total);
 
-                                if(!$scope.elementos.por_clues[insumo.clues]){
-                                    $scope.elementos.por_clues[insumo.clues] = { insumos: [] };
-                                }
-
-                                $scope.elementos.por_clues[insumo.clues].insumos.push(insumo);
-
-                                if($scope.elementos.concentrado_indices[insumo.insumo_id] == undefined){
-                                    $scope.elementos.concentrado_indices[insumo.insumo_id] = $scope.elementos.concentrado.length;
-                                    var nuevo_insumo = JSON.parse(JSON.stringify(insumo));
-                                    nuevo_insumo.total = 0;
-                                    nuevo_insumo.cantidad = 0;
-                                    $scope.elementos.concentrado.push(nuevo_insumo);
-                                }
-
-                                $scope.elementos.concentrado[$scope.elementos.concentrado_indices[insumo.insumo_id]].cantidad += parseInt(insumo.cantidad);
-                                $scope.elementos.concentrado[$scope.elementos.concentrado_indices[insumo.insumo_id]].total += parseFloat(insumo.total);
+                            if(!$scope.elementos.por_clues[insumo.clues]){
+                                $scope.elementos.por_clues[insumo.clues] = { insumos: [] };
                             }
 
+                            $scope.elementos.por_clues[insumo.clues].insumos.push(insumo);
+
+                            if($scope.elementos.concentrado_indices[insumo.insumo_id] == undefined){
+                                $scope.elementos.concentrado_indices[insumo.insumo_id] = $scope.elementos.concentrado.length;
+                                var nuevo_insumo = JSON.parse(JSON.stringify(insumo));
+                                nuevo_insumo.total = 0;
+                                nuevo_insumo.cantidad = 0;
+                                $scope.elementos.concentrado.push(nuevo_insumo);
+                            }
+
+                            $scope.elementos.concentrado[$scope.elementos.concentrado_indices[insumo.insumo_id]].cantidad += insumo.cantidad;
+                            $scope.elementos.concentrado[$scope.elementos.concentrado_indices[insumo.insumo_id]].total += insumo.total;
+                            //}
+                            var iva = 0;
+
+                            if(insumo.tipo == 1 && insumo.cause == 1 && insumo.controlado == 0){
+                                $scope.subtotales.causes += insumo.total;
+                            }else if(insumo.tipo == 1 && insumo.cause == 1 && insumo.controlado == 1){
+                                $scope.subtotales.controlados += insumo.total;
+                            }else if(insumo.tipo == 1 && insumo.cause == 0){
+                                $scope.subtotales.no_causes += insumo.total;
+                            }else{
+                                iva = (insumo.total*16/100);
+                                $scope.subtotales.material_curacion += (insumo.total+iva);
+                            }
+
+                            /*
                             if(requisicion.tipo_requisicion == 3){
                                 $scope.subtotales.material_curacion = requisicion.gran_total;
                             }else if(requisicion.tipo_requisicion == 2){
@@ -95,14 +113,16 @@
                             }else{
                                 $scope.subtotales.causes = requisicion.gran_total;
                             }
-                            $scope.totales.subtotal += parseFloat(requisicion.sub_total);
-                            $scope.totales.iva += parseFloat(requisicion.iva);
+                            */
+
+                            $scope.totales.subtotal += insumo.total;
+                            $scope.totales.iva += iva;
                         }
                         $scope.totales.total = $scope.totales.subtotal + $scope.totales.iva;
                     }
 
                     //Salvar a localStorage
-                    $scope.modulo.requisiciones = $scope.requisiciones;
+                    //$scope.modulo.requisiciones = $scope.requisiciones;
                     $scope.modulo.elementos = $scope.elementos;
                     $scope.modulo.subtotales = $scope.subtotales;
                     $scope.modulo.totales = $scope.totales;
@@ -140,7 +160,7 @@
                     por_clues:{}
                 };
                 $scope.clues_seleccionada = undefined;
-                $scope.requisiciones = undefined;
+                //$scope.requisiciones = undefined;
                 $scope.totales = {
                     iva:0,
                     total:0,
@@ -164,7 +184,7 @@
 
                     $scope.lista_clues = $scope.modulo.lista_clues;
                     $scope.configuracion = $scope.modulo.configuracion;
-                    $scope.requisiciones = $scope.modulo.requisiciones;
+                    //$scope.requisiciones = $scope.modulo.requisiciones;
                     $scope.elementos = $scope.modulo.elementos;
                     $scope.subtotales = $scope.modulo.subtotales;
                     $scope.totales = $scope.modulo.totales;
@@ -240,12 +260,14 @@
             var tipo_requisicion = 0;
             if(tipo == 1){
                 tipo_requisicion = 0;
-            }else if(tipo.tipo == 1 && tipo.cause == 1){
+            }else if(tipo.tipo == 1 && tipo.cause == 1 && tipo.controlado == 0){
                 tipo_requisicion = 1;
             }else if(tipo.tipo == 1 && tipo.cause == 0){
                 tipo_requisicion = 2;
             }else if(tipo.tipo == 2 && tipo.cause == 0){
                 tipo_requisicion = 3;
+            }else if(tipo.tipo == 1 && tipo.cause == 1 && tipo.controlado == 1){
+                tipo_requisicion = 4;
             }
             recalcularTotales(tipo_requisicion);
         };
@@ -262,13 +284,15 @@
                     if(insumo.tipo == 2 && insumo.cause == 0){
                         $scope.totales.iva += (insumo.total*16/100);
                     }
-                }else if(insumo.tipo == 1 && insumo.cause == 1 && tipo == 1){
+                }else if(insumo.tipo == 1 && insumo.cause == 1 && insumo.controlado == 0 && tipo == 1){
                     $scope.totales.subtotal += insumo.total;
                 }else if(insumo.tipo == 1 && insumo.cause == 0 && tipo == 2){
                     $scope.totales.subtotal += insumo.total;
                 }else if(insumo.tipo == 2 && insumo.cause == 0 && tipo == 3){
                     $scope.totales.subtotal += insumo.total;
                     $scope.totales.iva += (insumo.total*16/100);
+                }else if(insumo.tipo == 1 && insumo.cause == 1 && insumo.controlado == 1 && tipo == 4){
+                    $scope.totales.subtotal += insumo.total;
                 }
             }
             $scope.totales.total = $scope.totales.iva + $scope.totales.subtotal;
@@ -594,16 +618,19 @@
 
         $scope.crearActa = function(ev){
             var useFullScreen = ($mdMedia('sm') || $mdMedia('xs'))  && $scope.customFullscreen;
-            var requisiciones = prepararGuardado();
+            //var requisiciones = prepararGuardado();
+            var insumos = prepararGuardado();
             var locals = {
-                requisiciones: requisiciones,
+                //requisiciones: requisiciones,
+                insumos: insumos,
                 configuracion: $scope.configuracion,
                 modulo: $scope.modulo
             };
 
             $mdDialog.show({
-                controller: function($scope, $mdDialog, requisiciones, configuracion, modulo) {
-                    $scope.requisiciones = requisiciones;
+                controller: function($scope, $mdDialog, insumos, configuracion, modulo) {
+                    //$scope.requisiciones = requisiciones;
+                    $scope.insumos = insumos;
                     $scope.acta = {};
                     $scope.validacion = {};
                     $scope.cargando = false;
@@ -626,7 +653,8 @@
                             $scope.acta.hora_inicio = $filter('date')($scope.acta.hora_inicio_date,'HH:mm:ss');
                             $scope.acta.hora_termino = $filter('date')($scope.acta.hora_termino_date,'HH:mm:ss');
                             $scope.acta.estatus = 2;
-                            var parametros = {requisiciones: $scope.requisiciones, acta: $scope.acta};
+                            //var parametros = {requisiciones: $scope.requisiciones, acta: $scope.acta};
+                            var parametros = {insumos: $scope.insumos, acta: $scope.acta};
 
                             RequisicionesDataApi.guardar(parametros,function (res) {
                                 $scope.modulo.cambios = false;
@@ -665,9 +693,10 @@
         };
         
         function prepararGuardado(){
-            var requisiciones = $scope.requisiciones; //hasta tres requisiciones 1, 2 y 3
+            //var requisiciones = $scope.requisiciones; //hasta tres requisiciones 1, 2 y 3
             var clues_insumos = $scope.elementos.por_clues;
-
+            var insumos = [];
+            /*
             if(requisiciones){
                 for(var i in requisiciones){
                     requisiciones[i].insumos = [];
@@ -675,11 +704,12 @@
             }else{
                 requisiciones = {};
             }
+            */
 
             for(var clues in clues_insumos){
-                var insumos = clues_insumos[clues].insumos;
-                for(var i in insumos){
-                    if(insumos[i].tipo == 1 && insumos[i].cause == 1 && insumos[i].controlado == 1){
+                var insumos_en_clues = clues_insumos[clues].insumos;
+                for(var i in insumos_en_clues){
+                    /*if(insumos[i].tipo == 1 && insumos[i].cause == 1 && insumos[i].controlado == 1){
                         var tipo_req = 4; //Medicamentos - causes controlados
                     }else if(insumos[i].tipo == 1 && insumos[i].cause == 1){
                         var tipo_req = 1; //Medicamentos - causes
@@ -687,8 +717,8 @@
                         var tipo_req = 2; //Medicamentos - no causes
                     }else{
                         var tipo_req = 3; //Material de curación
-                    }
-
+                    }*/
+                    /*
                     if(!requisiciones[tipo_req]){
                         requisiciones[tipo_req] = {
                             lotes: 0,
@@ -696,14 +726,13 @@
                             tipo_requisicion: tipo_req,
                             insumos: []
                         }
-                    }
-                    
-                    insumos[i].clues = clues;
-
-                    requisiciones[tipo_req].insumos.push(insumos[i]);
+                    }*/
+                    insumos_en_clues[i].clues = clues;
+                    //requisiciones[tipo_req].insumos.push(insumos[i]);
+                    insumos.push(insumos_en_clues[i]);
                 }
             }
-
+            /*
             if(requisiciones){
                 var borrar_requisiciones = [];
                 for(var i in requisiciones){
@@ -717,13 +746,17 @@
                 }
             }
             return requisiciones;
+            */
+            return insumos;
         };
 
         $scope.guardar = function() {
             $scope.cargando = true;
             
-            var requisiciones = prepararGuardado();
-            var parametros = {requisiciones: requisiciones};
+            //var requisiciones = prepararGuardado();
+            var insumos = prepararGuardado();
+            //var parametros = {requisiciones: requisiciones};
+            var parametros = {insumos: insumos};
 
             RequisicionesDataApi.guardar(parametros,function (res) {
                 $scope.cargando = false;
@@ -739,7 +772,7 @@
             }, function (e) {
                 $scope.cargando = false;
                 $scope.validacion = {};
-                if(e.error_type = 'form_validation'){
+                if(e.error_type == 'form_validation'){
                     Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:'Hay un error en los datos del formulario.'});
                     //$scope.toggleDatosActa = true;
                     var errors = e.error;
@@ -747,7 +780,7 @@
                         var error = JSON.parse('{ "' + errors[i] + '" : true }');
                         $scope.validacion[i] = error;
                     }
-                }else if(e.error_type = 'data_validation'){
+                }else if(e.error_type == 'data_validation'){
                     Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:e.error});
                 }else{
                     Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:'Ocurrió un error al intentar guardar los datos.'});
@@ -758,8 +791,6 @@
         $scope.imprimir = function(){
             window.open(URLS.BASE_API +'/requisiciones-jurisdiccion-pdf?token='+$localStorage.control_desabasto.access_token);
         };
-
-
 
         $scope.importarDatos = function(obj)
         {
@@ -994,6 +1025,7 @@
         }
 
         var input = angular.element($document[0].querySelector('input#input-file-id'));
+
         input.bind('change', function(e) {
             $scope.$apply(function() {
                 $scope.cargando = true;
