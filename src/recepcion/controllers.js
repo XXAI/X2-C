@@ -238,7 +238,7 @@
     $rootScope, $scope, RecepcionDataApi,$mdSidenav,$location,$mdBottomSheet,$routeParams,$filter,$localStorage,
     $http,$mdToast,Auth,Menu,URLS,UsuarioData,$mdDialog,$mdMedia,$window,Mensajero,ImprimirEntrada
     ){
-        $scope.menuSelected = "/pedidos";
+        $scope.menuSelected = "/recepcion";
         $scope.menu = Menu.getMenu();
         $scope.menuIsOpen = false;
         $scope.loggedUser = UsuarioData.getDatosUsuario();
@@ -332,17 +332,17 @@
             $scope.entregas_guardadas = {};
             $scope.entregas_imprimir = {};
 
-            if($scope.acta.entregas.length){
-                for(var i in $scope.acta.entregas){
-                    var entrega = $scope.acta.entregas[i];
+            if($scope.acta.entradas.length){
+                for(var i in $scope.acta.entradas){
+                    var entrega = $scope.acta.entradas[i];
 
-                    if(entrega.fecha_entrega){
-                        entrega.fecha_entrega = new Date(entrega.fecha_entrega + ' 00:00:00');
+                    if(entrega.fecha_recibe){
+                        entrega.fecha_recibe = new Date(entrega.fecha_recibe + ' 00:00:00');
                     }
 
-                    if(entrega.hora_entrega){
-                        var horaEntrega = entrega.hora_entrega.split(':')
-                        entrega.hora_entrega_date =  new Date(1970, 0, 1, horaEntrega[0], horaEntrega[1], 0);
+                    if(entrega.hora_recibe){
+                        var horaEntrega = entrega.hora_recibe.split(':')
+                        entrega.hora_recibe_date =  new Date(1970, 0, 1, horaEntrega[0], horaEntrega[1], 0);
                     }
 
                     if(entrega.estatus <= 2){
@@ -360,10 +360,10 @@
                             if(!$scope.ingresos_proveedores[entrega.proveedor_id][entrega.stock[j].insumo_id]){
                                 $scope.ingresos_proveedores[entrega.proveedor_id][entrega.stock[j].insumo_id] = {cantidad:0,lotes:[]};
                             }
-                            $scope.ingresos_proveedores[entrega.proveedor_id][entrega.stock[j].insumo_id].cantidad += entrega.stock[j].cantidad_entregada;
+                            $scope.ingresos_proveedores[entrega.proveedor_id][entrega.stock[j].insumo_id].cantidad += entrega.stock[j].cantidad_recibida;
                             $scope.ingresos_proveedores[entrega.proveedor_id][entrega.stock[j].insumo_id].lotes.push({
                                 //insumo_id: entrega.stock[j].insumo_id,
-                                cantidad: entrega.stock[j].cantidad_entregada,
+                                cantidad: entrega.stock[j].cantidad_recibida,
                                 fecha_caducidad: new Date(entrega.stock[j].fecha_caducidad + ' 00:00:00'),
                                 lote: entrega.stock[j].lote,
                                 validacion:{}
@@ -371,7 +371,7 @@
                         }
                     }
                 }
-                $scope.acta.entregas = undefined;
+                $scope.acta.entradas = undefined;
             }
             
             for(var i in $scope.acta.requisiciones){
@@ -685,7 +685,7 @@
 
         var prepararGuardado = function(){
             var entrega = $scope.recepcion;
-            entrega.hora_entrega = $filter('date')(entrega.hora_entrega_date,'HH:mm:ss');
+            entrega.hora_recibe = $filter('date')(entrega.hora_recibe_date,'HH:mm:ss');
             entrega.acta_id = $scope.acta.id;
             
             //entrega.ingresos_requisicion = $scope.ingresos_requisicion[$scope.recepcion.proveedor_id];
@@ -828,8 +828,8 @@
                     var fecha_actual = new Date();
                     fecha_actual = new Date(fecha_actual.getFullYear(), fecha_actual.getMonth(), fecha_actual.getDate(), fecha_actual.getHours(), fecha_actual.getMinutes(), 0);
                     
-                    $scope.recepcion.fecha_entrega = fecha_actual;
-                    $scope.recepcion.hora_entrega_date = fecha_actual;
+                    $scope.recepcion.fecha_recibe = fecha_actual;
+                    $scope.recepcion.hora_recibe_date = fecha_actual;
 
                     $scope.recepcion.nombre_recibe = $scope.configuracion.encargado_almacen;
                 }

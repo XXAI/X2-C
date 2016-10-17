@@ -52,28 +52,12 @@
                     $scope.configuracion = res.configuracion;
 
                     if(res.data.length){
-                        //$scope.requisiciones = {};
                         for(var i in res.data){
-                            //var requisicion = res.data[i];
                             var insumo = res.data[i];
 
-                            /*
-                            $scope.requisiciones[requisicion.tipo_requisicion] = {
-                                id: requisicion.id,
-                                pedido: requisicion.pedido,
-                                tipo_requisicion: requisicion.tipo_requisicion,
-                                insumos: []
-                            };
-                            */
-
-                            //for(var j in requisicion.insumos_clues){
-                                //var insumo = requisicion.insumos_clues[j];
-                            /*insumo.insumo_id = insumo.id;
-                            insumo.requisicion_id = insumo.requisicion_id;
-                            insumo.clues = insumo.clues;
-                            insumo.usuario = insumo.usuario;*/
                             insumo.cantidad = parseInt(insumo.cantidad);
                             insumo.total = parseFloat(insumo.total);
+                            insumo.repetido = 0;
 
                             if(!$scope.elementos.por_clues[insumo.clues]){
                                 $scope.elementos.por_clues[insumo.clues] = { insumos: [] };
@@ -91,7 +75,7 @@
 
                             $scope.elementos.concentrado[$scope.elementos.concentrado_indices[insumo.insumo_id]].cantidad += insumo.cantidad;
                             $scope.elementos.concentrado[$scope.elementos.concentrado_indices[insumo.insumo_id]].total += insumo.total;
-                            //}
+                            
                             var iva = 0;
 
                             if(insumo.tipo == 1 && insumo.cause == 1 && insumo.controlado == 0){
@@ -104,17 +88,7 @@
                                 iva = (insumo.total*16/100);
                                 $scope.subtotales.material_curacion += (insumo.total+iva);
                             }
-
-                            /*
-                            if(requisicion.tipo_requisicion == 3){
-                                $scope.subtotales.material_curacion = requisicion.gran_total;
-                            }else if(requisicion.tipo_requisicion == 2){
-                                $scope.subtotales.no_causes = requisicion.gran_total;
-                            }else{
-                                $scope.subtotales.causes = requisicion.gran_total;
-                            }
-                            */
-
+                            
                             $scope.totales.subtotal += insumo.total;
                             $scope.totales.iva += iva;
                         }
@@ -122,7 +96,6 @@
                     }
 
                     //Salvar a localStorage
-                    //$scope.modulo.requisiciones = $scope.requisiciones;
                     $scope.modulo.elementos = $scope.elementos;
                     $scope.modulo.subtotales = $scope.subtotales;
                     $scope.modulo.totales = $scope.totales;
@@ -217,15 +190,17 @@
         $scope.eliminarInsumo = function(insumo){
             //var insumo_local = $scope.acta.insumos[index];
             var insumo_local = insumo;
-            console.log(insumo);
+            //console.log(insumo);
             $scope.totales.subtotal -= insumo_local.total;
             if(insumo_local.tipo == 2){
                 var iva = (insumo_local.total*16/100);
                 $scope.totales.iva -= iva;
             }
 
-            if(insumo.tipo == 1 && insumo.cause == 1){
+            if(insumo.tipo == 1 && insumo.cause == 1 && insumo.controlado == 0){
                 $scope.subtotales.causes -= insumo.total;
+            }else if(insumo.tipo == 1 && insumo.cause == 1 && insumo.controlado == 1){
+                $scope.subtotales.controlados -= insumo.total;
             }else if(insumo.tipo == 1 && insumo.cause == 0){
                 $scope.subtotales.no_causes -= insumo.total;
             }else{
@@ -238,6 +213,11 @@
             var insumo_concentrado = $scope.elementos.concentrado[$scope.elementos.concentrado_indices[insumo.id]];
             insumo_concentrado.cantidad -= insumo.cantidad;
             insumo_concentrado.total -= insumo.total;
+
+            if(insumo.repetido){
+                insumo_concentrado.repetido -= 1;
+                $scope.clues_seleccionada.repetido -= 1;
+            }
 
             if(insumo_concentrado.cantidad == 0){
                 var insumo_concentrado_index = $scope.elementos.concentrado_indices[insumo.id];
@@ -252,7 +232,10 @@
             }
 
             $scope.totales.total = $scope.totales.iva + $scope.totales.subtotal;
-            $scope.modulo.cambios = true;
+
+            if(!insumo.repetido){
+                $scope.modulo.cambios = true;
+            }
             //$localStorage.modulo_requisiciones.cambios = true;
         };
 
@@ -424,9 +407,12 @@
                             $scope.insumos_estatus.editados[$scope.insumo.id] = true;
 
                             //Ajsutar Subtotales
-                            if(insumo_local.tipo == 1 && insumo_local.cause == 1){
+                            if(insumo_local.tipo == 1 && insumo_local.cause == 1 && insumo_local.controlado == 0){
                                 $scope.subtotales.causes -= insumo_local.total;
                                 $scope.subtotales.causes += $scope.insumo.total;
+                            }else if(insumo_local.tipo == 1 && insumo_local.cause == 1 && insumo_local.controlado == 1){
+                                $scope.subtotales.controlados -= insumo_local.total;
+                                $scope.subtotales.controlados += $scope.insumo.total;
                             }else if(insumo_local.tipo == 1 && insumo_local.cause == 0){
                                 $scope.subtotales.no_causes -= insumo_local.total;
                                 $scope.subtotales.no_causes += $scope.insumo.total;
@@ -447,8 +433,10 @@
 
 
                             //Ajsutar Subtotales
-                            if($scope.insumo.tipo == 1 && $scope.insumo.cause == 1){
+                            if($scope.insumo.tipo == 1 && $scope.insumo.cause == 1 && $scope.insumo.controlado == 0){
                                 $scope.subtotales.causes += $scope.insumo.total;
+                            }else if($scope.insumo.tipo == 1 && $scope.insumo.cause == 1 && $scope.insumo.controlado == 1){
+                                $scope.subtotales.controlados += $scope.insumo.total;
                             }else if($scope.insumo.tipo == 1 && $scope.insumo.cause == 0){
                                 $scope.subtotales.no_causes += $scope.insumo.total;
                             }else{
@@ -501,6 +489,7 @@
                                 $scope.insumo.cause = $scope.insumoAutoComplete.insumo.cause;
                                 $scope.insumo.controlado = $scope.insumoAutoComplete.insumo.controlado;
                                 $scope.insumo.pedido = $scope.insumoAutoComplete.insumo.pedido;
+                                $scope.insumo.repetido = 0;
                                 $scope.insumo.total = 0.00;
                             }
                         }else{
@@ -590,6 +579,7 @@
                 return 0;
             }
         };
+
         $scope.querySearchClues = function(query){
             var results = query ? $scope.lista_clues.filter( createFilterFor(query,['clues','nombre'])) : $scope.lista_clues;
             for(var i in results){
@@ -601,17 +591,12 @@
         function createFilterFor(query,searchValues) {
             var lowercaseQuery = angular.lowercase(query);
             return function filterFn(item) {
-                /*var total = 0;
-                if($scope.elementos.por_clues[item.clues]){
-                    total = $scope.elementos.por_clues[item.clues].insumos.length;
+                //for(var i in searchValues){
+                    //if(angular.lowercase(item[searchValues[i]]).indexOf(lowercaseQuery) >= 0){
+                if(angular.lowercase(item.nombre).indexOf(lowercaseQuery) >= 0 || angular.lowercase(item.clues).indexOf(lowercaseQuery) >= 0){
+                    return true;
                 }
-                item.total_insumos = total;
-                */
-                for(var i in searchValues){
-                    if(angular.lowercase(item[searchValues[i]]).indexOf(lowercaseQuery) >= 0){
-                        return true;
-                    }
-                }
+                //}
                 return false;
             };
         };
@@ -693,69 +678,23 @@
         };
         
         function prepararGuardado(){
-            //var requisiciones = $scope.requisiciones; //hasta tres requisiciones 1, 2 y 3
             var clues_insumos = $scope.elementos.por_clues;
             var insumos = [];
-            /*
-            if(requisiciones){
-                for(var i in requisiciones){
-                    requisiciones[i].insumos = [];
-                }
-            }else{
-                requisiciones = {};
-            }
-            */
 
             for(var clues in clues_insumos){
                 var insumos_en_clues = clues_insumos[clues].insumos;
                 for(var i in insumos_en_clues){
-                    /*if(insumos[i].tipo == 1 && insumos[i].cause == 1 && insumos[i].controlado == 1){
-                        var tipo_req = 4; //Medicamentos - causes controlados
-                    }else if(insumos[i].tipo == 1 && insumos[i].cause == 1){
-                        var tipo_req = 1; //Medicamentos - causes
-                    }else if(insumos[i].tipo == 1 && insumos[i].cause == 0){
-                        var tipo_req = 2; //Medicamentos - no causes
-                    }else{
-                        var tipo_req = 3; //Material de curación
-                    }*/
-                    /*
-                    if(!requisiciones[tipo_req]){
-                        requisiciones[tipo_req] = {
-                            lotes: 0,
-                            pedido: insumos[i].pedido,
-                            tipo_requisicion: tipo_req,
-                            insumos: []
-                        }
-                    }*/
                     insumos_en_clues[i].clues = clues;
-                    //requisiciones[tipo_req].insumos.push(insumos[i]);
                     insumos.push(insumos_en_clues[i]);
                 }
             }
-            /*
-            if(requisiciones){
-                var borrar_requisiciones = [];
-                for(var i in requisiciones){
-                    var requisicion = requisiciones[i];
-                    if(!requisicion.insumos.length){
-                        borrar_requisiciones.push(i);
-                    }
-                }
-                for(var i in borrar_requisiciones){
-                    delete requisiciones[borrar_requisiciones[i]];
-                }
-            }
-            return requisiciones;
-            */
             return insumos;
         };
 
         $scope.guardar = function() {
             $scope.cargando = true;
-            
-            //var requisiciones = prepararGuardado();
+
             var insumos = prepararGuardado();
-            //var parametros = {requisiciones: requisiciones};
             var parametros = {insumos: insumos};
 
             RequisicionesDataApi.guardar(parametros,function (res) {
@@ -765,10 +704,33 @@
                     editados:{}
                 };
                 $scope.modulo.cambios = false;
-                //$localStorage.modulo_requisiciones.cambios = false;
-                Mensajero.mostrarToast({contenedor:'#modulo-contenedor',mensaje:'Requisiciones guardadas.'});
-                //console.log(res.data);
-                //$location.path('actas/'+res.data.id+'/editar');
+                if(res.insumos_repetidos.length === 0){
+                    Mensajero.mostrarToast({contenedor:'#modulo-contenedor',mensaje:'Requisiciones guardadas.'});
+                }else{
+                    Mensajero.mostrarToast({contenedor:'#modulo-contenedor',mensaje:'Requisiciones guardadas. Se detectaron insumos repetidos.'});
+                    for(var clues in res.insumos_repetidos){
+                        for(var unidades in $scope.lista_clues){
+                            if($scope.lista_clues[unidades].clues == clues){
+                                if(!$scope.lista_clues[unidades].repetido){
+                                    $scope.lista_clues[unidades].repetido = 0;
+                                }
+                                $scope.lista_clues[unidades].repetido += 1;
+                                break;
+                            }
+                        }
+                        var repetidos = res.insumos_repetidos[clues];
+                        for(var insumo_id in repetidos){
+                            for(var insumo in $scope.elementos.por_clues[clues].insumos){
+                                if($scope.elementos.por_clues[clues].insumos[insumo].insumo_id == repetidos[insumo_id]){
+                                    $scope.elementos.por_clues[clues].insumos[insumo].repetido = true;
+                                    var index = $scope.elementos.concentrado_indices[repetidos[insumo_id]];
+                                    $scope.elementos.concentrado[index].repetido += 1;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
             }, function (e) {
                 $scope.cargando = false;
                 $scope.validacion = {};
@@ -833,15 +795,18 @@
                                     var total_restar    = $scope.elementos.por_clues[clues].insumos[insumos_iteracion].total;
                                     var tipo            = $scope.elementos.por_clues[clues].insumos[insumos_iteracion].tipo;
                                     var cause           = $scope.elementos.por_clues[clues].insumos[insumos_iteracion].cause;
+                                    var controlado      = $scope.elementos.por_clues[clues].insumos[insumos_iteracion].controlado;
 
                                     //Ajsutar Subtotales
-                                    if(tipo == 1 && cause == 1){
+                                    if(tipo == 1 && cause == 1 && controlado == 0){
                                         $scope.subtotales.causes -= total_restar;
-                                     }else if(tipo == 1 && cause == 0){
+                                    }else if(tipo == 1 && cause == 1 && controlado == 1){
+                                        $scope.subtotales.controlados -= total_restar;
+                                    }else if(tipo == 1 && cause == 0){
                                         $scope.subtotales.no_causes -= total_restar;
-                                     }else{
+                                    }else{
                                         $scope.subtotales.material_curacion -= (total_restar*16/100);
-                                     }
+                                    }
 
                                      $scope.totales.subtotal -= total_restar;
 
@@ -904,8 +869,10 @@
                                                 $scope.elementos.por_clues[clues].insumos[agregar_iteracion_clues].cantidad += parseInt(registros[agregar_iteracion_tipo].insumos[agregar_iteracion_insumos].pivot.cantidad);
                                                 $scope.elementos.por_clues[clues].insumos[agregar_iteracion_clues].total += parseFloat(registros[agregar_iteracion_tipo].insumos[agregar_iteracion_insumos].pivot.total);
 
-                                                if(requisiciones.tipo == 1 && requisiciones.cause == 1){
+                                                if(requisiciones.tipo == 1 && requisiciones.cause == 1 && requisiciones.controlado == 0){
                                                     $scope.subtotales.causes += parseFloat(requisiciones.pivot.total);
+                                                }else if(requisiciones.tipo == 1 && requisiciones.cause == 1 && requisiciones.controlado == 1){
+                                                    $scope.subtotales.controlados += parseFloat(requisiciones.pivot.total);
                                                 }else if(requisiciones.tipo == 1 && requisiciones.cause == 0){
                                                     $scope.subtotales.no_causes += parseFloat(requisiciones.pivot.total);
                                                 }else{
@@ -997,8 +964,10 @@
                     $scope.elementos.concentrado[$scope.elementos.concentrado_indices[new_insumo.insumo_id]].total += parseFloat(datos[datos_insumos].pivot['total']);
 
                     //Ajsutar Subtotales
-                    if(new_insumo.tipo == 1 && new_insumo.cause == 1){
+                    if(new_insumo.tipo == 1 && new_insumo.cause == 1 && new_insumo.controlado == 0){
                         $scope.subtotales.causes += new_insumo.total;
+                    }else if(new_insumo.tipo == 1 && new_insumo.cause == 1 && new_insumo.controlado == 1){
+                        $scope.subtotales.controlados += new_insumo.total;
                     }else if(new_insumo.tipo == 1 && new_insumo.cause == 0){
                         $scope.subtotales.no_causes += new_insumo.total;
                     }else{

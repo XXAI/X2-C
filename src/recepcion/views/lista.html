@@ -66,18 +66,10 @@
 		        			<div flex="none">
 		        				<strong>Requisiciones:</strong> [ {{acta.requisiciones}} ]
 		        			</div>
-		        			<div flex></div>
-		        			<div flex="none">
-		        				
-		        			</div>
-		        			<div flex></div>
-		        			<span flex="none" ng-if="acta.total_validado">
-			        			
-			        		</span>
 		        		</div>
 		        	</h4>
 		        	<h4>
-		        		<div layout="row">
+		        		<div layout="row" ng-if="acta.total_claves_recibidas">
 		        			<div flex>
 		        				<strong>Claves:</strong> {{acta.total_claves_recibidas}} de {{acta.total_claves_validadas}} [ {{((acta.total_claves_recibidas*100)/acta.total_claves_validadas)|number:2}} % ]
 		        			</div>

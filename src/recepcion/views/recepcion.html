@@ -87,24 +87,24 @@
 					Sin Proveedor
 				</md-option>
 				<md-option ng-repeat="proveedor in proveedores" ng-value="proveedor.id">
-					{{(entregas_guardadas[proveedor.id])?'* ':''}}{{proveedor.nombre}} [ Ultima Recepción: {{((entregas_imprimir[proveedor.id])?(entregas_imprimir[proveedor.id].fecha_entrega | date:'dd/MM/yyyy') + ' | ' + (entregas_imprimir[proveedor.id].porcentaje_cantidad | number:2) + ' % completado':'Ninguna')}} ]
+					{{(entregas_guardadas[proveedor.id])?'* ':''}}{{proveedor.nombre}} [ Ultima Recepción: {{((entregas_imprimir[proveedor.id])?(entregas_imprimir[proveedor.id].fecha_recibe | date:'dd/MM/yyyy') + ' | ' + (entregas_imprimir[proveedor.id].porcentaje_cantidad | number:2) + ' % completado':'Ninguna')}} ]
 				</md-option>
 			</md-select>
 			<div class="errors" ng-messages="validacion.proveedor_id" >
               <div ng-message="required">{{ 'CAMPO_REQUERIDO' | translate }}</div>
             </div>
 		</md-input-container>
-		<md-input-container flex="20" md-is-error="validacion.fecha_entrega" style="margin-bottom:0px;">
-			<label>Fecha de Entrega</label>
-			<input type="date" ng-model="recepcion.fecha_entrega">
-			<div class="errors" ng-messages="validacion.fecha_entrega" >
+		<md-input-container flex="20" md-is-error="validacion.fecha_recibe" style="margin-bottom:0px;">
+			<label>Fecha de Recepción</label>
+			<input type="date" ng-model="recepcion.fecha_recibe">
+			<div class="errors" ng-messages="validacion.fecha_recibe" >
               <div ng-message="required">{{ 'CAMPO_REQUERIDO' | translate }}</div>
             </div>
 		</md-input-container>
-		<md-input-container flex="20" md-is-error="validacion.hora_entrega" style="margin-bottom:0px;">
-			<label>Hora de Entrega</label>
-			<input type="time" ng-model="recepcion.hora_entrega_date">
-			<div class="errors" ng-messages="validacion.hora_entrega" >
+		<md-input-container flex="20" md-is-error="validacion.hora_recibe" style="margin-bottom:0px;">
+			<label>Hora de Recepción</label>
+			<input type="time" ng-model="recepcion.hora_recibe_date">
+			<div class="errors" ng-messages="validacion.hora_recibe" >
               <div ng-message="required">{{ 'CAMPO_REQUERIDO' | translate }}</div>
             </div>
 		</md-input-container>
