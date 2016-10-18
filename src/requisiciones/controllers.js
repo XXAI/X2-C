@@ -711,10 +711,7 @@
                     for(var clues in res.insumos_repetidos){
                         for(var unidades in $scope.lista_clues){
                             if($scope.lista_clues[unidades].clues == clues){
-                                if(!$scope.lista_clues[unidades].repetido){
-                                    $scope.lista_clues[unidades].repetido = 0;
-                                }
-                                $scope.lista_clues[unidades].repetido += 1;
+                                $scope.lista_clues[unidades].repetido = res.insumos_repetidos[clues].length;
                                 break;
                             }
                         }
