@@ -72,7 +72,7 @@
           </md-input-container>
           <md-input-container flex md-is-error="validacion.cantidad">
             <label>Cantidad</label>
-            <input type="number" ng-model="insumo.cantidad" ng-change="calcularTotal()" ng-keyup="$event.keyCode == 13 ? answer() : null">
+            <input type="number" id="input_cantidad" ng-model="insumo.cantidad" ng-change="calcularTotal()" ng-keyup="$event.keyCode == 13 ? answer() : null">
             <div class="errors" ng-messages="validacion.cantidad" >
               <div ng-message="required">{{ 'CAMPO_REQUERIDO' | translate }}</div>
             </div>

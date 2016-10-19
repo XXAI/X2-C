@@ -33,11 +33,11 @@
 			  <md-icon md-svg-icon="undo"></md-icon>
 			</md-button>
 
-			<md-icon md-svg-icon="dots-vertical" style="color: #005DA7;"></md-icon>
+			<!--md-icon md-svg-icon="dots-vertical" style="color: #005DA7;"></md-icon-->
 			
-			<md-button class="md-icon-button" ng-disabled="cargando" ng-click="imprimir()"  aria-label="{{ 'IMPRIMIR' | translate }}">
+			<!--md-button class="md-icon-button" ng-disabled="cargando" ng-click="imprimir()"  aria-label="{{ 'IMPRIMIR' | translate }}">
 			  <md-icon md-svg-icon="printer"></md-icon>
-			</md-button>
+			</md-button-->
 		</div>
 	</md-toolbar>
 	<md-content layout="column" flex>
@@ -167,15 +167,27 @@
 					<input value="$ {{subtotales.controlados | number:2}}" readonly>
 				</md-input-container>
 
+				<md-input-container flex="none" style="margin-bottom:0px; height:35px;">
+					<label>Surfactante Causes:</label>
+					<input value="$ {{subtotales.surfactante_causes | number:2}}" readonly>
+				</md-input-container>
+
+				<md-input-container flex="none" style="margin-bottom:0px; height:35px;">
+					<label>Surfactante No Causes:</label>
+					<input value="$ {{subtotales.surfactante_no_causes | number:2}}" readonly>
+				</md-input-container>
+
 				<md-subheader class="md-primary md-hue-1">
 					Filtrar por tipo:
 				</md-subheader>
 				<md-radio-group ng-model="filtroTipo" class="md-primary md-padding" ng-change="cambiaFiltro(filtroTipo)">
 					<md-radio-button ng-value="1">Todos</md-radio-button>
-					<md-radio-button ng-value="{tipo:1,cause:1,controlado:0}">Causes</md-radio-button>
-					<md-radio-button ng-value="{tipo:1,cause:0}">No Causes</md-radio-button>
+					<md-radio-button ng-value="{tipo:1,cause:1,controlado:0,surfactante:0}">Causes</md-radio-button>
+					<md-radio-button ng-value="{tipo:1,cause:0,surfactante:0}">No Causes</md-radio-button>
 					<md-radio-button ng-value="{tipo:2,cause:0}">Material de Curación</md-radio-button>
-					<md-radio-button ng-value="{tipo:1,cause:1,controlado:1}">Controlados</md-radio-button>
+					<md-radio-button ng-value="{tipo:1,cause:1,controlado:1,surfactante:0}">Controlados</md-radio-button>
+					<md-radio-button ng-value="{tipo:1,cause:1,surfactante:1}">Surfactante Causes</md-radio-button>
+					<md-radio-button ng-value="{tipo:1,cause:0,surfactante:1}">Surfactante No Causes</md-radio-button>
 				</md-radio-group>
 				<div flex></div>
 				<md-divider></md-divider>
