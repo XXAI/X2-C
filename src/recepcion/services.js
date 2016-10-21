@@ -41,7 +41,9 @@
 					1:'MEDICAMENTOS CAUSES',
 					2:'MEDICAMENTOS NO CAUSES',
 					3:'MATERIALES DE CURACIÓN',
-					4:'MEDICAMENTOS CONTROLADOS'
+					4:'MEDICAMENTOS CONTROLADOS',
+					5:'FACTOR SURFACTANTE (CAUSES)',
+					6:'FACTOR SURFACTANTE (NO CAUSES)'
 				};
 
 				try{
@@ -49,7 +51,11 @@
 						var stock_insumo = entrega.stock[i];
 						var tipo_insumo = 0;
 
-						if(stock_insumo.insumo.tipo == 1 && stock_insumo.insumo.cause == 1 && stock_insumo.insumo.controlado == 0){
+						if(stock_insumo.insumo.tipo == 1 && stock_insumo.insumo.cause == 1 && stock_insumo.insumo.surfactante == 1){
+							tipo_insumo = 5; //surfactante causes
+						}else if(stock_insumo.insumo.tipo == 1 && stock_insumo.insumo.cause == 0 && stock_insumo.insumo.surfactante == 1){
+							tipo_insumo = 6; //surfactante no causes
+						}else if(stock_insumo.insumo.tipo == 1 && stock_insumo.insumo.cause == 1 && stock_insumo.insumo.controlado == 0){
 							tipo_insumo = 1; //Causes
 						}else if(stock_insumo.insumo.tipo == 1 && stock_insumo.insumo.cause == 0 && stock_insumo.insumo.controlado == 0){
 							tipo_insumo = 2; //no causes
@@ -63,7 +69,7 @@
 							insumos[tipo_insumo] = {subtotal:0,items:{}};
 						}
 
-						var total_calculado = stock_insumo.cantidad_entregada * (stock_insumo.insumo.precio);
+						var total_calculado = stock_insumo.cantidad_recibida * (stock_insumo.insumo.precio);
 
 						if(!insumos[tipo_insumo].items[stock_insumo.insumo_id]){
 							insumos[tipo_insumo].items[stock_insumo.insumo_id] = {
@@ -83,17 +89,17 @@
 						insumos[tipo_insumo].items[stock_insumo.insumo_id]['lotes'].push({
 							'lote': stock_insumo.lote.toString(),
 							'fecha_caducidad': stock_insumo.fecha_caducidad,
-							'cantidad': $filter('number')(stock_insumo.cantidad_entregada)
+							'cantidad': $filter('number')(stock_insumo.cantidad_recibida)
 						});
 
-						insumos[tipo_insumo].items[stock_insumo.insumo_id]['total_cantidad'] += stock_insumo.cantidad_entregada;
+						insumos[tipo_insumo].items[stock_insumo.insumo_id]['total_cantidad'] += stock_insumo.cantidad_recibida;
 						insumos[tipo_insumo].items[stock_insumo.insumo_id]['total'] += total_calculado;
 
 						insumos[tipo_insumo].subtotal += total_calculado;
 						subtotal += total_calculado;
 
 						if(stock_insumo.insumo.tipo == 2){ //material de curación
-							iva += (stock_insumo.cantidad_entregada * (stock_insumo.insumo.precio))*16/100;
+							iva += (stock_insumo.cantidad_recibida * (stock_insumo.insumo.precio))*16/100;
 						}
 					}
 
@@ -111,9 +117,9 @@
 						}
 					}
 
-					entrega.fecha_entrega = new Date(entrega.fecha_entrega + ' 00:00:00');
-					var horaEntrega = entrega.hora_entrega.split(':')
-					entrega.hora_entrega =  new Date(1970, 0, 1, horaEntrega[0], horaEntrega[1], 0);
+					entrega.fecha_recibe = new Date(entrega.fecha_recibe + ' 00:00:00');
+					var horaRecibe = entrega.hora_recibe.split(':')
+					entrega.hora_recibe =  new Date(1970, 0, 1, horaRecibe[0], horaRecibe[1], 0);
 
 					// playground requires you to assign document definition to a variable called dd
 					var contadorLineasHorizontalesV = 0;
@@ -145,8 +151,8 @@
 					                    {text: "EMPRESA ADJUDICADA EN LICITACIÓN",style: "tableHeader",colSpan: 5,alignment: "center"},{},{},{},{}
 					                ],
 					                [
-					                    {text: $filter('date')(entrega.fecha_entrega,'dd/MM/yyyy'),style: "tableHeaderData",colSpan: 2,alignment: "center"},{},
-					                    {text: $filter('date')(entrega.hora_entrega,'HH:mm'),style: "tableHeaderData",colSpan: 2,alignment: "center"},{},
+					                    {text: $filter('date')(entrega.fecha_recibe,'dd/MM/yyyy'),style: "tableHeaderData",colSpan: 2,alignment: "center"},{},
+					                    {text: $filter('date')(entrega.hora_recibe,'HH:mm'),style: "tableHeaderData",colSpan: 2,alignment: "center"},{},
 					                    {text: entrega.stock.length.toString(),style: "tableHeaderData",colSpan: 2,alignment: "center"},{},
 					                    {text: configuracion.empresa_nombre,colSpan: 5,style: "tableHeaderData",alignment: "center"},{},{},{},{}
 					                ],
@@ -263,7 +269,7 @@
 						}
 					};
 
-					for (var i = 1; i <= 4; i++) {
+					for (var i = 1; i <= 6; i++) {
 						if(insumos[i]){
 							dd.content[0].table.body.push([
 			                    {text: tipos_descripcion[i],style: "tableHeaderVerde",colSpan: 10,alignment: "center"},{},{},{},{},{},{},{},{},{},
@@ -386,14 +392,14 @@
 	                    },{},{},{},{},{},{},{},{},{},{}]
 					);
 
-					var fecha_entrega = $filter('date')(entrega.fecha_entrega,'dd-MM-yyyy');
+					var fecha_recibe = $filter('date')(entrega.fecha_recibe,'dd-MM-yyyy');
 
 					var folio_acta = entrega.acta.folio;
 		       			folio_acta = folio_acta.replace('\/','-');
 
 		       		//console.log(JSON.stringify(dd));
 
-					pdfMake.createPdf(dd).download('Entrega_'+folio_acta+'_['+fecha_entrega+'].pdf');
+					pdfMake.createPdf(dd).download('Entrega_'+folio_acta+'_['+fecha_recibe+'].pdf');
 
 					defer.resolve();
 				}catch(e){

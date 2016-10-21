@@ -57,7 +57,7 @@
 	            <md-menu-item ng-if="(recepcion.estatus >= 2)">
 		            <md-button ng-click="imprimirEntrega(recepcion.id)" ng-disabled="(recepcion.estatus < 2)">
 		                <div layout="row">
-		                    <p flex>Recepción actual: {{recepcion.fecha_entrega | date:'yyyy-MM-dd'}}</p>
+		                    <p flex>Recepción actual: {{recepcion.fecha_recibe | date:'yyyy-MM-dd'}}</p>
 		                    <md-icon md-menu-align-target md-svg-icon="file" style="margin: auto 3px auto 0;"></md-icon>
 		                </div>
 		            </md-button>
@@ -65,7 +65,7 @@
 	            <md-menu-item ng-if="(reporte_imprimir && recepcion.estatus < 2)">
 	            	<md-button ng-click="imprimirEntrega(reporte_imprimir.id)">
 		                <div layout="row">
-		                	<p flex>Recepción previa: {{reporte_imprimir.fecha_entrega | date:'yyyy-MM-dd'}}</p>
+		                	<p flex>Recepción previa: {{reporte_imprimir.fecha_recibe | date:'yyyy-MM-dd'}}</p>
 		                    <md-icon md-menu-align-target md-svg-icon="file" style="margin: auto 3px auto 0;"></md-icon>
 		                </div>
 		            </md-button>

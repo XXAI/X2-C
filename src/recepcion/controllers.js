@@ -384,6 +384,10 @@
                     descripcion_requisicion = 'Material de Curación';
                 }else if(requisicion.tipo_requisicion == 4){
                     descripcion_requisicion = 'Controlados';
+                }else if(requisicion.tipo_requisicion == 5){
+                    descripcion_requisicion = 'Surfactante Causes';
+                }else if(requisicion.tipo_requisicion == 6){
+                    descripcion_requisicion = 'Surfactante No Causes';
                 }
 
                 $scope.tipos_requisiciones.push({
