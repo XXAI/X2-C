@@ -309,7 +309,7 @@
 				                	desglose.table.body.push([
 										{text: lote.lote.toString(),style: "tableRow",alignment: "center"},
 										{text: lote.fecha_caducidad,style: "tableRow",alignment: "center"},
-										{text: $filter('number')(lote.cantidad),style: "tableRow",alignment: "center"}
+										{text: lote.cantidad,style: "tableRow",alignment: "center"}
 				                	]);
 				                }
 
