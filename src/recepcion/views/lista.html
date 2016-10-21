@@ -28,7 +28,7 @@
 				<label>Buscar</label>
 				<md-icon md-svg-icon="magnify" class="buscar"></md-icon>
             	<input type="text" ng-model="textoBusqueda" ng-keyup="$event.keyCode==13?realizarBusqueda():null">
-            	<div class="hint" ng-if="mostrarAyuda"><small>La busqueda se realiza en los campos de folio, lugar y ciudad</small></div>
+            	<div class="hint" ng-if="mostrarAyuda"><small>La busqueda se realiza en los campos de folio, lugar y ciudad, si se proporciona un número entero se buscará por número de requisición</small></div>
           	</md-input-container>
 			<div layout="column">
 				<div flex layout-padding>
