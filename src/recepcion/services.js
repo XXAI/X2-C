@@ -399,7 +399,7 @@
 
 		       		//console.log(JSON.stringify(dd));
 
-					pdfMake.createPdf(dd).download('Entrega_'+folio_acta+'_['+fecha_recibe+'].pdf');
+					pdfMake.createPdf(dd).download('Entrada_'+folio_acta+'_['+fecha_recibe+'].pdf');
 
 					defer.resolve();
 				}catch(e){
