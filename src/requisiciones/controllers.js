@@ -50,6 +50,7 @@
                 function(res){
                     $scope.lista_clues = res.clues;
                     $scope.configuracion = res.configuracion;
+                    $scope.captura_habilitada = res.captura_habilitada;
 
                     if(res.data.length){
                         for(var i in res.data){

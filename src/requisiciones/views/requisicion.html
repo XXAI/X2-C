@@ -9,11 +9,11 @@
 			<h2><span></span></h2>
 			<span flex></span>
 
-			<md-button ng-permiso="permisoGuardar" class="md-accent md-raised" hide-xs hide-sm ng-click="crearActa($event)" ng-disabled="cargando"  aria-label="{{ 'CREAR ACTA' | translate }}">
+			<md-button ng-if='(captura_habilitada == 1)' ng-permiso="permisoGuardar" class="md-accent md-raised" hide-xs hide-sm ng-click="crearActa($event)" ng-disabled="cargando"  aria-label="{{ 'CREAR ACTA' | translate }}">
 			  <md-icon md-svg-icon="check"></md-icon>
 			  {{ 'CREAR ACTA' | translate }}
 			</md-button>
-			<md-button ng-permiso="permisoGuardar" class="md-icon-button md-accent"  hide-gt-sm  ng-disabled="cargando" ng-click="crearActa($event)"  aria-label="{{ 'CREAR ACTA' | translate }}">
+			<md-button ng-if='(captura_habilitada == 1)' ng-permiso="permisoGuardar" class="md-icon-button md-accent"  hide-gt-sm  ng-disabled="cargando" ng-click="crearActa($event)"  aria-label="{{ 'CREAR ACTA' | translate }}">
 			  <md-icon md-svg-icon="check"></md-icon>
 			</md-button>
 

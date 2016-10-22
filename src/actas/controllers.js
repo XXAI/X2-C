@@ -319,6 +319,7 @@
         $scope.loggedUser = UsuarioData.getDatosUsuario();
         $scope.toggleDatosActa = true;
         $scope.filtroTipo = 1;
+        $scope.captura_habilitada = 1;
         $scope.subtotales = {causes:0,no_causes:0,surfactante_causes:0,surfactante_no_causes:0,material_curacion:0,controlados:0};
         
         $scope.permisoAgregar = '2EF18B5F2E2D7';
@@ -332,6 +333,7 @@
             ActasDataApi.ver($routeParams.id,function(res){
                 $scope.acta = res.data;
 				$scope.configuracion = res.configuracion;
+                $scope.captura_habilitada = res.captura_habilitada;
 
                 if($scope.acta.fecha){
                     $scope.acta.fecha = new Date(res.data.fecha + ' 00:00:00');

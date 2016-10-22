@@ -29,11 +29,11 @@
 			  <md-icon md-svg-icon="delete"></md-icon>
 			</md-button>
 
-			<md-button ng-if="(acta.estatus == 1)" ng-permiso="permisoEditar" class="md-accent md-raised" hide-xs hide-sm ng-click="finalizarActa($event)" ng-disabled="cargando"  aria-label="{{ 'FINALIZAR' | translate }}">
+			<md-button ng-if="(acta.estatus == 1 && captura_habilitada == 1)" ng-permiso="permisoEditar" class="md-accent md-raised" hide-xs hide-sm ng-click="finalizarActa($event)" ng-disabled="cargando"  aria-label="{{ 'FINALIZAR' | translate }}">
 			  <md-icon md-svg-icon="check"></md-icon>
 			  {{ 'FINALIZAR' | translate }}
 			</md-button>
-			<md-button class="md-icon-button md-accent" ng-permiso="permisoEditar" hide-gt-sm  ng-if="(acta.estatus == 1)" ng-disabled="cargando" ng-click="finalizarActa($event)"  aria-label="{{ 'FINALIZAR' | translate }}">
+			<md-button class="md-icon-button md-accent" ng-permiso="permisoEditar" hide-gt-sm  ng-if="(acta.estatus == 1 && captura_habilitada == 1)" ng-disabled="cargando" ng-click="finalizarActa($event)"  aria-label="{{ 'FINALIZAR' | translate }}">
 			  <md-icon md-svg-icon="check"></md-icon>
 			</md-button>
 
