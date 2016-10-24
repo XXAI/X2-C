@@ -1041,6 +1041,10 @@
             }
         };
 
+        $scope.generarExcel = function(){
+            window.open(URLS.BASE_API +'/acta-excel/'+$routeParams.id+'?token='+$localStorage.control_desabasto.access_token);
+        };
+
         $scope.exportar = function(){
             window.open(URLS.BASE_API +'/exportar-csv/'+$routeParams.id+'?token='+$localStorage.control_desabasto.access_token);
         }

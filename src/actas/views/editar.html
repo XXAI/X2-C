@@ -84,6 +84,10 @@
 	            </md-menu-item>
 	          </md-menu-content>
 	        </md-menu>
+
+	        <md-button class="md-icon-button" ng-disabled="cargando" ng-click="generarExcel()"  aria-label="{{ 'excel' | translate }}">
+			  <md-icon md-svg-icon="file-excel"></md-icon>
+			</md-button>
 		</div>
 	</md-toolbar>
 	<md-content layout="column" flex ng-include="'src/actas/views/form.html'"></md-content>
