@@ -760,6 +760,9 @@
                                 }
                             }else if(e.error_type == 'data_validation'){
                                 Mensajero.mostrarToast({contenedor:'#modulo-dialogo',titulo:'Error:',mensaje:e.error});
+                                if(e.data.id){
+                                    $mdDialog.hide({yes:true});
+                                }
                             }else{
                                 Mensajero.mostrarToast({contenedor:'#modulo-dialogo',titulo:'Error:',mensaje:'Ocurrió un error al intentar guardar los datos.'});
                             }
