@@ -31,24 +31,26 @@
             </md-button></h1>
         </md-toolbar>
         <md-content layout-padding>
-            <md-input-container class="md-icon-float md-block" style="margin-bottom:0;">
+            <!--<md-input-container class="md-icon-float md-block" style="margin-bottom:0;">
                 <label>Buscar</label>
                 <md-icon md-svg-icon="magnify" class="buscar"></md-icon>
                 <input type="text" ng-model="textoBusqueda" ng-keyup="$event.keyCode==13?realizarBusqueda():null">
                 <div class="hint" ng-if="mostrarAyuda"><small>La busqueda se realiza en los campos de folio, lugar y ciudad</small></div>
-            </md-input-container>
+            </md-input-container-->
             <div layout="column">
+                <label>Buscar</label>
                 <div flex layout-padding>
                     <md-radio-group ng-model="menuFiltro.estatus">
                         <md-radio-button value="todos" class="md-primary">Todos</md-radio-button>
-                        <md-radio-button value="pendientes">Pendientes</md-radio-button>
-                        <md-radio-button value="validados">Validados</md-radio-button>
+                        <md-radio-button value="pendiente">Pendientes</md-radio-button>
+                        <md-radio-button value="validado">Validado</md-radio-button>
+                        <md-radio-button value="pedido">Pedido</md-radio-button>
                     </md-radio-group>
                 </div>
                 <div layout="row" flex>
-                    <div flex>
+                    <!--<div flex>
                         <md-switch ng-model="mostrarAyuda" aria-label="Ver ayuda">Ayuda</md-switch>
-                    </div>
+                    </div>-->
                     <div flex="none">
                         <md-button class="md-raised md-accent" aria-label="buscar" ng-click="realizarBusqueda()">
                             <md-icon md-svg-icon="magnify"></md-icon> Aplicar
@@ -71,18 +73,20 @@
                                 <strong>Fecha:</strong> {{requisicionunindad.fecha | date:'yyyy-MM-dd'}}
                             </div>
                             <div flex></div>
-                            <div flex="none" ng-if="requisicionunindad.fecha_validacion">
-                                <strong>Fecha de Validación:</strong> {{requisicionunindad.fecha_validacion | date:'yyyy-MM-dd HH:mm'}} hrs.
+                            <div flex="none" ng-if="requisicionunindad.estatus_acta">
+                                <strong>Estatus:</strong> {{requisicionunindad.estatus_acta_texto }}
                             </div>
                         </div>
                     </h4>
                     <h4>
-		        		<span ng-if="!requisicion.total_validado">
+		        		<span ng-if="!requisicionunindad.total_validado">
 		        			<strong>Total Importe:</strong> $ {{requisicionunindad.total_requisitado | number:2}}
 		        		</span>
-		        		<span ng-if="requisicion.total_validado">
+		        		<span ng-if="requisicionunindad.total_validado">
 		        			<strong>Total Validado:</strong> $ {{requisicionunindad.total_validado | number:2}}
 		        		</span>
+                        <br>
+
                     </h4>
                 </div>
                 <md-icon md-svg-icon="delete" ng-if="(requisicion.id && requisicion.estatus == 1)" ng-permiso="permisoEliminar" ng-click="eliminarActa(requisicion,$event)" aria-label="Borrar requisicion" class="md-secondary md-hue-3">
