@@ -381,21 +381,22 @@
                                  $scope.requisicionunidad.subtotal += insumo.total;
 
 
+
                                  if(requisicion.tipo_requisicion == 3){
                                     $scope.requisicionunidad.iva += (insumo.total*16/100);
                                     $scope.subtotales.material_curacion += insumo.total
                                  }else if(requisicion.tipo_requisicion == 2){
-                                     if(insumo.surfactante == 1)
-                                         $scope.subtotales.surfactante_no_causes += insumo.total;
-                                     else
-                                        $scope.subtotales.no_causes += insumo.total
+                                     $scope.subtotales.no_causes += insumo.total
                                  }else if(requisicion.tipo_requisicion == 4){
-                                    $scope.subtotales.controlados += insumo.total
+                                     $scope.subtotales.controlados += insumo.total
+                                 }
+                                 else if(requisicion.tipo_requisicion == 5){
+                                     $scope.subtotales.surfactante_causes += insumo.total;
+                                 }
+                                 else if(requisicion.tipo_requisicion == 6){
+                                     $scope.subtotales.surfactante_no_causes += insumo.total;
                                  }else{
-                                     if(insumo.surfactante == 1)
-                                         $scope.subtotales.surfactante_causes += insumo.total;
-                                     else
-                                        $scope.subtotales.causes += insumo.total
+                                     $scope.subtotales.causes += insumo.total
                                  }
 
                                  if(!insumos_guardados[insumo.insumo_id]){
@@ -502,7 +503,7 @@
                     };
 
                     var recalcularTotales = function(tipo){
-                        console.log(tipo);
+
                         $scope.requisicionunidad.subtotal = 0;
                         $scope.requisicionunidad.iva = 0;
                         $scope.requisicionunidad.total = 0;
