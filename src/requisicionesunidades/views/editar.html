@@ -34,7 +34,7 @@
                 {{ 'GUARDAR' | translate }}
             </md-button>
 
-            <md-button ng-if="(requisicionunidad.estatus == 1)" ng-permiso="permisoExportar" hide-xs hide-sm ng-click="exportar(requisicionunidad)" ng-disabled="cargando"  aria-label="{{ 'EXPORTAR' | translate }}">
+            <md-button ng-if="(requisicionunidad.estatus != 2)" ng-permiso="permisoExportar" hide-xs hide-sm ng-click="exportar(requisicionunidad)" ng-disabled="cargando"  aria-label="{{ 'EXPORTAR' | translate }}">
                 <md-icon md-svg-icon="upload"></md-icon>
                 {{ 'EXPORTAR' | translate }}
             </md-button>
