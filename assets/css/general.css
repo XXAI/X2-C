@@ -95,3 +95,7 @@ Para el autocomplete de CLUES
 .insumo-repetido{
 	color:#DD0000 !important;
 }
+.insumo-no-cuadro-basico{
+	/*background-color: #FF4500 !important;*/
+	color:#FF4500 !important;
+}

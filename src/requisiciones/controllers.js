@@ -48,10 +48,25 @@
         var cargarRequisiciones = function(){
             RequisicionesDataApi.requisiciones(
                 function(res){
-                    console.log(res);
+                    //console.log(res);
                     $scope.lista_clues = res.clues;
                     $scope.configuracion = res.configuracion;
                     $scope.captura_habilitada = res.captura_habilitada;
+                    var cuadro_basico_clues = {};
+
+                    for(var i in $scope.lista_clues){
+                        if($scope.lista_clues[i].cuadro_basico.length){
+                            var cuadro_basico = {};
+                            for(var j in $scope.lista_clues[i].cuadro_basico){
+                                var insumo = $scope.lista_clues[i].cuadro_basico[j];
+                                cuadro_basico[insumo.llave] = true;
+                            }
+                            $scope.lista_clues[i].cuadro_basico = cuadro_basico;
+                            cuadro_basico_clues[$scope.lista_clues[i].clues] = cuadro_basico;
+                        }else{
+                            $scope.lista_clues[i].cuadro_basico = undefined;
+                        }
+                    }
 
                     if(res.data.length){
                         for(var i in res.data){
@@ -60,6 +75,16 @@
                             insumo.cantidad = parseInt(insumo.cantidad);
                             insumo.total = parseFloat(insumo.total);
                             insumo.repetido = 0;
+
+                            if(cuadro_basico_clues[insumo.clues]){
+                                if(cuadro_basico_clues[insumo.clues][insumo.llave]){
+                                    insumo.cuadro_basico = 1;
+                                }else{
+                                    insumo.cuadro_basico = 0;
+                                }
+                            }else{
+                                insumo.cuadro_basico = 1;
+                            }
 
                             if(!$scope.elementos.por_clues[insumo.clues]){
                                 $scope.elementos.por_clues[insumo.clues] = { insumos: [] };
@@ -72,8 +97,13 @@
                                 var nuevo_insumo = JSON.parse(JSON.stringify(insumo));
                                 nuevo_insumo.total = 0;
                                 nuevo_insumo.cantidad = 0;
+                                nuevo_insumo.cuadro_basico = 1;
                                 $scope.elementos.concentrado.push(nuevo_insumo);
                             }
+
+                            /*if(insumo.cuadro_basico){
+                                $scope.elementos.concentrado[$scope.elementos.concentrado_indices[insumo.insumo_id]].cuadro_basico += 1;
+                            }*/
 
                             $scope.elementos.concentrado[$scope.elementos.concentrado_indices[insumo.insumo_id]].cantidad += insumo.cantidad;
                             $scope.elementos.concentrado[$scope.elementos.concentrado_indices[insumo.insumo_id]].total += insumo.total;
@@ -98,9 +128,12 @@
                             $scope.totales.subtotal += insumo.total;
                             $scope.totales.iva += iva;
                         }
+
                         $scope.totales.total = $scope.totales.subtotal + $scope.totales.iva;
                     }
 
+                    cuadro_basico_clues = undefined;
+                    
                     //Salvar a localStorage
                     $scope.modulo.elementos = $scope.elementos;
                     $scope.modulo.subtotales = $scope.subtotales;
@@ -157,6 +190,19 @@
             $scope.cargando = true;
             RequisicionesDataApi.catalogos(
                 function(res){
+
+                    for(var i in res.clues){
+                        if(res.clues[i].cuadro_basico.length){
+                            var cuadro_basico = {};
+                            for(var j in res.clues[i].cuadro_basico){
+                                var insumo = res.clues[i].cuadro_basico[j];
+                                cuadro_basico[insumo.llave] = true;
+                            }
+                            res.clues[i].cuadro_basico = cuadro_basico;
+                        }else{
+                            res.clues[i].cuadro_basico = undefined;
+                        }
+                    }
 
                     $scope.modulo.lista_clues = res.clues;
                     $scope.modulo.configuracion = res.configuracion;
@@ -306,6 +352,7 @@
                 insumo: undefined,
                 index: undefined,
                 modulo: $scope.modulo,
+                clues_seleccionada: $scope.clues_seleccionada,
                 lista_insumos: $scope.lista_insumos,
                 RequisicionesDataApi: RequisicionesDataApi
             };
@@ -315,7 +362,7 @@
             }
 
             $mdDialog.show({
-                controller: function($scope, $mdDialog, insumo, index, modulo,lista_insumos, RequisicionesDataApi) {
+                controller: function($scope, $mdDialog, insumo, index, modulo, clues_seleccionada, lista_insumos, RequisicionesDataApi) {
                     if(insumo){
                         $scope.insumoAutoComplete = {insumo:insumo, searchText:insumo.clave};
                         $scope.insumo = insumo;
@@ -327,6 +374,7 @@
                     }
                     $scope.modulo = modulo;
                     $scope.validacion = {};
+                    $scope.clues_seleccionada = clues_seleccionada;
                     $scope.lista_insumos = lista_insumos;
 
                     $scope.concentrado          = modulo.elementos.concentrado;
@@ -345,7 +393,8 @@
                     $scope.cancel = function() {
                         $mdDialog.cancel();
                     };
-                    $scope.answer = function() { ///Aqui es---------------------------------------------------------------------------------------
+
+                    $scope.answer = function() {
                         if(!$scope.insumo){
                             $scope.validacion.insumo = {'required':true};
                             return false;
@@ -356,18 +405,16 @@
                             return false;
                         }
 
-
                         if($scope.concentrado_indices[$scope.insumo.insumo_id] == undefined){
                             $scope.concentrado_indices[$scope.insumo.insumo_id] = $scope.concentrado.length;
                             var nuevo_insumo = JSON.parse(JSON.stringify($scope.insumo));
                             nuevo_insumo.total = 0;
                             nuevo_insumo.cantidad = 0;
+                            nuevo_insumo.cuadro_basico = 1;
                             $scope.concentrado.push(nuevo_insumo);
                         }
 
-
                         if($scope.index != undefined){
-
                             var insumo_local = $scope.lista_insumos[$scope.index];
 
                             //ACtualizamos el concentrado de insumos
@@ -517,6 +564,7 @@
                                 $scope.insumo.controlado = $scope.insumoAutoComplete.insumo.controlado;
                                 $scope.insumo.surfactante = $scope.insumoAutoComplete.insumo.surfactante;
                                 $scope.insumo.pedido = $scope.insumoAutoComplete.insumo.pedido;
+                                $scope.insumo.cuadro_basico = $scope.insumoAutoComplete.insumo.cuadro_basico;
                                 $scope.insumo.repetido = 0;
                                 $scope.insumo.total = 0.00;
                             }
@@ -528,7 +576,23 @@
                     $scope.querySearchInsumo = function(query) {
                         return $http.get(URLS.BASE_API + '/insumos',{ params:{ query: query }})
                             .then(function(res){
+                                //console.log($scope.clues_seleccionada);
                                 var resultados = [];
+                                var valor_default = 0;
+                                var cuadro_basico = {};
+
+                                if(!$scope.clues_seleccionada.cuadro_basico){
+                                    valor_default = 1;
+                                }else{
+                                    cuadro_basico = $scope.clues_seleccionada.cuadro_basico;
+                                }
+
+                                for(var i in res.data.data){
+                                    res.data.data[i].cuadro_basico = valor_default;
+                                    if(cuadro_basico[res.data.data[i].llave]){
+                                        res.data.data[i].cuadro_basico = 1;
+                                    }
+                                }
                                 return res.data.data;
                             });
                     };
