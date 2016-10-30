@@ -321,6 +321,7 @@
         $scope.filtroTipo = 1;
         $scope.captura_habilitada = 1;
         $scope.subtotales = {causes:0,no_causes:0,surfactante_causes:0,surfactante_no_causes:0,material_curacion:0,controlados:0};
+        $scope.cuadro_basico = undefined;
         
         $scope.permisoAgregar = '2EF18B5F2E2D7';
         $scope.permisoEditar = 'AC634E145647F';
@@ -334,6 +335,15 @@
                 $scope.acta = res.data;
 				$scope.configuracion = res.configuracion;
                 $scope.captura_habilitada = res.captura_habilitada;
+
+                if($scope.configuracion.lista_base_id){
+                    var cuadro_basico = {};
+                    for(var j in $scope.configuracion.cuadro_basico){
+                        var insumo = $scope.configuracion.cuadro_basico[j];
+                        cuadro_basico[insumo.llave] = true;
+                    }
+                    $scope.cuadro_basico = cuadro_basico;
+                }
 
                 if($scope.acta.fecha){
                     $scope.acta.fecha = new Date(res.data.fecha + ' 00:00:00');
@@ -378,6 +388,7 @@
                             var insumo = {};
                             
                             insumo.descripcion = requisicion.insumos[j].descripcion;
+                            insumo.llave = requisicion.insumos[j].llave;
                             insumo.clave = requisicion.insumos[j].clave;
                             insumo.lote = requisicion.insumos[j].lote;
                             insumo.unidad = requisicion.insumos[j].unidad;
@@ -387,6 +398,16 @@
                             insumo.surfactante = requisicion.insumos[j].surfactante;
                             insumo.precio = requisicion.insumos[j].precio;
                             insumo.pedido = requisicion.insumos[j].pedido;
+
+                            if($scope.cuadro_basico){
+                                if($scope.cuadro_basico[insumo.llave]){
+                                    insumo.cuadro_basico = 1;
+                                }else{
+                                    insumo.cuadro_basico = 0;
+                                }
+                            }else{
+                                insumo.cuadro_basico = 1;
+                            }
                             
                             insumo.insumo_id = requisicion.insumos[j].id;
 
@@ -444,6 +465,13 @@
             ActasDataApi.cargarConfiguracion($routeParams.id,function(res){
                 $scope.acta.ciudad = res.data.localidad;
                 $scope.acta.lugar_reunion = res.data.clues_nombre;
+
+                if(res.data.lista_base_id){
+                    $scope.cuadro_basico = {};
+                    for(var i in res.data.cuadro_basico){
+                        $scope.cuadro_basico[res.data.cuadro_basico[i].llave] = true;
+                    }
+                }
 
                 var fecha_actual = new Date();
                 fecha_actual = new Date(fecha_actual.getFullYear(), fecha_actual.getMonth(), fecha_actual.getDate(), fecha_actual.getHours(), fecha_actual.getMinutes(), 0);
@@ -552,6 +580,7 @@
                 insumo: undefined,
                 index: undefined,
                 acta: $scope.acta,
+                cuadro_basico: $scope.cuadro_basico,
                 subtotales: $scope.subtotales
             };
             if(insumo){
@@ -561,8 +590,8 @@
 
             $mdDialog.show({
                 //controller: function($scope, $mdDialog, insumo, index) {
-                controller: function($scope, $mdDialog, insumo, index, acta, subtotales) {
-                    console.log('inicia la aventura.');
+                controller: function($scope, $mdDialog, insumo, index, acta, cuadro_basico, subtotales) {
+                    console.log(cuadro_basico);
 
                     //$scope.cargando = true;
                     //$scope.catalogo_insumos = [];
@@ -587,6 +616,7 @@
                     }
                     $scope.validacion = {};
                     $scope.acta = acta;
+                    $scope.cuadro_basico = cuadro_basico;
                     $scope.subtotales = subtotales;
                     $scope.insumos_seleccionados = {};
                     
@@ -709,6 +739,7 @@
                                 $scope.insumo.controlado = $scope.insumoAutoComplete.insumo.controlado;
                                 $scope.insumo.surfactante = $scope.insumoAutoComplete.insumo.surfactante;
                                 $scope.insumo.pedido = $scope.insumoAutoComplete.insumo.pedido;
+                                $scope.insumo.cuadro_basico = $scope.insumoAutoComplete.insumo.cuadro_basico;
                                 $scope.insumo.total = 0.00;
                                 var element = $window.document.getElementById('input_cantidad');
                                 element.focus();
@@ -726,7 +757,22 @@
                     $scope.querySearchInsumo = function(query) {
                         return $http.get(URLS.BASE_API + '/insumos',{ params:{ query: query }})
                             .then(function(res){
-                                var resultados = [];
+                                var valor_default = 0;
+                                var cuadro_basico = {};
+
+                                if(!$scope.cuadro_basico){
+                                    valor_default = 1;
+                                }else{
+                                    cuadro_basico = $scope.cuadro_basico;
+                                }
+
+                                for(var i in res.data.data){
+                                    res.data.data[i].cuadro_basico = valor_default;
+                                    if(cuadro_basico[res.data.data[i].llave]){
+                                        res.data.data[i].cuadro_basico = 1;
+                                    }
+                                }
+                                
                                 return res.data.data;
                             });
                     };
