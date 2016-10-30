@@ -364,8 +364,8 @@
             }
 
             $mdDialog.show({
-                controller: function($scope, $mdDialog, insumo, index, modulo, clues_seleccionada, lista_insumos, RequisicionesDataApi) {
-
+                controller: function($scope, $mdDialog, insumo, index, modulo, clues_seleccionada,requisicion_id_unidad, lista_insumos, RequisicionesDataApi) {
+                   
                     if(insumo){
                         $scope.insumoAutoComplete = {insumo:insumo, searchText:insumo.clave};
                         $scope.insumo = insumo;
