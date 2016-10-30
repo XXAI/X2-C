@@ -19,7 +19,7 @@
                 <div flex style="text-align:center;">Descripción del Insumo</div>
                 <div flex="15" style="text-align:center;">Unidad de Medida</div>
                 <div flex="10" style="text-align:center;">Precio Unitario</div>
-                <div flex="10" style="text-align:center;"><div ng-if="(requisicionunidad.estatus == 1)">Cantidad</div><div ng-if="(requisicionunidad.estatus ==2)">Validado / Solicitado</div></div>
+                <div flex="10" style="text-align:center;"><div ng-if="(requisicionunidad.estatus <= 2)">Cantidad</div><div ng-if="(requisicionunidad.estatus > 2)">Validado / Solicitado</div></div>
                 <div flex="20" style="text-align:center;">Importe</div>
             </div>
         </md-subheader>
@@ -39,7 +39,7 @@
                         <div flex style="text-align:center;"><p style="line-height:14px; margin:0px;"><small>{{insumo.descripcion}}</small></p></div>
                         <div flex="15" style="text-align:center;"><p style="line-height:14px; margin:0px;"><small>{{insumo.unidad}}</small></p></div>
                         <div flex="10" style="text-align:center;">$ {{insumo.precio | number:2}}</div>
-                        <div flex="10" style="text-align:center;"><div ng-if="(requisicionunidad.estatus == 1)">{{insumo.cantidad | number}}</div><div ng-if="(requisicionunidad.estatus ==2)"><b class="insumo-repetido">{{insumo.cantidad | number}}</b> / {{insumo.cantidad_inicial | number}}</div></div>
+                        <div flex="10" style="text-align:center;"><div ng-if="(requisicionunidad.estatus <= 2)">{{insumo.cantidad | number}}</div><div ng-if="(requisicionunidad.estatus > 2)"><b class="insumo-repetido">{{insumo.cantidad | number}}</b> / {{insumo.cantidad_inicial | number}}</div></div>
                         <div flex="20" style="text-align:center;">$ {{insumo.total | number:2}}</div>
                     </div>
                     <md-icon ng-if="(requisicionunidad.estatus < 2)" md-svg-icon="delete" ng-click="eliminarInsumo(insumo)" aria-label="quitar" class="md-secondary md-hue-3">

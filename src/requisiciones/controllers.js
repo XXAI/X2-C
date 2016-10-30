@@ -301,21 +301,23 @@
         
         $scope.mostrarDialogo = function(ev,insumo) {
 
+
             var useFullScreen = ($mdMedia('sm') || $mdMedia('xs'))  && $scope.customFullscreen;
             var locals = {
                 insumo: undefined,
                 index: undefined,
                 modulo: $scope.modulo,
                 lista_insumos: $scope.lista_insumos,
+                requisicion_id_unidad: $scope.requisicion_id_unidad,
                 RequisicionesDataApi: RequisicionesDataApi
             };
             if(insumo){
-                locals.insumo = JSON.parse(JSON.stringify(insumo));;
+                locals.insumo = JSON.parse(JSON.stringify(insumo));
                 locals.index = $scope.lista_insumos.indexOf(insumo);
             }
 
             $mdDialog.show({
-                controller: function($scope, $mdDialog, insumo, index, modulo,lista_insumos, RequisicionesDataApi) {
+                controller: function($scope, $mdDialog, insumo, index, modulo,lista_insumos, requisicion_id_unidad, RequisicionesDataApi) {
                     if(insumo){
                         $scope.insumoAutoComplete = {insumo:insumo, searchText:insumo.clave};
                         $scope.insumo = insumo;
@@ -356,10 +358,13 @@
                             return false;
                         }
 
+                        $scope.insumo.requisicion_id_unidad = requisicion_id_unidad; // Campo agregado para unidades offline, identificador de requisicion
+
 
                         if($scope.concentrado_indices[$scope.insumo.insumo_id] == undefined){
                             $scope.concentrado_indices[$scope.insumo.insumo_id] = $scope.concentrado.length;
                             var nuevo_insumo = JSON.parse(JSON.stringify($scope.insumo));
+
                             nuevo_insumo.total = 0;
                             nuevo_insumo.cantidad = 0;
                             $scope.concentrado.push(nuevo_insumo);
@@ -367,7 +372,7 @@
 
 
                         if($scope.index != undefined){
-
+                            console.log("index")
                             var insumo_local = $scope.lista_insumos[$scope.index];
 
                             //ACtualizamos el concentrado de insumos
@@ -446,7 +451,6 @@
                             }
                         }else{
 
-
                             $scope.lista_insumos.push($scope.insumo);
 
                             $scope.insumos_estatus.nuevos[$scope.insumo.id] = true;
@@ -471,6 +475,7 @@
                             }else{
                                 $scope.subtotales.material_curacion += ($scope.insumo.total+($scope.insumo.total*16/100));
                             }
+
                         }
 
                         $scope.totales.subtotal += $scope.insumo.total;
@@ -489,11 +494,33 @@
                         document.querySelector('#autocomplete-insumos').focus();
                         //console.log('--answer^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^');
                         $scope.modulo.cambios = true;
+                        $scope.modulo.cambios = true;
+
                     };
 
                     $scope.calcularTotal = function(){
                         $scope.insumo.total = $scope.insumo.cantidad * $scope.insumo.precio;
                     };
+
+                    $scope.reorganizar_indices = function(insumos, clues)
+                    {
+                        var requisicion_id_unidad  = 0;
+                        for(var index in insumos)
+                        {
+                            if(insumos[index].requisicion_id_unidad && insumos[index].requisicion_id_unidad!=0)
+                            {
+                                requisicion_id_unidad = insumos[index].requisicion_id_unidad;
+                            }
+                        }
+
+                        for(var index in insumos)
+                        {
+                            insumos[index].requisicion_id_unidad = requisicion_id_unidad;
+
+                        }
+                        $scope.lista_insumos = insumos;
+                        console.log($scope);
+                    }
 
                     $scope.insumoAutoCompleteItemChange = function(){
                         $scope.validacion = {};
@@ -579,13 +606,20 @@
             if ($scope.cluesAutoComplete.clues != null){
                 $scope.clues_seleccionada = $scope.cluesAutoComplete.clues;
                 if(!$scope.elementos.por_clues[$scope.clues_seleccionada.clues]){
-                    $scope.elementos.por_clues[$scope.clues_seleccionada.clues] = { insumos:[] };
+                    $scope.elementos.por_clues[$scope.clues_seleccionada.clues] = { insumos:[], requisicion_acta_id:0 };
                 }
-                $scope.lista_insumos = $scope.elementos.por_clues[$scope.clues_seleccionada.clues].insumos
+                $scope.requisicion_id_unidad = $scope.elementos.por_clues[$scope.clues_seleccionada.clues].requisicion_acta_id;
+                if(!$scope.elementos.por_clues[$scope.clues_seleccionada.clues].requisicion_acta_id)
+                {
+                    $scope.elementos.por_clues[$scope.clues_seleccionada.clues].requisicion_acta_id = 0;
+                }
+                $scope.lista_insumos = $scope.elementos.por_clues[$scope.clues_seleccionada.clues].insumos;
             }else{
+                $scope.requisicion_id_unidad = undefined;
                 $scope.clues_seleccionada = undefined;
                 $scope.lista_insumos = $scope.elementos.concentrado;
             }
+
             var subtotal = 0;
             var iva = 0;
             for(var i in $scope.lista_insumos){
@@ -668,6 +702,7 @@
                             //var parametros = {requisiciones: $scope.requisiciones, acta: $scope.acta};
                             var parametros = {insumos: $scope.insumos, acta: $scope.acta};
 
+
                             RequisicionesDataApi.guardar(parametros,function (res) {
                                 $scope.modulo.cambios = false;
                                 $location.path('actas/'+res.acta.id+'/editar');
@@ -724,6 +759,7 @@
             var insumos = prepararGuardado();
             var parametros = {insumos: insumos};
 
+            console.log(parametros);
             RequisicionesDataApi.guardar(parametros,function (res) {
                 $scope.cargando = false;
                 $scope.insumos_estatus = {
@@ -874,12 +910,16 @@
                                 var agregar_iteracion_tipo = 0;
                                 var solicitud_nueva = {};
                                 var insumos = Array();
-                                var arreglo = [{clues : registros[0].clues , insumos : []}];
+                                var arreglo = [{clues : registros[0].clues , insumos : [], acta_id: 0 }];
+                                var requisicion_id_unidad = 0;
+
                                 for(agregar_iteracion_tipo in registros)
                                 {
 
                                     var clues = registros[agregar_iteracion_tipo].clues;
                                     var agregar_iteracion_insumos = 0;
+                                    requisicion_id_unidad = registros[agregar_iteracion_tipo].acta_id;
+                                    $scope.elementos.por_clues[registros[agregar_iteracion_tipo].clues].requisicion_acta_id = registros[agregar_iteracion_tipo].acta_id;
 
                                     for(agregar_iteracion_insumos in registros[agregar_iteracion_tipo].insumos)
                                     {
@@ -897,6 +937,7 @@
 
                                                 $scope.elementos.por_clues[clues].insumos[agregar_iteracion_clues].cantidad += parseInt(registros[agregar_iteracion_tipo].insumos[agregar_iteracion_insumos].pivot.cantidad);
                                                 $scope.elementos.por_clues[clues].insumos[agregar_iteracion_clues].total += parseFloat(registros[agregar_iteracion_tipo].insumos[agregar_iteracion_insumos].pivot.total);
+                                                $scope.elementos.por_clues[clues].insumos[agregar_iteracion_clues].requisicion_id_unidad = registros[agregar_iteracion_tipo].acta_id;
 
                                                 if(requisiciones.tipo == 1 && requisiciones.cause == 1 && requisiciones.surfactante == 1){
                                                     $scope.subtotales.surfactante_causes += parseFloat(requisiciones.pivot.total);
@@ -931,6 +972,7 @@
                                     }
                                 }
                                 arreglo[0].insumos = insumos;
+                                arreglo[0].acta_id = requisicion_id_unidad;
                                 ingresa_insumos(arreglo);
                                 $mdDialog.cancel();
                             }
@@ -946,31 +988,34 @@
 
         function ingresa_insumos(registros)
         {
-
+            var clues = "";
+            var id_acta_unidad = 0;
             for(var requisiciones in registros){
 
                 var datos = registros[requisiciones].insumos;
-                var clues = registros[requisiciones].clues;
+                clues = registros[requisiciones].clues;
+                id_acta_unidad = registros[requisiciones].acta_id;
 
 
                 for(var datos_insumos in datos){
                     var new_insumo = {};
                     new_insumo =
                     {
-                        cantidad    : datos[datos_insumos].pivot['cantidad'],
-                        cause       : datos[datos_insumos].cause,
-                        clave       : datos[datos_insumos].clave,
-                        controlado  : datos[datos_insumos].controlado,
-                        descripcion : datos[datos_insumos].descripcion,
-                        id          : datos[datos_insumos].id,
-                        insumo_id   : datos[datos_insumos].id,
-                        lote        : datos[datos_insumos].lote,
-                        pedido      : datos[datos_insumos].pedido,
-                        precio      : datos[datos_insumos].precio,
-                        tipo        : datos[datos_insumos].tipo,
-                        unidad      : datos[datos_insumos].unidad,
-                        surfactante : datos[datos_insumos].surfactante,
-                        total       : parseFloat(datos[datos_insumos].pivot['total'])
+                        cantidad                : datos[datos_insumos].pivot['cantidad'],
+                        cause                   : datos[datos_insumos].cause,
+                        clave                   : datos[datos_insumos].clave,
+                        controlado              : datos[datos_insumos].controlado,
+                        descripcion             : datos[datos_insumos].descripcion,
+                        id                      : datos[datos_insumos].id,
+                        insumo_id               : datos[datos_insumos].id,
+                        lote                    : datos[datos_insumos].lote,
+                        pedido                  : datos[datos_insumos].pedido,
+                        precio                  : datos[datos_insumos].precio,
+                        tipo                    : datos[datos_insumos].tipo,
+                        unidad                  : datos[datos_insumos].unidad,
+                        surfactante             : datos[datos_insumos].surfactante,
+                        requisicion_id_unidad   : id_acta_unidad,
+                        total                   : parseFloat(datos[datos_insumos].pivot['total'])
                     }
 
                     if(!$scope.elementos.por_clues[clues]){
@@ -978,6 +1023,7 @@
                     }
 
                     $scope.elementos.por_clues[clues].insumos.push(new_insumo);
+                    $scope.elementos.por_clues[clues].requisicion_acta_id = id_acta_unidad;
 
                     if($scope.elementos.concentrado_indices[new_insumo.insumo_id] == undefined){
                         $scope.elementos.concentrado_indices[new_insumo.insumo_id] = $scope.elementos.concentrado.length;
@@ -1023,12 +1069,25 @@
 
                 }
             }
+
+            reindicarunidad($scope.modulo.elementos.por_clues[clues]);
             $scope.modulo.cambios = true;
             $scope.modulo.elementos = $scope.elementos;
             $scope.modulo.subtotales = $scope.subtotales;
             $scope.modulo.totales = $scope.totales;
             $scope.modulo.insumos_estatus = $scope.insumos_estatus;
             $scope.modulo.lista_clues = $scope.lista_clues;
+
+
+        }
+
+        function reindicarunidad(elementos_clues)
+        {
+            var acta_unidad = elementos_clues.requisicion_acta_id;
+            for(var i in elementos_clues.insumos)
+            {
+                elementos_clues.insumos[i].requisicion_id_unidad = acta_unidad;
+            }
         }
 
         var input = angular.element($document[0].querySelector('input#input-file-id'));
