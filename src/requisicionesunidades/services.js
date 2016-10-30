@@ -9,6 +9,9 @@
 				ver: function (id, success, error) {
 					$http.get(URLS.BASE_API + '/requisicionesunidades/' + id).success(success).error(error)
 				},
+                duplicar: function (id, success, error) {
+                   $http.get(URLS.BASE_API + '/requisicionesunidades-duplicar/' + id).success(success).error(error)
+                },
 				cargarConfiguracion: function (id, success, error) {
 					$http.get(URLS.BASE_API + '/configuracion/' + id).success(success).error(error)
 				},

@@ -7,7 +7,7 @@
 		        <md-icon md-svg-icon="menu" ></md-icon>
 		    </md-button>		
 			<h2>
-			  <span>REQUISICIONES UNIDADES </span>
+			  <span>REQUISICIONES UNIDADES</span>
 			</h2>
 
 			<span flex></span>
@@ -25,18 +25,39 @@
 
 			<md-icon md-svg-icon="dots-vertical" style="color: #005DA7;"></md-icon>
 
-			<md-button ng-if="(requisicionunidad.estatus != 2)" ng-permiso="permisoEliminar" class="md-icon-button" ng-click="eliminar($event)"  aria-label="{{ 'ELIMINAR' | translate }}">
+			<md-button ng-if="(requisicionunidad.estatus == 1)" ng-permiso="permisoEliminar" class="md-icon-button" ng-click="eliminar($event)"  aria-label="{{ 'ELIMINAR' | translate }}">
 			  <md-icon md-svg-icon="delete"></md-icon>
 			</md-button>
+            <md-button ng-if="(requisicionunidad.estatus == 1)" class="md-accent md-raised" hide-xs hide-sm ng-click="Finalizar($event)" aria-label="{{ 'FINALIZAR' | translate }}">
+                <md-icon md-svg-icon="check"></md-icon>
+                {{ 'FINALIZAR' | translate }}
+            </md-button>
+            <md-button  ng-if="(requisicionunidad.estatus == 1)" class="md-icon-button md-accent"  hide-gt-sm  ng-disabled="cargando" ng-click="Finalizar($event)"  aria-label="{{ 'FINALIZAR' | translate }}">
+                <md-icon md-svg-icon="check"></md-icon>
+            </md-button>
 
-            <md-button ng-if="(requisicionunidad.estatus != 2)" ng-permiso="permisoEditar" hide-xs hide-sm ng-click="guardar()" ng-disabled="cargando"  aria-label="{{ 'GUARDAR' | translate }}">
+            <md-button ng-if="(requisicionunidad.estatus == 1)" ng-permiso="permisoEditar" hide-xs hide-sm ng-click="guardar()" ng-disabled="cargando"  aria-label="{{ 'GUARDAR' | translate }}">
                 <md-icon md-svg-icon="content-save"></md-icon>
                 {{ 'GUARDAR' | translate }}
             </md-button>
-
-            <md-button ng-if="(requisicionunidad.estatus != 2)" ng-permiso="permisoExportar" hide-xs hide-sm ng-click="exportar(requisicionunidad)" ng-disabled="cargando"  aria-label="{{ 'EXPORTAR' | translate }}">
+            <md-button ng-if="(requisicionunidad.estatus == 1)" ng-permiso="permisoEditar" class="md-icon-button"  hide-gt-sm  aria-label="{{ 'GUARDAR' | translate }}">
+                <md-icon md-svg-icon="content-save"></md-icon>
+            </md-button>
+            <!--Duplicar-->
+            <md-button ng-if="(requisicionunidad.estatus > 1)" ng-permiso="permisoEditar" hide-xs hide-sm ng-click="duplicar()" ng-disabled="cargando"  aria-label="{{ 'DUPLICAR' | translate }}">
+                <md-icon md-svg-icon="content-copy"></md-icon>
+                {{ 'DUPLICAR' | translate }}
+            </md-button>
+            <md-button ng-if="(requisicionunidad.estatus > 1)" ng-permiso="permisoEditar" class="md-icon-button"  hide-gt-sm  ng-click="duplicar()"  aria-label="{{ 'DUPLICAR' | translate }}">
+                <md-icon md-svg-icon="content-copy"></md-icon>
+            </md-button>
+            <!--Duplicar-->
+            <md-button ng-if="(requisicionunidad.estatus == 2)" ng-permiso="permisoExportar" hide-xs hide-sm ng-click="exportar(requisicionunidad)" ng-disabled="cargando"  aria-label="{{ 'EXPORTAR' | translate }}">
                 <md-icon md-svg-icon="upload"></md-icon>
                 {{ 'EXPORTAR' | translate }}
+            </md-button>
+            <md-button ng-if="(requisicionunidad.estatus == 2)" ng-permiso="permisoExportar" class="md-icon-button"  hide-gt-sm  aria-label="{{ 'GUARDAR' | translate }}">
+                <md-icon md-svg-icon="upload"></md-icon>
             </md-button>
 
 		</div>

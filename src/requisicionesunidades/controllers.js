@@ -101,9 +101,10 @@
                         parametros.query = $scope.textoBuscado;
                     }
 
+
                     RequisicionesUnidadesDataApi.lista(parametros,function (res) {
 
-
+                        console.log(res);
                         if($scope.requisicionesunidadesInfinitas.maxItems != res.totales){
                             $scope.requisicionesunidadesInfinitas.maxItems = res.totales;
                         }
@@ -111,7 +112,7 @@
                         for (var i = 0; i < res.data.length; i++){
                             var obj = {
                                 id: res.data[i].id,
-                                folio: res.data[i].id+" - "+res.data[i].clues,
+                                folio: res.data[i].acta_id+" - "+res.data[i].clues,
                                 icono: 'file-outline',
                                 fecha: res.data[i].created_at,
                                 fecha_validacion: res.data[i].fecha_validacion,
@@ -123,13 +124,13 @@
                             };
 
 
-                            if(obj.estatus_acta == 1){
+                            if(res.data[i].estatus == 1){
                                 obj.estatus_acta_texto = 'Pendiente';
-                            }else if(obj.estatus_acta == 2){
+                            }else if(res.data[i].estatus == 2){
                                 obj.estatus_acta_texto = 'Cerrada';
-                            }else if(obj.estatus_acta == 3){
+                            }else if(res.data[i].estatus == 3){
                                 obj.estatus_acta_texto = 'Validado';
-                            }else if(obj.estatus_acta == 4){
+                            }else if(res.data[i].estatus == 4){
                                 obj.estatus_acta_texto = 'Pedido';
                             }
 
@@ -137,12 +138,14 @@
 
                             if(res.data[i].estatus == 1){
                                 $scope.requisicionNueva = res.data[i].id;
-                            }else if(res.data[i].estatus_sincronizacion == 0){
-                                obj.icono = 'sync-alert';
+                            }else if(res.data[i].estatus == 1){
+                                obj.icono = 'lock-open';
                             }else if(res.data[i].estatus == 2){
-                                obj.icono = 'file-send';
-                            }else if(res.data[i].estatus > 2){
-                                obj.icono = 'file-check';
+                                obj.icono = 'lock';
+                            }else if(res.data[i].estatus == 3){
+                                obj.icono = 'check';
+                            }else if(res.data[i].estatus == 4){
+                                obj.icono = 'check-all';
                             }
 
                             if(res.data[i].fecha_validacion){
@@ -310,7 +313,7 @@
                     if($routeParams.id){
                          RequisicionesUnidadesDataApi.ver($routeParams.id,function(res){
 
-                         $scope.requisicion = res.data;
+                         $scope.requisicionunidad = res.data;
                          $scope.configuracion = res.configuracion;
                          $scope.requisicionunidad = {estatus:1, iva:0.00,total:0.00,subtotal:0.00,requisiciones:{},insumos:[]};
 
@@ -318,20 +321,21 @@
                          $scope.requisicionunidad.clues = res.configuracion.clues;
 
                          //Se necesita configurar
-                         if($scope.requisicion.requisiciones[0].created_at){
+                         /*if($scope.requisicion.requisiciones[0].created_at){
                             $scope.requisicionunidad.fecha = new Date(res.data.requisiciones[0].created_at );
                          }
 
                          if($scope.requisicion.requisiciones[0].created_at){
                             var horaInicio = $scope.requisicion.requisiciones[0].created_at.substring(11).split(':');
                             $scope.requisicionunidad.hora_inicio_date =  new Date(1970, 0, 1, horaInicio[0], horaInicio[1], 0);
-                         }
+                         }*/
 
                          $scope.requisicionunidad.insumos = [];
                          $scope.requisicionunidad.subtotal = 0;
                          $scope.requisicionunidad.total = 0;
                          $scope.requisicionunidad.iva = 0;
                          var requisiciones = {};
+
                          if(res.data.requisiciones.length){
                              var insumos_guardados = {};
                              for(var i in res.data.requisiciones){
@@ -350,6 +354,7 @@
                              }
 
 
+
                              for(var j in requisicion.insumos){
                                  var insumo = {};
 
@@ -366,7 +371,7 @@
                                  insumo.insumo_id = requisicion.insumos[j].id;
 
 
-                                 if($scope.requisicionunidad.estatus == 2){
+                                 if($scope.requisicionunidad.estatus > 2){
                                  if(requisicion.insumos[j].pivot.cantidad_validada === null){ continue; }
                                     insumo.cantidad = requisicion.insumos[j].pivot.cantidad_validada;
                                     insumo.cantidad_inicial = requisicion.insumos[j].pivot.cantidad;
@@ -407,6 +412,7 @@
 
                                  $scope.requisicionunidad.insumos.push(insumo);
                              }
+
                              //$scope.requisicion.insumos += requisicion.insumos;
                              }
                          }
@@ -737,7 +743,7 @@
                         });
                     };
 
-                    /*$scope.finalizarActa = function(ev){
+                    $scope.Finalizar = function(ev){
                         var confirm = $mdDialog.confirm()
                             .title('Finalizar captura del requisicion?')
                             .content('La requisicion se cerrará y ya no podrá editarse.')
@@ -745,10 +751,10 @@
                             .ok('Finalizar')
                             .cancel('Cancelar');
                         $mdDialog.show(confirm).then(function() {
-                            $scope.requisicion.estatus = 2;
+                            $scope.requisicionunidad.estatus = 2;
                             $scope.guardar();
                         }, function() {});
-                    };*/
+                    };
 
                     function devuelveMes(mes){
                         if(mes==0) return 'ENERO';
@@ -763,6 +769,28 @@
                         else if(mes==9) return 'OCTUBRE';
                         else if(mes==10) return 'NOVIEMBRE';
                         else return 'DICIEMBRE';
+                    }
+
+                    $scope.duplicar = function() {
+                        if($scope.requisicionunidad.insumos.length > 0)
+                        {
+                            RequisicionesUnidadesDataApi.duplicar($scope.requisicionunidad.insumos[0].requisicion_id,function (res){
+
+                                $scope.cargando = false;
+                                $location.path('requisicionesunidades/'+res.acta+"/editar");
+                            },function (e, status){
+                                if(status == 403){
+                                    Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Acceso Denegado:',mensaje:'No tiene permiso para eliminar este elemento.'});
+                                }else{
+                                    Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:'Ocurrió un error al intentar eliminar el empleado.'});
+                                }
+                                $scope.cargando = false;
+                                console.log(e);
+                            });
+                        }else{
+                            Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:'Ocurrió un error al duplicar la requisición.'});
+                        }
+
                     }
 
                     $scope.guardar = function() {
@@ -837,10 +865,8 @@
 
                         if($routeParams.id){
 
-                            //console.log($scope.requisicionunidad.insumos[0].requisicion_id);
-                            console.log($scope.requisicionunidad);
                             RequisicionesUnidadesDataApi.editar($scope.requisicionunidad.insumos[0].requisicion_id, $scope.requisicionunidad ,function (res) {
-                                //console.log(res);
+                                console.log(res);
                                 $scope.cargando = false;
                                 var index_insumos_guardados = {};
                                 var insumos_guardados = [];
@@ -930,7 +956,7 @@
 
                             RequisicionesUnidadesDataApi.crear($scope.requisicionunidad,function (res) {
                                 $scope.cargando = false;
-                                $location.path('requisicionesunidades/'+res.data.id+'/editar');
+                                $location.path('requisicionesunidades/'+res.acta+'/editar');
                             }, function (e) {
                                 $scope.cargando = false;
                                 $scope.validacion = {};

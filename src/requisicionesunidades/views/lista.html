@@ -31,20 +31,21 @@
             </md-button></h1>
         </md-toolbar>
         <md-content layout-padding>
-            <!--<md-input-container class="md-icon-float md-block" style="margin-bottom:0;">
+            <md-input-container class="md-icon-float md-block" style="margin-bottom:0;">
                 <label>Buscar</label>
                 <md-icon md-svg-icon="magnify" class="buscar"></md-icon>
                 <input type="text" ng-model="textoBusqueda" ng-keyup="$event.keyCode==13?realizarBusqueda():null">
                 <div class="hint" ng-if="mostrarAyuda"><small>La busqueda se realiza en los campos de folio, lugar y ciudad</small></div>
-            </md-input-container-->
+            </md-input-container>
             <div layout="column">
                 <label>Buscar</label>
                 <div flex layout-padding>
                     <md-radio-group ng-model="menuFiltro.estatus">
                         <md-radio-button value="todos" class="md-primary">Todos</md-radio-button>
                         <md-radio-button value="pendiente">Pendientes</md-radio-button>
-                        <md-radio-button value="validado">Validado</md-radio-button>
-                        <md-radio-button value="pedido">Pedido</md-radio-button>
+                        <md-radio-button value="cerrada">Cerradas</md-radio-button>
+                        <md-radio-button value="validado">Validados</md-radio-button>
+                        <md-radio-button value="pedido">Pedidos</md-radio-button>
                     </md-radio-group>
                 </div>
                 <div layout="row" flex>
