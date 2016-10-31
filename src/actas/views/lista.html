@@ -79,10 +79,10 @@
 		        		</div>
 		        	</h4>
 		        	<h4>
-		        		<span ng-if="!acta.total_validado">
+		        		<span ng-if="acta.estatus <= 2">
 		        			<strong>Total Importe:</strong> $ {{acta.total_requisitado | number:2}}
 		        		</span>
-		        		<span ng-if="acta.total_validado">
+		        		<span ng-if="acta.estatus > 2">
 		        			<strong>Total Validado:</strong> $ {{acta.total_validado | number:2}}
 		        		</span>
 		        	</h4>

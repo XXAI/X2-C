@@ -346,8 +346,6 @@
         };
         
         $scope.mostrarDialogo = function(ev,insumo) {
-
-
             var useFullScreen = ($mdMedia('sm') || $mdMedia('xs'))  && $scope.customFullscreen;
             var locals = {
                 insumo: undefined,
