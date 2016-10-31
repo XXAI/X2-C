@@ -67,7 +67,7 @@
                             $scope.lista_clues[i].cuadro_basico = undefined;
                         }
                     }
-
+                    //aca subtotales
                     if(res.data.length){
                         for(var i in res.data){
                             var insumo = res.data[i];
@@ -162,7 +162,7 @@
                   .cancel('Cancelar');
             $mdDialog.show(confirm).then(function() {
                 $scope.cargando = true;
-                $scope.subtotales = {causes:0,no_causes:0,material_curacion:0,surfactante_causes:0,surfactante_no_causes:0};
+                $scope.subtotales = {causes:0,no_causes:0,material_curacion:0, controlados:0,surfactante_causes:0,surfactante_no_causes:0};
                 $scope.configuracion = {};
                 $scope.insumos_estatus = {
                     nuevos:{},
@@ -927,6 +927,7 @@
                             };
                             $scope.sustituir = function() {
                                 var objetos = [];
+
                                 for(var insumos_iteracion in $scope.elementos.por_clues[clues].insumos){
                                     var indice = $scope.elementos.concentrado_indices[$scope.elementos.por_clues[clues].insumos[insumos_iteracion].insumo_id];
 
@@ -965,7 +966,8 @@
                                         $scope.elementos.concentrado[indice].total = parseFloat($scope.elementos.concentrado[indice].total) - parseFloat($scope.elementos.por_clues[clues].insumos[insumos_iteracion].total);
                                     }
                                 }
-                                $scope.elementos.por_clues[clues].insumos = [];
+                                delete $scope.elementos.por_clues[clues];
+                                //$scope.elementos.por_clues[clues].insumos = [];
                                 var array_concentrado   = [];
                                 var array_indices       = {};
                                 var contador            = 0;
@@ -973,15 +975,26 @@
                                     if($scope.elementos.concentrado[indice_concentrado].cantidad > 0)
                                     {
                                         array_concentrado.push($scope.elementos.concentrado[indice_concentrado]);
-                                        array_indices[$scope.elementos.concentrado[indice_concentrado].insumo_id] = array_concentrado.length;
+                                        array_indices[$scope.elementos.concentrado[indice_concentrado].insumo_id] = (array_concentrado.length - 1);
                                         contador++;
                                     }
                                 }
-                                $scope.elementos.concentrado_indices = array_indices;
-                                $scope.elementos.concentrado          = array_concentrado;
-                                $scope.lista_insumos                  = array_concentrado;
+                                //$scope.lista_insumos = array_concentrado;
+
+                                $scope.elementos.concentrado_indices    = array_indices;
+                                $scope.elementos.concentrado            = array_concentrado;
+
+                                $scope.modulo.cambios = true;
+                                $scope.modulo.elementos = $scope.elementos;
+                                $scope.modulo.subtotales = $scope.subtotales;
+                                $scope.modulo.totales = $scope.totales;
+                                $scope.cluesAutoCompleteItemChange();
                                 ingresa_insumos(registros);
+
                                 $mdDialog.cancel();
+
+                                //
+
                             }
                             $scope.agregar_solicitud = function() {
 
@@ -1051,6 +1064,7 @@
                                 }
                                 arreglo[0].insumos = insumos;
                                 arreglo[0].acta_id = requisicion_id_unidad;
+
                                 ingresa_insumos(arreglo);
                                 $mdDialog.cancel();
                             }
@@ -1149,12 +1163,16 @@
             }
 
             reindicarunidad($scope.modulo.elementos.por_clues[clues]);
+
+
+
             $scope.modulo.cambios = true;
             $scope.modulo.elementos = $scope.elementos;
             $scope.modulo.subtotales = $scope.subtotales;
             $scope.modulo.totales = $scope.totales;
-            $scope.modulo.insumos_estatus = $scope.insumos_estatus;
-            $scope.modulo.lista_clues = $scope.lista_clues;
+            $scope.cluesAutoCompleteItemChange();
+            //$scope.modulo.insumos_estatus = $scope.insumos_estatus;
+            //$scope.modulo.lista_clues = $scope.lista_clues;
 
 
         }
