@@ -313,22 +313,22 @@
                     if($routeParams.id){
                          RequisicionesUnidadesDataApi.ver($routeParams.id,function(res){
 
+                         //configuracion de insumos basicos
+                         var cuadro_basico = {};
+                         for(var i in res.lista_insumos_basico){
+                             cuadro_basico[res.lista_insumos_basico[i].disur] = true;
+                             cuadro_basico[res.lista_insumos_basico[i].exfarma] = true;
+                         }
+                         $scope.listainsumosbasicos = cuadro_basico;
+
+                         //
                          $scope.requisicionunidad = res.data;
                          $scope.configuracion = res.configuracion;
+                         var cuadro_basico_clues = {};
                          $scope.requisicionunidad = {estatus:1, iva:0.00,total:0.00,subtotal:0.00,requisiciones:{},insumos:[]};
 
                          $scope.requisicionunidad.ciudad = res.configuracion.clues+" - "+res.configuracion.localidad;
                          $scope.requisicionunidad.clues = res.configuracion.clues;
-
-                         //Se necesita configurar
-                         /*if($scope.requisicion.requisiciones[0].created_at){
-                            $scope.requisicionunidad.fecha = new Date(res.data.requisiciones[0].created_at );
-                         }
-
-                         if($scope.requisicion.requisiciones[0].created_at){
-                            var horaInicio = $scope.requisicion.requisiciones[0].created_at.substring(11).split(':');
-                            $scope.requisicionunidad.hora_inicio_date =  new Date(1970, 0, 1, horaInicio[0], horaInicio[1], 0);
-                         }*/
 
                          $scope.requisicionunidad.insumos = [];
                          $scope.requisicionunidad.subtotal = 0;
@@ -353,13 +353,12 @@
                                      insumos: []
                              }
 
-
-
                              for(var j in requisicion.insumos){
                                  var insumo = {};
 
                                  insumo.descripcion = requisicion.insumos[j].descripcion;
                                  insumo.clave = requisicion.insumos[j].clave;
+                                 insumo.llave = requisicion.insumos[j].llave;
                                  insumo.lote = requisicion.insumos[j].lote;
                                  insumo.unidad = requisicion.insumos[j].unidad;
                                  insumo.tipo = requisicion.insumos[j].tipo;
@@ -369,6 +368,10 @@
                                  insumo.precio = requisicion.insumos[j].precio;
 
                                  insumo.insumo_id = requisicion.insumos[j].id;
+                                 if($scope.listainsumosbasicos[insumo.llave])
+                                    insumo.cuadro_basico = true;
+                                 else
+                                    insumo.cuadro_basico = false;
 
 
                                  if($scope.requisicionunidad.estatus > 2){
@@ -422,6 +425,7 @@
                          res.data.requisiciones = requisiciones;
 
                          $scope.cargando = false;
+                             console.log($scope);
                          },function(e){
 
                          Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:'Ocurrió un error al intentar obtener los datos.'});
