@@ -48,7 +48,7 @@
         var cargarRequisiciones = function(){
             RequisicionesDataApi.requisiciones(
                 function(res){
-                    //console.log(res);
+                    console.log($scope);
                     $scope.lista_clues = res.clues;
                     $scope.configuracion = res.configuracion;
                     $scope.captura_habilitada = res.captura_habilitada;
