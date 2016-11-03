@@ -205,6 +205,7 @@
                             res.clues[i].cuadro_basico = undefined;
                         }
                     }
+                    $scope.captura_habilitada = res.captura_habilitada;
 
                     $scope.modulo.lista_clues = res.clues;
                     $scope.modulo.configuracion = res.configuracion;
@@ -420,7 +421,7 @@
                             nuevo_insumo.cuadro_basico = 1;
                             $scope.concentrado.push(nuevo_insumo);
                         }
-
+                        
                         if($scope.index != undefined){
                             var insumo_local = $scope.lista_insumos[$scope.index];
 
@@ -499,9 +500,9 @@
                                 $scope.subtotales.material_curacion += ($scope.insumo.total+($scope.insumo.total*16/100));
                             }
                         }else{
-
+                            
                             $scope.lista_insumos.push($scope.insumo);
-
+                            
                             $scope.insumos_estatus.nuevos[$scope.insumo.id] = true;
 
                             $scope.concentrado[$scope.concentrado_indices[$scope.insumo.insumo_id]].total += $scope.insumo.total;
@@ -543,8 +544,6 @@
                         document.querySelector('#autocomplete-insumos').focus();
                         //console.log('--answer^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^');
                         $scope.modulo.cambios = true;
-                        $scope.modulo.cambios = true;
-
                     };
 
                     $scope.calcularTotal = function(){
@@ -675,11 +674,10 @@
 
                 if(!$scope.elementos.por_clues[$scope.clues_seleccionada.clues]){
                     $scope.elementos.por_clues[$scope.clues_seleccionada.clues] = { insumos:[], requisicion_acta_id:0 };
-                }else
-                {
-                    $scope.lista_insumos = $scope.elementos.por_clues[$scope.clues_seleccionada.clues].insumos;
+                }else{
                     $scope.requisicion_id_unidad = $scope.elementos.por_clues[$scope.clues_seleccionada.clues].requisicion_acta_id;
                 }
+                $scope.lista_insumos = $scope.elementos.por_clues[$scope.clues_seleccionada.clues].insumos;
                 /*if(!$scope.elementos.por_clues[$scope.clues_seleccionada.clues].requisicion_acta_id)
                 {
                     $scope.elementos.por_clues[$scope.clues_seleccionada.clues].requisicion_acta_id = 0;
