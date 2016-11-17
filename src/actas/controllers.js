@@ -307,10 +307,10 @@
         };
     }])
     .controller('FormActaCtrl',
-    ['$rootScope', '$scope', 'ActasDataApi', '$mdSidenav','$location','$mdBottomSheet','$routeParams','$filter','$localStorage',
+    ['$rootScope', '$scope', 'ActasDataApi', '$mdSidenav','$location','$mdBottomSheet','$routeParams','$filter','$localStorage','$timeout',
     '$http','$mdToast','Auth','Menu','URLS','UsuarioData','$mdDialog','$mdMedia','Mensajero','$window','ImprimirSolicitud',
     function(
-    $rootScope, $scope, ActasDataApi,$mdSidenav,$location,$mdBottomSheet,$routeParams,$filter,$localStorage,
+    $rootScope, $scope, ActasDataApi,$mdSidenav,$location,$mdBottomSheet,$routeParams,$filter,$localStorage,$timeout,
     $http,$mdToast,Auth,Menu,URLS,UsuarioData,$mdDialog,$mdMedia,Mensajero, $window, ImprimirSolicitud
     ){
         $scope.menuSelected = "/actas";
@@ -329,6 +329,10 @@
         $scope.permisoEliminar = 'FF915DEC2F235';
 
         $scope.cargando = true;
+
+        $scope.mostrarDatosActa = function(){
+            $scope.toggleDatosActa=!$scope.toggleDatosActa;
+        };
 
         if($routeParams.id){
             ActasDataApi.ver($routeParams.id,function(res){
@@ -741,13 +745,11 @@
                                 $scope.insumo.pedido = $scope.insumoAutoComplete.insumo.pedido;
                                 $scope.insumo.cuadro_basico = $scope.insumoAutoComplete.insumo.cuadro_basico;
                                 $scope.insumo.total = 0.00;
-                                var element = $window.document.getElementById('input_cantidad');
-                                element.focus();
-                                //document.querySelector('#input-cantidad').focus();
-                                //document.querySelector('#input-cantidad').trigger('focus');
-                                //$document[0].querySelector('input#input-cantidad').focus();
-                                //document.getElementById("input-cantidad").click();
-                                //angular.element($document[0].querySelector('input#input-cantidad')).focus();
+                                
+                                $timeout(function(){
+                                    var element = $window.document.getElementById('input_cantidad');
+                                    element.focus();
+                                },200);
                             }
                         }else{
                             $scope.insumo = undefined;

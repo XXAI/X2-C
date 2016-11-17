@@ -1,5 +1,6 @@
 <md-sidenav ng-class="(menuCerrado)?'menu-principal-izq':''" layout="column"   class="md-sidenav-left md-whiteframe-z2" md-component-id="left" md-is-locked-open="$mdMedia('gt-sm')"   ng-include="'src/app/views/menu.html'"></md-sidenav>
-<div layout="column" class="relative" layout-fill role="main" id="modulo-nuevo">
+
+<div layout="column" flex id="modulo-nuevo">
 	<md-progress-linear  ng-if="cargando" class="md-accent" style="position:fixed; top:-3px; left:0px; z-index:999"  md-mode="indeterminate"></md-progress-linear>
 	<md-toolbar layout="column" class="md-whiteframe-z2">
 		<div class="md-toolbar-tools">    
@@ -90,5 +91,5 @@
 			</md-button>
 		</div>
 	</md-toolbar>
-	<md-content layout="column" flex ng-include="'src/actas/views/form.html'"></md-content>
+	<div layout="row" flex id="modulo-contenedor" ng-include="'src/actas/views/form.html'"></div>
 </div>
