@@ -3,10 +3,10 @@
     angular.module('RequisicionesModule')
     .controller('RequisicionesCtrl',
     ['$rootScope', '$scope', 'RequisicionesDataApi', '$mdSidenav','$location','$document','$mdBottomSheet','$routeParams','$filter','$localStorage',
-    '$http','$mdToast','Auth','Menu','URLS','UsuarioData','$mdDialog','$mdMedia','Mensajero',
+    '$http','$mdToast','Auth','Menu','URLS','UsuarioData','$mdDialog','$mdMedia','Mensajero','$timeout','$window',
     function(
     $rootScope, $scope, RequisicionesDataApi,$mdSidenav,$location,$document,$mdBottomSheet,$routeParams,$filter,$localStorage,
-    $http,$mdToast,Auth,Menu,URLS,UsuarioData,$mdDialog,$mdMedia,Mensajero
+    $http,$mdToast,Auth,Menu,URLS,UsuarioData,$mdDialog,$mdMedia,Mensajero,$timeout,$window
     ){
 
         $scope.menuSelected = "/requisiciones";
@@ -48,10 +48,15 @@
         var cargarRequisiciones = function(){
             RequisicionesDataApi.requisiciones(
                 function(res){
-                    console.log($scope);
+                    //console.log($scope);
                     $scope.lista_clues = res.clues;
                     $scope.configuracion = res.configuracion;
-                    $scope.captura_habilitada = res.captura_habilitada;
+                    if(res.captura_habilitada == 1){
+                        $scope.captura_habilitada = true;
+                    }else{
+                        $scope.captura_habilitada = false;
+                    }
+                    
                     var cuadro_basico_clues = {};
 
                     for(var i in $scope.lista_clues){
@@ -205,7 +210,12 @@
                             res.clues[i].cuadro_basico = undefined;
                         }
                     }
-                    $scope.captura_habilitada = res.captura_habilitada;
+                    
+                    if(res.captura_habilitada == 1){
+                        $scope.captura_habilitada = true;
+                    }else{
+                        $scope.captura_habilitada = false;
+                    }
 
                     $scope.modulo.lista_clues = res.clues;
                     $scope.modulo.configuracion = res.configuracion;
@@ -595,6 +605,11 @@
                                 $scope.insumo.cuadro_basico = $scope.insumoAutoComplete.insumo.cuadro_basico;
                                 $scope.insumo.repetido = 0;
                                 $scope.insumo.total = 0.00;
+
+                                $timeout(function(){
+                                    var element = $window.document.getElementById('input_cantidad');
+                                    element.focus();
+                                },200);
                             }
                         }else{
                             $scope.insumo = undefined;
