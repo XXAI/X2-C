@@ -1,5 +1,5 @@
 <md-sidenav ng-class="(menuCerrado)?'menu-principal-izq':''" layout="column"   class="md-sidenav-left md-whiteframe-z2" md-component-id="left" md-is-locked-open="$mdMedia('gt-sm')"   ng-include="'src/app/views/menu.html'"></md-sidenav>
-<div layout="column" class="relative" layout-fill role="main" id="modulo-nuevo">
+<div layout="column" flex id="modulo-nuevo">
 	<md-progress-linear  ng-if="cargando" class="md-accent" style="position:fixed; top:-3px; left:0px; z-index:999"  md-mode="indeterminate"></md-progress-linear>
 	<md-toolbar layout="column" class="md-whiteframe-z2">
 		<div class="md-toolbar-tools">    
@@ -36,110 +36,117 @@
 
 		</div>
 	</md-toolbar>
-	<md-content layout="column" flex>
-		<div layout="row" flex id="modulo-contenedor">
-			<md-content layout="column" flex>
-				<md-content layout="row" flex="none" layout-padding>
-					<div flex layout="row">
-						<md-autocomplete flex
-			            md-input-id="autocomplete-clues"
-			            md-no-cache="true"
-			            md-selected-item="cluesAutoComplete.clues"
-			            md-search-text="cluesAutoComplete.searchText"
-			            md-selected-item-change ="cluesAutoCompleteItemChange()"
-			            md-items="item in querySearchClues(cluesAutoComplete.searchText)"
-			            md-item-text="item.clues + ' - ' + item.nombre"
-			            md-min-length="0"
-			            placeholder="Buscar CLUES"
-			            md-menu-class="autocomplete-custom-template">
-			            <md-item-template>
-			            	<span class="item-title" ng-class="(item.repetido)?'insumo-repetido':''" >
-			                	<div layout="row" layout-padding>
-					                <div flex="none"><strong><span md-highlight-text="cluesAutoComplete.searchText">CLUES:</span></strong> {{item.clues}}</div>
-					                <div flex></div>
-					                <div flex="none"><span><strong>Claves:</strong> {{item.total_insumos | number}}</span></div>
-			                	</div>
-			            	</span>
-			            	<span class="item-metadata md-padding">
-			                	<span class="item-metastat">
-			                  		<span md-highlight-text="cluesAutoComplete.searchText" >{{item.nombre}}</span><br>
-			                  		<small>JURISDICCIÓN {{item.jurisdiccion}}</small>
-			                	</span>
-			            	</span>
-			            </md-item-template>
-			            <md-not-found>
-			              No hay resultados para  "{{cluesAutoComplete.searchText}}".
-			            </md-not-found>
-			        	</md-autocomplete>
-						<div flex="none">
-							<input class="ng-hide" id="input-file-id" type="file" accept=".zip"/>
-							<label for="input-file-id" class="md-button md-primary">
-					    		<md-icon md-svg-icon="attachment"></md-icon> Importar archivo
-					    	</label>
-						</div>
+
+	<div layout="row" flex id="modulo-contenedor" >
+		<div layout="column" flex class="relative" layout-fill role="main" >
+			<md-content layout="row" flex="none" layout-padding>
+				<div flex layout="row">
+					<md-autocomplete flex
+		            md-input-id="autocomplete-clues"
+		            md-no-cache="true"
+		            md-selected-item="cluesAutoComplete.clues"
+		            md-search-text="cluesAutoComplete.searchText"
+		            md-selected-item-change ="cluesAutoCompleteItemChange()"
+		            md-items="item in querySearchClues(cluesAutoComplete.searchText)"
+		            md-item-text="item.clues + ' - ' + item.nombre"
+		            md-min-length="0"
+		            placeholder="Buscar CLUES"
+		            md-menu-class="autocomplete-custom-template">
+		            <md-item-template>
+		            	<span class="item-title" ng-class="(item.repetido)?'insumo-repetido':''" >
+		                	<div layout="row" layout-padding>
+				                <div flex="none"><strong><span md-highlight-text="cluesAutoComplete.searchText">CLUES:</span></strong> {{item.clues}}</div>
+				                <div flex></div>
+				                <div flex="none"><span><strong>Claves:</strong> {{item.total_insumos | number}}</span></div>
+		                	</div>
+		            	</span>
+		            	<span class="item-metadata md-padding">
+		                	<span class="item-metastat">
+		                  		<span md-highlight-text="cluesAutoComplete.searchText" >{{item.nombre}}</span><br>
+		                  		<small>JURISDICCIÓN {{item.jurisdiccion}}</small>
+		                	</span>
+		            	</span>
+		            </md-item-template>
+		            <md-not-found>
+		              No hay resultados para  "{{cluesAutoComplete.searchText}}".
+		            </md-not-found>
+		        	</md-autocomplete>
+					<div flex="none">
+						<input class="ng-hide" id="input-file-id" type="file" accept=".zip"/>
+						<label for="input-file-id" class="md-button md-primary">
+				    		<md-icon md-svg-icon="attachment"></md-icon> Importar archivo
+				    	</label>
 					</div>
-				</md-content>
-				<md-divider></md-divider>
-				<md-subheader flex="none" class="md-primary">
-					<div layout="row">
-						<div flex="5" style="text-align:center;">No. Lote</div>
-						<div flex="15" style="text-align:center;">Clave</div>
-						<div flex style="text-align:center;">Descripción del Insumo</div>
-						<div flex="15" style="text-align:center;">Unidad de Medida</div>
-						<div flex="10" style="text-align:center;">Precio Unitario</div>
-						<div flex="10" style="text-align:center;">Cantidad</div>
-						<div flex="20" style="text-align:center;">Importe</div>
-					</div>
-				</md-subheader>
-				<md-divider></md-divider>
-				<md-content flex>
-					<md-list>
-						<md-list-item ng-if="lista_insumos.length == 0">
-					    	<md-subheader class="{{(validacion.requisiciones)?'md-warn':''}} md-no-sticky">
-					    		<span ng-hide="validacion.requisiciones">No hay insumos de médicamentos capturados</span>
-								<span ng-show="validacion.requisiciones">Es necesario capturar al menos un insumo</span>
-					    	</md-subheader>
-					    </md-list-item>
-						<md-list-item ng-repeat="insumo in lista_insumos | filter: filtroTipo" ng-click="editarInsumo($event,insumo)">
-							<div flex layout="row" ng-class="(insumo.repetido)?'insumo-repetido':((insumo.cuadro_basico)?'':'insumo-no-cuadro-basico')" ng-style="(!insumos_estatus.nuevos[insumo.id])?((insumos_estatus.editados[insumo.id])?{'font-style':'italic'}:{'color':'black'}):{'font-weight':'bold'}">
-								<div flex="5" style="text-align:center;">{{insumo.lote}}</div>
-								<div flex="15" style="text-align:center;">{{insumo.clave}}</div>
-								<div flex style="text-align:center;"><p style="line-height:14px; margin:0px;"><small>{{insumo.descripcion}}</small></p></div>
-								<div flex="15" style="text-align:center;"><p style="line-height:14px; margin:0px;"><small>{{insumo.unidad}}</small></p></div>
-								<div flex="10" style="text-align:center;">$ {{insumo.precio | number:2}}</div>
-								<div flex="10" style="text-align:center;">{{insumo.cantidad | number}}</div>
-								<div flex="20" style="text-align:center;">$ {{insumo.total | number:2}}</div>
-							</div>
-					    	<md-icon ng-if="clues_seleccionada" md-svg-icon="delete" ng-click="eliminarInsumo(insumo)" aria-label="quitar" class="md-secondary md-hue-3">
-					    	</md-icon>
-							<md-divider></md-divider>
-						</md-list-item>
-					</md-list>
-				</md-content>
-				<md-divider></md-divider>
-				<md-content layout="row" flex="none" layout-wrap>
-					<md-button class="md-raised md-accent" ng-click="agregarInsumo($event)" ng-disabled="!clues_seleccionada">
-						<md-icon md-svg-icon="plus"></md-icon> Agregar Insumo
-					</md-button>
-					<div flex></div>
-					<div flex="none" layout="row" style="overflow:hidden;">
-						<md-input-container flex="none" style="margin-bottom:0px;height:35px;">
-							<label>Subtotal</label>
-							<input value="$ {{totales.subtotal | number:2}}" readonly>
-						</md-input-container>
-						<md-input-container flex="none" style="margin-bottom:0px;height:35px;">
-							<label>I.V.A.</label>
-							<input value="$ {{totales.iva | number:2}}" readonly>
-						</md-input-container>
-						<md-input-container flex="none" style="margin-bottom:0px;height:35px;">
-							<label>Total</label>
-							<input value="$ {{totales.total | number:2}}" readonly>
-						</md-input-container>
-					</div>
-				</md-content>
+				</div>
 			</md-content>
 
-			<md-content layout="column" flex="15" class="md-whiteframe-z2">
+			<md-divider></md-divider>
+
+			<md-subheader flex="none" class="md-primary">
+				<div layout="row">
+					<div flex="5" style="text-align:center;">No. Lote</div>
+					<div flex="15" style="text-align:center;">Clave</div>
+					<div flex style="text-align:center;">Descripción del Insumo</div>
+					<div flex="15" style="text-align:center;">Unidad de Medida</div>
+					<div flex="10" style="text-align:center;">Precio Unitario</div>
+					<div flex="10" style="text-align:center;">Cantidad</div>
+					<div flex="20" style="text-align:center;">Importe</div>
+				</div>
+			</md-subheader>
+
+			<md-divider></md-divider>
+
+			<md-virtual-repeat-container style="height:880px;" id="lista-insumos">
+				<md-list>
+					<md-list-item ng-if="lista_insumos.length == 0">
+				    	<md-subheader class="{{(validacion.requisiciones)?'md-warn':''}} md-no-sticky">
+				    		<span ng-hide="validacion.requisiciones">No hay insumos de médicamentos capturados</span>
+							<span ng-show="validacion.requisiciones">Es necesario capturar al menos un insumo</span>
+				    	</md-subheader>
+				    </md-list-item>
+					<md-list-item class="md-2-line paciente-item" md-virtual-repeat="insumo in lista_insumos | filter: filtroTipo" ng-click="editarInsumo($event,insumo)" md-item-size="50">
+						<div flex layout="row" ng-class="(insumo.repetido)?'insumo-repetido':((insumo.cuadro_basico)?'':'insumo-no-cuadro-basico')" ng-style="(!insumos_estatus.nuevos[insumo.id])?((insumos_estatus.editados[insumo.id])?{'font-style':'italic'}:{'color':'black'}):{'font-weight':'bold'}">
+							<div flex="5" style="text-align:center;">{{insumo.lote}}</div>
+							<div flex="15" style="text-align:center;">{{insumo.clave}}</div>
+							<div flex style="text-align:center;"><p style="line-height:14px; margin:0px;"><small>{{insumo.descripcion}}</small></p></div>
+							<div flex="15" style="text-align:center;"><p style="line-height:14px; margin:0px;"><small>{{insumo.unidad}}</small></p></div>
+							<div flex="10" style="text-align:center;">$ {{insumo.precio | number:2}}</div>
+							<div flex="10" style="text-align:center;">{{insumo.cantidad | number}}</div>
+							<div flex="20" style="text-align:center;">$ {{insumo.total | number:2}}</div>
+						</div>
+				    	<md-icon ng-if="clues_seleccionada" md-svg-icon="delete" ng-click="eliminarInsumo(insumo)" aria-label="quitar" class="md-secondary md-hue-3">
+				    	</md-icon>
+						<md-divider></md-divider>
+					</md-list-item>
+				</md-list>
+			</md-virtual-repeat-container>
+
+			<md-divider></md-divider>
+
+			<md-content layout="row" flex="none" layout-wrap>
+				<md-button class="md-raised md-accent" ng-click="agregarInsumo($event)" ng-disabled="!clues_seleccionada">
+					<md-icon md-svg-icon="plus"></md-icon> Agregar Insumo
+				</md-button>
+				<div flex></div>
+				<div flex="none" layout="row" style="overflow:hidden;">
+					<md-input-container flex="none" style="margin-bottom:0px;height:35px;">
+						<label>Subtotal</label>
+						<input value="$ {{totales.subtotal | number:2}}" readonly>
+					</md-input-container>
+					<md-input-container flex="none" style="margin-bottom:0px;height:35px;">
+						<label>I.V.A.</label>
+						<input value="$ {{totales.iva | number:2}}" readonly>
+					</md-input-container>
+					<md-input-container flex="none" style="margin-bottom:0px;height:35px;">
+						<label>Total</label>
+						<input value="$ {{totales.total | number:2}}" readonly>
+					</md-input-container>
+				</div>
+			</md-content>
+		</div>
+
+		<div flex="none" layout="column" class="md-whiteframe-z2" style="overflow:hidden;">
+			<md-content layout="column" flex>
 				<md-subheader class="md-primary md-hue-1">
 					Totales por tipo:
 				</md-subheader>
@@ -185,13 +192,14 @@
 					<md-radio-button ng-value="{tipo:1,cause:1,surfactante:1}">Surfactante Causes</md-radio-button>
 					<md-radio-button ng-value="{tipo:1,cause:0,surfactante:1}">Surfactante No Causes</md-radio-button>
 				</md-radio-group>
-				<div flex></div>
-				<md-divider></md-divider>
-				<md-input-container flex="none" style="margin-bottom:0px;">
-					<label>Total Claves</label>
-					<input value="{{(lista_insumos | filter: filtroTipo).length | number}}" readonly>
-				</md-input-container>
 			</md-content>
+
+			<md-divider></md-divider>
+
+			<md-input-container flex="none" style="margin-bottom:0px;height:35px;">
+				<label>Total Claves</label>
+				<input value="{{(lista_insumos | filter: filtroTipo).length | number}}" readonly>
+			</md-input-container>
 		</div>
-	</md-content>
+	</div>
 </div>

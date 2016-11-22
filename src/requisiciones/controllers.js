@@ -693,11 +693,9 @@
                     $scope.requisicion_id_unidad = $scope.elementos.por_clues[$scope.clues_seleccionada.clues].requisicion_acta_id;
                 }
                 $scope.lista_insumos = $scope.elementos.por_clues[$scope.clues_seleccionada.clues].insumos;
-                /*if(!$scope.elementos.por_clues[$scope.clues_seleccionada.clues].requisicion_acta_id)
-                {
+                /*if(!$scope.elementos.por_clues[$scope.clues_seleccionada.clues].requisicion_acta_id){
                     $scope.elementos.por_clues[$scope.clues_seleccionada.clues].requisicion_acta_id = 0;
-                }else
-                {
+                }else{
                     $scope.requisicion_id_unidad = $scope.elementos.por_clues[$scope.clues_seleccionada.clues].requisicion_acta_id;
                 }*/
 
@@ -706,8 +704,8 @@
                 $scope.clues_seleccionada = undefined;
                 $scope.lista_insumos = $scope.elementos.concentrado;
             }
-            console.log($scope);
-            console.log($scope.requisicion_id_unidad);
+            //console.log($scope);
+            //console.log($scope.requisicion_id_unidad);
 
             var subtotal = 0;
             var iva = 0;
