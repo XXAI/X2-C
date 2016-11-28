@@ -1,0 +1,74 @@
+<md-dialog aria-label="detalle insumo" flex ng-cloak>
+  <form>
+    <md-toolbar>
+      <div class="md-toolbar-tools">
+        <h2>{{(insumo.clave)?insumo.clave:'Insumo'}}</h2>
+        <span flex></span>
+        <md-button class="md-icon-button" ng-click="cancel()">
+          <md-icon md-svg-icon="close" aria-label="Close dialog"></md-icon>
+        </md-button>
+      </div>
+    </md-toolbar>
+    <md-progress-linear  ng-if="cargando" class="md-accent" style="position:fixed; top:-3px; left:0px; z-index:999"  md-mode="indeterminate"></md-progress-linear>
+
+    <md-subheader class="">
+      <div flex layout="row" layout-wrap ng-class="(insumo.cuadro_basico)?'':'insumo-no-cuadro-basico'" >
+          <div flex="100" class="hint">{{insumo.descripcion}}</div>
+          <md-input-container flex style="margin-bottom: 0px;">
+            <label>Lote</label>
+            <input value="{{insumo.lote}}" readonly>
+          </md-input-container>
+          <md-input-container flex="none" style="margin-bottom: 0px;">
+            <label>Unidad</label>
+            <input value="{{insumo.unidad}}" readonly>
+          </md-input-container>
+          <md-input-container flex style="margin-bottom: 0px;">
+            <label>Precio</label>
+            <input value="$ {{insumo.precio | number:2}}" readonly>
+          </md-input-container>
+          <md-input-container flex style="margin-bottom: 0px;">
+            <label>Cantidad</label>
+            <input value="{{insumo.cantidad | number}}" readonly>
+          </md-input-container>
+          <md-input-container flex style="margin-bottom: 0px;">
+            <label>Total</label>
+            <input value="$ {{insumo.total | number:2}}" readonly>
+          </md-input-container>
+        </div>
+    </md-subheader><!--You can use md-no-sticky class-->
+
+    <md-divider></md-divider>
+
+    <md-dialog-content>
+      <div class="md-dialog-content" layout="column" ng-if="insumos_clues.length">
+        <div layout="row" layout-wrap>
+          <div flex="100" layout="row" ng-repeat="item in insumos_clues">
+            <md-input-container flex="none" style="margin-bottom: 0px; height: 35px;">
+              <label>CLUES</label>
+              <input type="text" value="{{item.clues}}" readonly>
+            </md-input-container>
+            <md-input-container flex  flex style="margin-bottom: 0px; height: 35px;">
+              <label>Nombre</label>
+              <input type="text" value="{{item.nombre}}" readonly>
+            </md-input-container>
+            <md-input-container flex="15" style="margin-bottom: 0px; height: 35px;">
+              <label>Cantidad</label>
+              <input value="{{item.cantidad | number}}" readonly>
+            </md-input-container>
+            <md-input-container flex="15" style="margin-bottom: 0px; height: 35px;">
+              <label>Total</label>
+              <input value="$ {{item.total | number:2}}" readonly>
+            </md-input-container>
+          </div>
+        </div>
+      </div>
+    </md-dialog-content>
+
+    <md-dialog-actions layout="row">
+      <span flex></span>
+      <md-button ng-disabled="cargando" class="md-raised" ng-click="cancel()" style="margin-right:20px;">
+        <md-icon md-svg-icon="close"></md-icon> Cerrar
+      </md-button>
+    </md-dialog-actions>
+  </form>
+</md-dialog>

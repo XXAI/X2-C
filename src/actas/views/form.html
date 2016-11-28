@@ -1,35 +1,35 @@
 <div layout="column" flex class="relative" layout-fill role="main" >
 
 	<md-content ng-show="toggleDatosActa" layout="row" flex="none" layout-wrap layout-padding >
-		<md-input-container flex="50" md-is-error="validacion.ciudad" style="margin-bottom:0px;">
+		<md-input-container flex="50" flex-sm="100" flex-md="100" md-is-error="validacion.ciudad" style="margin-bottom:0px;">
 			<label>Ciudad</label>
 			<input ng-model="acta.ciudad">
 			<div class="errors" ng-messages="validacion.ciudad" >
 				<div ng-message="required">{{ 'CAMPO_REQUERIDO' | translate }}</div>
 			</div>
 		</md-input-container>
-		<md-input-container flex="20" md-is-error="validacion.fecha" style="margin-bottom:0px;">
+		<md-input-container flex="20" flex-sm="33" flex-md="33" md-is-error="validacion.fecha" style="margin-bottom:0px;">
 			<label>Fecha</label>
 			<input type="date" ng-model="acta.fecha">
 			<div class="errors" ng-messages="validacion.fecha" >
 				<div ng-message="required">{{ 'CAMPO_REQUERIDO' | translate }}</div>
 			</div>
 		</md-input-container>
-		<md-input-container flex="15" md-is-error="validacion.hora_inicio" style="margin-bottom:0px;">
+		<md-input-container flex="15" flex-sm="33" flex-md="33" md-is-error="validacion.hora_inicio" style="margin-bottom:0px;">
 			<label>Hora de inicio</label>
 			<input type="time" ng-model="acta.hora_inicio_date">
 			<div class="errors" ng-messages="validacion.hora_inicio" >
 				<div ng-message="required">{{ 'CAMPO_REQUERIDO' | translate }}</div>
 			</div>
 		</md-input-container>
-		<md-input-container flex="15" md-is-error="validacion.hora_termino" style="margin-bottom:0px;">
+		<md-input-container flex="15" flex-sm="33" flex-md="33" md-is-error="validacion.hora_termino" style="margin-bottom:0px;">
 			<label>Hora de termino</label>
 			<input type="time" ng-model="acta.hora_termino_date">
 			<div class="errors" ng-messages="validacion.hora_termino" >
 				<div ng-message="required">{{ 'CAMPO_REQUERIDO' | translate }}</div>
 			</div>
 		</md-input-container>
-		<md-input-container flex="100" md-is-error="validacion.lugar_reunion" style="margin-bottom:0px;">
+		<md-input-container flex="100" flex-sm="100" flex-md="100" md-is-error="validacion.lugar_reunion" style="margin-bottom:0px;">
 			<label>Lugar de Reunion</label>
 			<input ng-model="acta.lugar_reunion">
 			<div class="errors" ng-messages="validacion.lugar_reunion" >
@@ -43,11 +43,11 @@
 	<md-subheader flex="none" class="md-primary">
 		<div layout="row">
 			<div flex="5" style="text-align:center;">No. Lote</div>
-			<div flex="15" style="text-align:center;">Clave</div>
-			<div flex style="text-align:center;">Descripción del Insumo</div>
-			<div flex="15" style="text-align:center;">Unidad de Medida</div>
-			<div flex="10" style="text-align:center;">Precio Unitario</div>
-			<div flex="10" style="text-align:center;">Cantidad</div>
+			<div flex="15" flex-md="30" style="text-align:center;">Clave</div>
+			<div flex="35" flex-md="40" style="text-align:center;">Descripción del Insumo</div>
+			<div flex="15" style="text-align:center;" hide show-gt-md>Unidad de Medida</div>
+			<div flex="10" style="text-align:center;" hide show-gt-md>Precio Unitario</div>
+			<div flex="10" style="text-align:center;" hide show-gt-md>Cantidad</div>
 			<div flex="20" style="text-align:center;">Importe</div>
 		</div>
 	</md-subheader>
@@ -65,15 +65,15 @@
 			<md-list-item class="md-2-line paciente-item" md-virtual-repeat="insumo in acta.insumos | filter: filtroTipo" ng-click="editarInsumo($event,insumo)" md-item-size="50">
 				<div flex layout="row" ng-class="(insumo.repetido)?'insumo-repetido':((insumo.cuadro_basico)?'':'insumo-no-cuadro-basico')" ng-style="(insumo.requisicion_id)?((insumo.editado)?{'font-style':'italic'}:{'color':'black'}):{'font-weight':'bold'}">
 					<div flex="5" style="text-align:center;">{{insumo.lote}}</div>
-					<div flex="15" style="text-align:center;">{{insumo.clave}}</div>
-					<div flex="35" style="text-align:center;">
+					<div flex="15" flex-md="30" style="text-align:center;">{{insumo.clave}}</div>
+					<div flex="35" flex-md="40" style="text-align:center;">
 						<p style="line-height:14px; margin:0px;"><small>{{insumo.descripcion}}</small></p>
 					</div>
-					<div flex="15" style="text-align:center;">
+					<div flex="15" style="text-align:center;" hide show-gt-md>
 						<p style="line-height:14px; margin:0px;"><small>{{insumo.unidad}}</small></p>
 					</div>
-					<div flex="10" style="text-align:center;">$ {{insumo.precio | number:2}}</div>
-					<div flex="10" style="text-align:center;">{{insumo.cantidad | number}}</div>
+					<div flex="10" style="text-align:center;" hide show-gt-md>$ {{insumo.precio | number:2}}</div>
+					<div flex="10" style="text-align:center;" hide show-gt-md>{{insumo.cantidad | number}}</div>
 					<div flex="20" style="text-align:center;">$ {{insumo.total | number:2}}</div>
 				</div>
 		    	<md-icon ng-if="(acta.estatus < 2)" md-svg-icon="delete" ng-click="eliminarInsumo(insumo)" aria-label="quitar" class="md-secondary md-hue-3">
@@ -113,7 +113,7 @@
 	</md-content>
 </div>
 
-<div flex="none" layout="column" class="md-whiteframe-z2" style="overflow:hidden;">
+<div flex="none" flex-md="20" layout="column" class="md-whiteframe-z2" style="overflow:hidden;">
 	<md-content layout="column" flex>
 		<md-subheader class="md-primary md-hue-1">
 			Totales por tipo:

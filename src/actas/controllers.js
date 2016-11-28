@@ -322,6 +322,9 @@
         $scope.captura_habilitada = 1;
         $scope.subtotales = {causes:0,no_causes:0,surfactante_causes:0,surfactante_no_causes:0,material_curacion:0,controlados:0};
         $scope.cuadro_basico = undefined;
+
+        $scope.insumos_clues = {};
+        $scope.clues = {};
         
         $scope.permisoAgregar = '2EF18B5F2E2D7';
         $scope.permisoEditar = 'AC634E145647F';
@@ -339,6 +342,10 @@
                 $scope.acta = res.data;
 				$scope.configuracion = res.configuracion;
                 $scope.captura_habilitada = res.captura_habilitada;
+
+                if(res.clues){
+                    $scope.clues = res.clues;
+                }
 
                 if($scope.configuracion.lista_base_id){
                     var cuadro_basico = {};
@@ -451,6 +458,33 @@
 
                             $scope.acta.insumos.push(insumo);
                         }
+
+                        if(requisicion.insumos_clues.length){
+                            for(var j in requisicion.insumos_clues){
+                                var insumo = {};
+                                
+                                //insumo.precio = requisicion.insumos_clues[j].precio;
+                                insumo.cuadro_basico = 1;
+                                insumo.insumo_id = requisicion.insumos_clues[j].id;
+                                insumo.clues = requisicion.insumos_clues[j].pivot.clues;
+
+                                if($scope.acta.estatus > 2){
+                                    if(requisicion.insumos_clues[j].pivot.cantidad_validada === null){ continue; }
+                                    insumo.cantidad = requisicion.insumos_clues[j].pivot.cantidad_validada;
+                                    insumo.total = parseFloat(requisicion.insumos_clues[j].pivot.total_validado);
+                                }else{
+                                    insumo.cantidad = requisicion.insumos_clues[j].pivot.cantidad;
+                                    insumo.total = parseFloat(requisicion.insumos_clues[j].pivot.total);
+                                }
+                                
+                                insumo.requisicion_id = requisicion.insumos_clues[j].pivot.requisicion_id;
+
+                                if(!$scope.insumos_clues[insumo.insumo_id]){
+                                    $scope.insumos_clues[insumo.insumo_id] = [];
+                                }
+                                $scope.insumos_clues[insumo.insumo_id].push(insumo);
+                            }
+                        }
                         //$scope.acta.insumos += requisicion.insumos;
                     }
                 }
@@ -497,6 +531,8 @@
         $scope.editarInsumo = function(ev,insumo){
             if($scope.acta.estatus < 2){
                 $scope.mostrarDialogo(ev,insumo);
+            }else{
+                $scope.mostrarDetallesInsumo(ev,insumo);
             }
         };
         $scope.eliminarInsumo = function(insumo){
@@ -798,6 +834,54 @@
                     
                 },
                 templateUrl: 'src/actas/views/form-insumo.html',
+                parent: angular.element(document.body),
+                targetEvent: ev,
+                clickOutsideToClose:true,
+                fullscreen: useFullScreen,
+                locals:locals
+            })
+            .then(function(res) {}, function() {});
+            $scope.$watch(function() {
+                return $mdMedia('xs') || $mdMedia('sm');
+            }, function(wantsFullScreen) {
+                $scope.customFullscreen = (wantsFullScreen === true);
+            });
+        };
+
+        $scope.mostrarDetallesInsumo = function(ev,insumo) {
+            var useFullScreen = ($mdMedia('sm') || $mdMedia('xs'))  && $scope.customFullscreen;
+            var locals = {
+                insumo: insumo,
+                cuadro_basico: $scope.cuadro_basico,
+                clues: $scope.clues,
+                insumos_clues: $scope.insumos_clues[insumo.insumo_id]
+            };
+
+            $mdDialog.show({
+                //controller: function($scope, $mdDialog, insumo, index) {
+                controller: function($scope, $mdDialog, insumo, cuadro_basico, clues, insumos_clues) {
+                    $scope.insumo = insumo;
+                    $scope.cuadro_basico = cuadro_basico;
+                    //$scope.clues = clues;
+                    $scope.insumos_clues = [];
+
+                    if(insumos_clues){
+                        for(var i in insumos_clues){
+                            $scope.insumos_clues.push({
+                                clues: insumos_clues[i].clues,
+                                nombre: clues[insumos_clues[i].clues],
+                                cantidad: insumos_clues[i].cantidad,
+                                total: insumos_clues[i].total
+                            });
+                        }
+                    }
+                    
+                    $scope.cancel = function() {
+                        $mdDialog.cancel();
+                    };
+                    
+                },
+                templateUrl: 'src/actas/views/detalle-insumo.html',
                 parent: angular.element(document.body),
                 targetEvent: ev,
                 clickOutsideToClose:true,
