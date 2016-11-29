@@ -1,0 +1,83 @@
+<md-dialog aria-label="form acta" flex ng-cloak id="fomulario-dialogo-acta">
+  <form>
+    <md-toolbar>
+      <div class="md-toolbar-tools">
+        <h2>{{clues_seleccionada.clues}} - {{clues_seleccionada.nombre}}</h2>
+        <span flex></span>
+        <md-button class="md-icon-button" ng-click="cancel()">
+          <md-icon md-svg-icon="close" aria-label="Close dialog"></md-icon>
+        </md-button>
+      </div>
+    </md-toolbar>
+    <md-dialog-content>
+      <div class="md-dialog-content">
+        <md-progress-linear  ng-if="cargando" class="md-accent" style="position:fixed; top:-3px; left:0px; z-index:999"  md-mode="indeterminate"></md-progress-linear>
+        <div layout="row" flex="none" layout-wrap>
+          <md-autocomplete flex="100"
+          md-autofocus="true"
+          md-no-cache="true"
+          md-selected-item="cluesAutoComplete.clues"
+          md-search-text="cluesAutoComplete.searchText"
+          md-selected-item-change ="cluesAutoCompleteItemChange()"
+          md-items="item in querySearchClues(cluesAutoComplete.searchText)"
+          md-item-text="item.clues + ' - ' + item.nombre"
+          md-min-length="0"
+          placeholder="Buscar CLUES"
+          md-menu-class="autocomplete-custom-template">
+            <md-item-template>
+              <span class="item-title" ng-class="(item.repetido)?'insumo-repetido':''" >
+                  <div layout="row" layout-padding>
+                    <div flex="none"><strong><span md-highlight-text="cluesAutoComplete.searchText">CLUES:</span></strong> {{item.clues}}</div>
+                    <div flex></div>
+                  </div>
+              </span>
+              <span class="item-metadata md-padding">
+                  <span class="item-metastat">
+                      <span md-highlight-text="cluesAutoComplete.searchText" >{{item.nombre}}</span><br>
+                      <small>JURISDICCIÓN {{item.jurisdiccion}}</small>
+                  </span>
+              </span>
+            </md-item-template>
+            <md-not-found>
+              No hay resultados para  "{{cluesAutoComplete.searchText}}".
+            </md-not-found>
+          </md-autocomplete>
+
+          <div flex="100" ng-show="validacion.clues" class="hint" ng-messages="validacion.clues"  style="color:rgb(221,44,0);">
+            <div ng-message="full">La CLUES seleccionada contiene datos capturados, ¿Que desea hacer?</div>
+            <div ng-message="duplicate">La CLUES seleccionada es igual a la CLUES de origen</div>
+          </div>
+          
+          <md-input-container flex="100" ng-if="elementos_clues">
+            <md-radio-group ng-model="acciones.seleccion">
+              <md-radio-button ng-value="1" class="md-primary">
+                Reemplazar todo <span class="hint" style="color:#6E6E6E;"><small>[ Limpia la CLUES seleccionada antes de insertar los insumos ]</small></span>
+              </md-radio-button>
+              <md-radio-button ng-value="2">
+                Agregar insumos no encontrados <span class="hint" style="color:#6E6E6E;"><small>[ Copia unicamente los insumos que no estén en la CLUES seleccionada ]</small></span>
+              </md-radio-button>
+              <md-radio-button ng-value="3">
+                Fusionar insumos <span class="hint" style="color:#6E6E6E;"><small>[ Fusiona las dos listas, incrementando las cantidades de los insumos presentes en la CLUES seleccionada ]</small></span>
+              </md-radio-button>
+            </md-radio-group>
+          </md-input-container>
+
+        </div>
+      </div>
+    </md-dialog-content>
+    <md-dialog-actions layout="row">
+      <div flex="none">
+        <md-checkbox ng-model="acciones.mover" aria-label="mover">
+          Mover insumos
+        </md-checkbox>
+      </div>
+      <span flex></span>
+      <md-button class="md-raised md-accent" ng-disabled="cargando" ng-click="copiar()" style="margin-right:20px;">
+        <md-icon md-svg-icon="check"></md-icon> {{(acciones.mover)?'Mover':'Copiar'}}
+      </md-button>
+      <md-button class="md-raised" ng-disabled="cargando" ng-click="cancel()" style="margin-right:20px;">
+        Cancelar
+      </md-button>
+    </md-dialog-actions>
+  </form>
+</md-dialog>

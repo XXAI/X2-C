@@ -129,12 +129,12 @@
 				<md-button class="md-raised md-accent" ng-click="agregarInsumo($event)" ng-disabled="!clues_seleccionada">
 					<md-icon md-svg-icon="plus"></md-icon> Agregar Insumo
 				</md-button>
-				<!--md-button class="md-raised md-primary" ng-click="copiarLista($event)" ng-disabled="(!clues_seleccionada || lista_insumos.length == 0)">
+				<md-button class="md-raised md-primary" ng-click="copiarInsumos($event)" ng-disabled="(!clues_seleccionada || lista_insumos.length == 0)">
 					<md-icon md-svg-icon="content-copy"></md-icon> Copiar Lista
 				</md-button>
-				<md-button class="md-raised md-warn" ng-disabled="(!clues_seleccionada || lista_insumos.length == 0)" ng-click="limpiarInsumos($event)" aria-label="vaciar">
-				  <md-icon md-svg-icon="delete"></md-icon> Vaciar
-				</md-button-->
+				<md-button class="md-raised md-warn" ng-disabled="(!clues_seleccionada || lista_insumos.length == 0)" ng-click="vaciarInsumos($event)" aria-label="vaciar">
+				  <md-icon md-svg-icon="delete-empty"></md-icon> Vaciar
+				</md-button>
 				<div flex></div>
 				<div flex="none" layout="row" style="overflow:hidden;">
 					<md-input-container flex="none" style="margin-bottom:0px;height:35px;">
