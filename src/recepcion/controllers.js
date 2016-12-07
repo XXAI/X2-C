@@ -232,10 +232,10 @@
         };
     }])
     .controller('FormRecepcionCtrl',
-    ['$rootScope', '$scope', 'RecepcionDataApi', '$mdSidenav','$location','$mdBottomSheet','$routeParams','$filter','$localStorage',
+    ['$rootScope', '$scope', 'RecepcionDataApi', '$mdSidenav','$location','$mdBottomSheet','$routeParams','$filter','$localStorage','$timeout',
     '$http','$mdToast','Auth','Menu','URLS','UsuarioData','$mdDialog','$mdMedia','$window','Mensajero','ImprimirEntrada',
     function(
-    $rootScope, $scope, RecepcionDataApi,$mdSidenav,$location,$mdBottomSheet,$routeParams,$filter,$localStorage,
+    $rootScope, $scope, RecepcionDataApi,$mdSidenav,$location,$mdBottomSheet,$routeParams,$filter,$localStorage,$timeout,
     $http,$mdToast,Auth,Menu,URLS,UsuarioData,$mdDialog,$mdMedia,$window,Mensajero,ImprimirEntrada
     ){
         $scope.menuSelected = "/recepcion";
@@ -540,8 +540,12 @@
                         }else{
                             $scope.ingreso = {cantidad:0,lotes:[{}]};
                             $scope.ingreso_respaldo = undefined;
-                            //var element = $window.document.getElementById('ingreso_lote_0');
-                            //element.focus();
+                        }
+                        if($scope.ingreso.cantidad == 0){
+                            $timeout(function(){
+                                var element = $window.document.getElementById('ingreso_lote_0');
+                                element.focus();
+                            },200);
                         }
                     };
 
@@ -584,9 +588,11 @@
 
                     $scope.agregarLote = function(){
                         $scope.ingreso.lotes.push({});
-                        //var ultimo_lote = $scope.ingreso.lotes.length-1;
-                        //var element = $window.document.getElementById('ingreso_lote_'+ultimo_lote);
-                        //element.focus();
+                        $timeout(function(){
+                            var ultimo_lote = $scope.ingreso.lotes.length-1;
+                            var element = $window.document.getElementById('ingreso_lote_'+ultimo_lote);
+                            element.focus();
+                        },200);
                     };
 
                     $scope.cancel = function() {
@@ -677,6 +683,7 @@
                 targetEvent: ev,
                 clickOutsideToClose:false,
                 escapeToClose:false,
+                focusOnOpen:false,
                 fullscreen: useFullScreen,
                 locals:locals
             })
