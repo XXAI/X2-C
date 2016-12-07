@@ -15,7 +15,8 @@
                                 { titulo: 'Requisición unidades',   key: '8164C929918CE', path: '/requisicionesunidades',       icono: 'file-document-box'  },
                                 { titulo: 'Solicitudes',            key: '6F5427E97863A', path: '/solicitudes',                 icono: 'file-document'      },
                                 { titulo: 'Requisiciones',          key: '4E4D8E11F6E4A', path: '/requisiciones',               icono: 'file'               },
-                                { titulo: 'Recepcion',              key: '97728B3AD53DB', path: '/recepcion',                   icono: 'truck'              }
+                                { titulo: 'Recepcion',              key: '97728B3AD53DB', path: '/recepcion',                   icono: 'truck'              },
+                                { titulo: 'Salidas',                key: '97728B3AD53DB', path: '/salidas',                     icono: 'pill'               }
                             ]//97728B3AD53DB
                          },
                          { 
