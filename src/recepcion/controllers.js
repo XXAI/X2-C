@@ -361,10 +361,11 @@
                                 $scope.ingresos_proveedores[entrega.proveedor_id][entrega.stock[j].insumo_id] = {cantidad:0,lotes:[]};
                             }
                             $scope.ingresos_proveedores[entrega.proveedor_id][entrega.stock[j].insumo_id].cantidad += entrega.stock[j].cantidad_recibida;
+
                             $scope.ingresos_proveedores[entrega.proveedor_id][entrega.stock[j].insumo_id].lotes.push({
                                 //insumo_id: entrega.stock[j].insumo_id,
                                 cantidad: entrega.stock[j].cantidad_recibida,
-                                fecha_caducidad: new Date(entrega.stock[j].fecha_caducidad + ' 00:00:00'),
+                                fecha_caducidad: (entrega.stock[j].fecha_caducidad)?new Date(entrega.stock[j].fecha_caducidad + ' 00:00:00'):undefined,
                                 lote: entrega.stock[j].lote,
                                 validacion:{}
                             });
@@ -495,38 +496,16 @@
                     $scope.lista_ingresos = lista_ingresos;
                     $scope.entrega_proveedor = entrega_proveedor;
                     $scope.totales = totales;
-                    //$scope.validacion = {};
-                    
-                    //$scope.index_siguiente = undefined;
-                    //$scope.index_anterior = undefined;
-                    //$scope.index_actual = lista_insumos.indexOf(insumo);
-                    //$scope.total_insumos = lista_insumos.length;
-
-                    /*if($scope.index_actual === 0){
-                        if($scope.total_insumos == 1){
-                            $scope.index_siguiente = undefined;
-                        }else{
-                            $scope.index_siguiente = 1;
-                        }
-                        $scope.index_anterior = undefined;
-                    }else if($scope.index_actual == ($scope.total_insumos-1)){
-                        $scope.index_siguiente = undefined;
-                        $scope.index_anterior = $scope.index_actual-1;
-                    }else{
-                        $scope.index_siguiente = $scope.index_actual+1;
-                        $scope.index_anterior = $scope.index_actual-1;
-                    }*/
 
                     var regresarRespaldo = function(){
                         if($scope.ingreso_respaldo){
                             for(var i in $scope.ingreso_respaldo.lotes){
-                                $scope.ingreso_respaldo.lotes[i].fecha_caducidad = new Date($scope.ingreso_respaldo.lotes[i].fecha_caducidad);
+                                if($scope.ingreso_respaldo.lotes[i].fecha_caducidad){
+                                    $scope.ingreso_respaldo.lotes[i].fecha_caducidad = new Date($scope.ingreso_respaldo.lotes[i].fecha_caducidad);
+                                }
                             }
                             $scope.ingreso = $scope.ingreso_respaldo;
                             $scope.lista_ingresos[$scope.insumo.insumo_id] = $scope.ingreso;
-                            //$scope.ingreso.lote = $scope.ingreso_respaldo.lote;
-                            //$scope.ingreso.fecha_caducidad = new Date($scope.ingreso_respaldo.fecha_caducidad);
-                            //$scope.ingreso.cantidad = $scope.ingreso_respaldo.cantidad;
                         }
                     };
 
@@ -550,37 +529,6 @@
                     };
 
                     cargarIngreso();
-                    /*
-                    $scope.siguiente = function(){
-                        if($scope.index_siguiente != undefined){
-                            $scope.index_anterior = $scope.index_actual;
-                            $scope.index_actual = $scope.index_siguiente;
-                            $scope.index_siguiente += 1;
-                            if($scope.index_siguiente == $scope.total_insumos){
-                                $scope.index_siguiente = undefined;
-                            }
-                        }
-                        $scope.validacion = {};
-                        regresarRespaldo();
-                        $scope.insumo = $scope.lista_insumos[$scope.index_actual];
-                        cargarIngreso();
-                    };
-
-                    $scope.anterior = function(){
-                        if($scope.index_anterior != undefined){
-                            $scope.index_siguiente = $scope.index_actual;
-                            $scope.index_actual = $scope.index_anterior;
-                            $scope.index_anterior -= 1;
-                            if($scope.index_anterior < 0){
-                                $scope.index_anterior = undefined;
-                            }
-                        }
-                        $scope.validacion = {};
-                        regresarRespaldo();
-                        $scope.insumo = $scope.lista_insumos[$scope.index_actual];
-                        cargarIngreso();
-                    };
-                    */
 
                     $scope.quitarLote = function(index){
                         $scope.ingreso.lotes.splice(index,1);
@@ -616,14 +564,22 @@
                                 errores = true;
                             }
 
-                            var hoy = new Date();
+                            if(lote_capturado.fecha_caducidad){
+                                var hoy = new Date();
+                                if(lote_capturado.fecha_caducidad < hoy){
+                                    lote_capturado.validacion.fecha_caducidad = {min:true};
+                                    errores = true;
+                                }
+                            }
+
+                            /*var hoy = new Date();
                             if(!lote_capturado.fecha_caducidad){
                                 lote_capturado.validacion.fecha_caducidad = {required:true};
                                 errores = true;
                             }else if(lote_capturado.fecha_caducidad < hoy){
                                 lote_capturado.validacion.fecha_caducidad = {min:true};
                                 errores = true;
-                            }
+                            }*/
 
                             if(lote_capturado.cantidad == undefined){
                                 lote_capturado.validacion.cantidad = {required:true};
@@ -836,6 +792,9 @@
 
                 if($scope.entregas_guardadas[$scope.aplicar_proveedor.id]){
                     $scope.recepcion = $scope.entregas_guardadas[$scope.aplicar_proveedor.id];
+                    if(!$scope.recepcion.nombre_recibe){
+                        $scope.recepcion.nombre_recibe = $scope.configuracion.encargado_almacen;
+                    }
                 }else{
                     $scope.recepcion.proveedor_id = $scope.aplicar_proveedor.id;
 

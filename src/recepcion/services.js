@@ -86,6 +86,10 @@
 							};
 						}
 
+						if(!stock_insumo.fecha_caducidad){
+							stock_insumo.fecha_caducidad = '';
+						}
+
 						insumos[tipo_insumo].items[stock_insumo.insumo_id]['lotes'].push({
 							'lote': stock_insumo.lote.toString(),
 							'fecha_caducidad': stock_insumo.fecha_caducidad,
