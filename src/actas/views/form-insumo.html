@@ -37,6 +37,13 @@
                   <div flex></div>
                   <div flex="none"><span><strong>Precio: </strong>$ {{item.precio}}</span></div>
                 </div>
+                <div ng-if="item.inventario_actual" layout="row" layout-padding ng-class="(item.cuadro_basico)?'':'insumo-no-cuadro-basico'" >
+                  <div flex="none"><strong>Cantidad:</strong> {{item.inventario_actual.cantidad}}</div>
+                  <div flex></div>
+                  <div flex="none"><span><strong>Mes:</strong> {{item.inventario_actual.mes}} {{item.inventario_actual.anio}}</span></div>
+                  <div flex></div>
+                  <div flex="none"><span><strong>Inventario: </strong> {{item.inventario_actual.fecha | date:'dd/MM/yyyy HH:MM'}} hrs.</span></div>
+                </div>
               </span>
               <span class="item-metadata md-padding" ng-class="(item.cuadro_basico)?'':'insumo-no-cuadro-basico'" >
                 <span class="item-metastat">
@@ -81,6 +88,13 @@
             <label>Total</label>
             <input value="$ {{insumo.total | number:2}}" disabled>
           </md-input-container>
+          <div flex="100" layout="row" ng-if="insumo.inventario_actual">
+            <div flex="none"><strong>Cantidad:</strong> {{insumo.inventario_actual.cantidad}}</div>
+            <div flex></div>
+            <div flex="none"><span><strong>Mes:</strong> {{insumo.inventario_actual.mes}} {{insumo.inventario_actual.anio}}</span></div>
+            <div flex></div>
+            <div flex="none"><span><strong>Inventario: </strong> {{insumo.inventario_actual.fecha | date:'dd/MM/yyyy HH:MM'}} hrs.</span></div>
+          </div>
         </div>
       </div>
     </md-dialog-content>

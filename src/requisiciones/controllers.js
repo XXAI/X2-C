@@ -71,9 +71,20 @@
                         }else{
                             $scope.lista_clues[i].cuadro_basico = undefined;
                         }
+
+                        /*if($scope.lista_clues[i].inventario.length){
+                            //
+                        }*/
                     }
                     //aca subtotales
                     if(res.data.length){
+                        var inventarios = res.inventario;
+                        var meses = {1:'Enero',2:'Febrero',3:'Marzo',4:'Abril',5:'Mayo',6:'Junio',7:'Julio',8:'Agosto',9:'Septiembre',10:'Octubre',11:'Noviembre',12:'Diciembre'};
+
+                        if(!inventarios){
+                            inventarios = {};
+                        }
+
                         for(var i in res.data){
                             var insumo = res.data[i];
 
@@ -90,6 +101,23 @@
                                 }
                             }else{
                                 insumo.cuadro_basico = 1;
+                            }
+                            
+                            if(inventarios[insumo.clues]){
+                                if(inventarios[insumo.clues][insumo.llave]){
+                                    var inventario = inventarios[insumo.clues][insumo.llave];
+                                    
+                                    for(var m = 1; m <= 12; m++){
+                                        if(inventario[m]){
+                                            insumo.inventario_actual = {
+                                                mes:meses[m],
+                                                anio:inventario.anio,
+                                                fecha: new Date(inventario.fecha_actualizo),
+                                                cantidad:inventario[m]
+                                            };
+                                        }
+                                    }
+                                }
                             }
 
                             if(!$scope.elementos.por_clues[insumo.clues]){
@@ -953,6 +981,7 @@
                                 $scope.insumo.surfactante = $scope.insumoAutoComplete.insumo.surfactante;
                                 $scope.insumo.pedido = $scope.insumoAutoComplete.insumo.pedido;
                                 $scope.insumo.cuadro_basico = $scope.insumoAutoComplete.insumo.cuadro_basico;
+                                $scope.insumo.inventario_actual = $scope.insumoAutoComplete.insumo.inventario_actual;
                                 $scope.insumo.repetido = 0;
                                 $scope.insumo.total = 0.00;
 
@@ -967,12 +996,13 @@
                     };
                     
                     $scope.querySearchInsumo = function(query) {
-                        return $http.get(URLS.BASE_API + '/insumos',{ params:{ query: query }})
+                        return $http.get(URLS.BASE_API + '/insumos',{ params:{ query: query, clues: $scope.clues_seleccionada.clues }})
                             .then(function(res){
                                 //console.log($scope.clues_seleccionada);
                                 var resultados = [];
                                 var valor_default = 0;
                                 var cuadro_basico = {};
+                                var meses = {1:'Enero',2:'Febrero',3:'Marzo',4:'Abril',5:'Mayo',6:'Junio',7:'Julio',8:'Agosto',9:'Septiembre',10:'Octubre',11:'Noviembre',12:'Diciembre'};
 
                                 if(!$scope.clues_seleccionada.cuadro_basico){
                                     valor_default = 1;
@@ -984,6 +1014,19 @@
                                     res.data.data[i].cuadro_basico = valor_default;
                                     if(cuadro_basico[res.data.data[i].llave]){
                                         res.data.data[i].cuadro_basico = 1;
+                                    }
+
+                                    if(res.data.data[i].inventario){
+                                        for(var m = 1; m <= 12; m++){
+                                            if(res.data.data[i].inventario[m]){
+                                                res.data.data[i].inventario_actual = {
+                                                    mes:meses[m],
+                                                    anio:res.data.data[i].inventario.anio,
+                                                    fecha:new Date(res.data.data[i].inventario.fecha_actualizo),
+                                                    cantidad:res.data.data[i].inventario[m]
+                                                };
+                                            }
+                                        }
                                     }
                                 }
                                 return res.data.data;

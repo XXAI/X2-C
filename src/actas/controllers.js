@@ -379,6 +379,8 @@
                 $scope.acta.total = 0;
                 $scope.acta.iva = 0;
                 var requisiciones = {};
+                var meses = {1:'Enero',2:'Febrero',3:'Marzo',4:'Abril',5:'Mayo',6:'Junio',7:'Julio',8:'Agosto',9:'Septiembre',10:'Octubre',11:'Noviembre',12:'Diciembre'};
+
                 if(res.data.requisiciones.length){
                     var insumos_guardados = {};
                     for(var i in res.data.requisiciones){
@@ -409,6 +411,19 @@
                             insumo.surfactante = requisicion.insumos[j].surfactante;
                             insumo.precio = requisicion.insumos[j].precio;
                             insumo.pedido = requisicion.insumos[j].pedido;
+
+                            if(requisicion.insumos[j].inventario){
+                                for(var m = 1; m <= 12; m++){
+                                    if(requisicion.insumos[j].inventario[m]){
+                                        insumo.inventario_actual = {
+                                            mes:meses[m],
+                                            anio:requisicion.insumos[j].inventario.anio,
+                                            fecha: new Date(requisicion.insumos[j].inventario.fecha_actualizo),
+                                            cantidad:requisicion.insumos[j].inventario[m]
+                                        };
+                                    }
+                                }
+                            }
 
                             if($scope.cuadro_basico){
                                 if($scope.cuadro_basico[insumo.llave]){
@@ -561,7 +576,6 @@
             var index = $scope.acta.insumos.indexOf(insumo);
             $scope.acta.insumos.splice(index,1);
             $scope.acta.total = $scope.acta.iva + $scope.acta.subtotal;
-
         };
 
         $scope.cambiaFiltro = function(tipo){
@@ -631,7 +645,7 @@
             $mdDialog.show({
                 //controller: function($scope, $mdDialog, insumo, index) {
                 controller: function($scope, $mdDialog, insumo, index, acta, cuadro_basico, subtotales) {
-                    console.log(cuadro_basico);
+                    //console.log(cuadro_basico);
 
                     //$scope.cargando = true;
                     //$scope.catalogo_insumos = [];
@@ -780,6 +794,7 @@
                                 $scope.insumo.surfactante = $scope.insumoAutoComplete.insumo.surfactante;
                                 $scope.insumo.pedido = $scope.insumoAutoComplete.insumo.pedido;
                                 $scope.insumo.cuadro_basico = $scope.insumoAutoComplete.insumo.cuadro_basico;
+                                $scope.insumo.inventario_actual = $scope.insumoAutoComplete.insumo.inventario_actual;
                                 $scope.insumo.total = 0.00;
                                 
                                 $timeout(function(){
@@ -808,6 +823,19 @@
                                     res.data.data[i].cuadro_basico = valor_default;
                                     if(cuadro_basico[res.data.data[i].llave]){
                                         res.data.data[i].cuadro_basico = 1;
+                                    }
+                                    if(res.data.data[i].inventario){
+                                        var meses = {1:'Enero',2:'Febrero',3:'Marzo',4:'Abril',5:'Mayo',6:'Junio',7:'Julio',8:'Agosto',9:'Septiembre',10:'Octubre',11:'Noviembre',12:'Diciembre'};
+                                        for(var m = 1; m <= 12; m++){
+                                            if(res.data.data[i].inventario[m]){
+                                                res.data.data[i].inventario_actual = {
+                                                    mes:meses[m],
+                                                    anio:res.data.data[i].inventario.anio,
+                                                    fecha:new Date(res.data.data[i].inventario.fecha_actualizo),
+                                                    cantidad:res.data.data[i].inventario[m]
+                                                };
+                                            }
+                                        }
                                     }
                                 }
                                 
@@ -1221,7 +1249,7 @@
           UsuarioData.guardarEstadoMenu($scope.menuIsOpen);
         };
         
-        $scope.mostrarIdiomas = function($event){                
+        $scope.mostrarIdiomas = function($event){
             $mdBottomSheet.show({
               templateUrl: './src/app/views/idiomas.html',
               controller: 'ListaIdiomasCtrl',                 

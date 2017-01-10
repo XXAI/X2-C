@@ -44,8 +44,8 @@
 		<div layout="row">
 			<div flex="5" style="text-align:center;">No. Lote</div>
 			<div flex="15" flex-md="30" style="text-align:center;">Clave</div>
-			<div flex="35" flex-md="40" style="text-align:center;">Descripción del Insumo</div>
-			<div flex="15" style="text-align:center;" hide show-gt-md>Unidad de Medida</div>
+			<div flex="35" flex-md="40" style="text-align:center;">Descripción del Insumo<span hide show-gt-md> / Unidad de Medida</span></div>
+			<div flex="15" style="text-align:center;" >Inventario</div>
 			<div flex="10" style="text-align:center;" hide show-gt-md>Precio Unitario</div>
 			<div flex="10" style="text-align:center;" hide show-gt-md>Cantidad</div>
 			<div flex="20" style="text-align:center;">Importe</div>
@@ -67,10 +67,14 @@
 					<div flex="5" style="text-align:center;">{{insumo.lote}}</div>
 					<div flex="15" flex-md="30" style="text-align:center;">{{insumo.clave}}</div>
 					<div flex="35" flex-md="40" style="text-align:center;">
-						<p style="line-height:14px; margin:0px;"><small>{{insumo.descripcion}}</small></p>
+						<p style="line-height:14px; margin:0px;">
+							<small>{{insumo.descripcion}}</small>
+							<div class="hint" hide show-gt-md  style="line-height:14px; margin:0px;"><small>[{{insumo.unidad}}]</small></div>
+						</p>
 					</div>
-					<div flex="15" style="text-align:center;" hide show-gt-md>
-						<p style="line-height:14px; margin:0px;"><small>{{insumo.unidad}}</small></p>
+					<div flex="15" style="text-align:center;">
+						<div ng-if="insumo.inventario_actual">{{insumo.inventario_actual.cantidad}}<br><small>{{insumo.inventario_actual.fecha | date:'dd/MM/yyyy'}}</small></div>
+						<p ng-if="!insumo.inventario_actual" style="line-height:14px; margin:0px;"><small>-</small></p>
 					</div>
 					<div flex="10" style="text-align:center;" hide show-gt-md>$ {{insumo.precio | number:2}}</div>
 					<div flex="10" style="text-align:center;" hide show-gt-md>{{insumo.cantidad | number}}</div>
