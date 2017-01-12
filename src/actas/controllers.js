@@ -322,6 +322,7 @@
         $scope.captura_habilitada = 1;
         $scope.subtotales = {causes:0,no_causes:0,surfactante_causes:0,surfactante_no_causes:0,material_curacion:0,controlados:0};
         $scope.cuadro_basico = undefined;
+        $scope.mostrarBotonDesglose = false;
 
         $scope.insumos_clues = {};
         $scope.clues = {};
@@ -342,6 +343,10 @@
                 $scope.acta = res.data;
 				$scope.configuracion = res.configuracion;
                 $scope.captura_habilitada = res.captura_habilitada;
+
+                if($scope.configuracion.tipo_clues == 2){
+                    $scope.mostrarBotonDesglose = true;
+                }
 
                 if(res.clues){
                     $scope.clues = res.clues;
@@ -1201,8 +1206,12 @@
             }
         };
 
-        $scope.generarExcel = function(){
-            window.open(URLS.BASE_API +'/acta-excel/'+$routeParams.id+'?token='+$localStorage.control_desabasto.access_token);
+        $scope.generarExcel = function(desglosado){
+            if(desglosado){
+                window.open(URLS.BASE_API +'/acta-excel-desglose/'+$routeParams.id+'?token='+$localStorage.control_desabasto.access_token);
+            }else{
+                window.open(URLS.BASE_API +'/acta-excel/'+$routeParams.id+'?token='+$localStorage.control_desabasto.access_token);
+            }
         };
 
         $scope.exportar = function(){

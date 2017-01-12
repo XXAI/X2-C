@@ -1576,8 +1576,6 @@
             $scope.cluesAutoCompleteItemChange();
             //$scope.modulo.insumos_estatus = $scope.insumos_estatus;
             //$scope.modulo.lista_clues = $scope.lista_clues;
-
-
         }
 
         function reindicarunidad(elementos_clues)
@@ -1588,6 +1586,10 @@
                 elementos_clues.insumos[i].requisicion_id_unidad = acta_unidad;
             }
         }
+
+        $scope.generarExcel = function(){
+            window.open(URLS.BASE_API +'/requisiciones-excel?token='+$localStorage.control_desabasto.access_token);
+        };
 
         var input = angular.element($document[0].querySelector('input#input-file-id'));
 
