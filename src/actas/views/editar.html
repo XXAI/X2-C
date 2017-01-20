@@ -24,6 +24,10 @@
 				<md-icon md-svg-icon="{{(toggleDatosActa)?'expand-panel-off':'expand-panel-on'}}"></md-icon>
 			</md-button>
 
+			<md-button class="md-icon-button" ng-if="puedeClonarActa" ng-click="clonarActa($event)" ng-disabled="cargando" aria-label="Clonar Acta">
+				<md-icon md-svg-icon="content-copy"></md-icon>
+			</md-button>
+
 			<md-icon md-svg-icon="dots-vertical" style="color: #005DA7;"></md-icon>
 			
 			<md-button ng-if="(acta.estatus == 1)" ng-permiso="permisoEliminar" class="md-icon-button" ng-click="eliminar($event)"  aria-label="{{ 'ELIMINAR' | translate }}">
