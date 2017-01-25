@@ -895,6 +895,8 @@
                 insumos_clues: $scope.insumos_clues[insumo.insumo_id]
             };
 
+            console.log(locals);
+
             $mdDialog.show({
                 //controller: function($scope, $mdDialog, insumo, index) {
                 controller: function($scope, $mdDialog, insumo, cuadro_basico, clues, insumos_clues) {
@@ -948,134 +950,48 @@
         };
 
         $scope.clonarActa = function(ev){
-
+            var mensaje = '';
+            if($scope.configuracion.tipo_clues == 2){
+                mensaje = 'Cualquier insumo capturado en Requisiciones sera borrado y la información se reemplazara con los datos de esta acta';
+            }
             var confirm = $mdDialog.confirm()
                 .title('Clonar acta?')
-                .content('¿Esta seguro que desea clonar esta acta?')
+                .content('¿Esta seguro que desea clonar esta acta? '+mensaje)
                 .targetEvent(ev)
                 .ok('Clonar')
                 .cancel('Cancelar');
 
             $mdDialog.show(confirm).then(function() {
                 $scope.cargando = true;
-                ActasDataApi.clonarActa($scope.acta.id,function (res) {
-                    $scope.cargando = false;
-                    $location.path('actas/'+res.data.id+'/editar');
-                }, function (e) {
-                    $scope.cargando = false;
-                    if(e.error_type == 'data_validation'){
-                        Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:e.error});
-                    }else{
-                        Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:'Ocurrió un error al intentar clonar el acta.'});
-                    }
-                });
-            }, function() {});
-            /*var useFullScreen = ($mdMedia('sm') || $mdMedia('xs'))  && $scope.customFullscreen;
-            var acta = {
-                id: $scope.acta.id,
-                ciudad: $scope.acta.ciudad,
-                lugar_reunion:$scope.acta.lugar_reunion,
-                estatus: $scope.acta.estatus,
-                hora_inicio: $scope.acta.hora_inicio,
-                hora_termino: $scope.acta.hora_termino
-            };
-
-            var locals = {
-                acta: acta
-            };
-
-            $mdDialog.show({
-                controller: function($scope, $mdDialog, acta) {
-                    //$scope.requisiciones = requisiciones;
-                    var fecha_actual = new Date();
-                    fecha_actual = new Date(fecha_actual.getFullYear(), fecha_actual.getMonth(), fecha_actual.getDate(), fecha_actual.getHours(), fecha_actual.getMinutes(), 0);
-                    $scope.cargando = true;
-
-                    $scope.acta = {};
-
-                    ActasDataApi.checarActaNueva(acta.id,function (res) {
+                if($scope.configuracion.tipo_clues == 2){
+                    ActasDataApi.clonarActaJurisdiccion($scope.acta.id,function (res) {
                         $scope.cargando = false;
-
-                        $scope.acta.fecha = res.data.fecha;
-                        $scope.acta.hora_inicio = res.data.hora_inicio;
-                        $scope.acta.hora_termino = res.data.hora_termino;
-                        $scope.acta.lugar_reunion = res.data.lugar_reunion;
-                        $scope.acta.ciudad = res.data.ciudad;
                         
-                        if($scope.acta.hora_inicio){
-                            var horaInicio = $scope.acta.hora_inicio.split(':')
-                            $scope.acta.hora_inicio_date =  new Date(1970, 0, 1, horaInicio[0], horaInicio[1], 0);
-                        }
+                        $localStorage.samm_modulo_requisiciones = {cambios:false};
 
-                        if($scope.acta.hora_termino){
-                            var horaTermino = $scope.acta.hora_termino.split(':')
-                            $scope.acta.hora_termino_date =  new Date(1970, 0, 1, horaTermino[0], horaTermino[1], 0);
-                        }
-                        
+                        $location.path('requisiciones');
                     }, function (e) {
                         $scope.cargando = false;
                         if(e.error_type == 'data_validation'){
-                            Mensajero.mostrarToast({contenedor:'#fomulario-dialogo-clonar-acta',titulo:'Error:',mensaje:e.error});
+                            Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:e.error});
                         }else{
-                            Mensajero.mostrarToast({contenedor:'#fomulario-dialogo-clonar-acta',titulo:'Error:',mensaje:'Ocurrió un error al intentar obtener los datos.'});
+                            Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:'Ocurrió un error al intentar clonar el acta.'});
                         }
                     });
-
-                    $scope.cancel = function() {
-                        $mdDialog.cancel();
-                    };
-
-                    $scope.clonar = function() {
-                        if(!$scope.cargando){
-                            $scope.cargando = true;
-
-                            var parametros = {
-                                //clues: $scope.acta.clues,
-                                validado: $scope.clonacion.validada,
-                                inputs:{
-                                    fecha:          $scope.acta.fecha,
-                                    hora_inicio:    $filter('date')($scope.acta.hora_inicio_date,'HH:mm:ss'),
-                                    hora_termino:   $filter('date')($scope.acta.hora_termino_date,'HH:mm:ss'),
-                                    ciudad:         $scope.acta.ciudad,
-                                    lugar_reunion:  $scope.acta.lugar_reunion
-                                }
-                            };
-
-                            RequisicionesDataApi.clonarActa($scope.acta_origen.id,parametros,function (res) {
-                                $scope.cargando = false;
-                                $location.path('requisiciones/'+res.data.id+'/ver');
-                            }, function (e) {
-                                $scope.cargando = false;
-                                $scope.validacion = {};
-                                if(e.error_type == 'form_validation'){
-                                    Mensajero.mostrarToast({contenedor:'#fomulario-dialogo-clonar-acta',titulo:'Error:',mensaje:'Hay un error en los datos del formulario.'});
-                                    var errors = e.error;
-                                    for (var i in errors){
-                                        var error = JSON.parse('{ "' + errors[i] + '" : true }');
-                                        $scope.validacion[i] = error;
-                                    }
-                                }else if(e.error_type == 'data_validation'){
-                                    Mensajero.mostrarToast({contenedor:'#fomulario-dialogo-clonar-acta',titulo:'Error:',mensaje:e.error});
-                                }else{
-                                    Mensajero.mostrarToast({contenedor:'#fomulario-dialogo-clonar-acta',titulo:'Error:',mensaje:'Ocurrió un error al intentar guardar los datos.'});
-                                }
-                            });
+                }else{
+                    ActasDataApi.clonarActa($scope.acta.id,function (res) {
+                        $scope.cargando = false;
+                        $location.path('actas/'+res.data.id+'/editar');
+                    }, function (e) {
+                        $scope.cargando = false;
+                        if(e.error_type == 'data_validation'){
+                            Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:e.error});
                         }else{
-                            console.log('cargando');
+                            Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:'Ocurrió un error al intentar clonar el acta.'});
                         }
-                    };
-                },
-                templateUrl: 'src/actas/views/form-clonar-acta.html',
-                parent: angular.element(document.body),
-                targetEvent: ev,
-                clickOutsideToClose:true,
-                fullscreen: useFullScreen,
-                locals:locals
-            })
-            .then(function(res) {}, function() {
-                //console.log('cancelado');
-            });
-            */
+                    });
+                }
+            }, function() {});
         };
         
 		function devuelveMes(mes){

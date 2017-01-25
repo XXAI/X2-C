@@ -29,6 +29,9 @@
 				clonarActa: function(id,success,error){
 					$http.put(URLS.BASE_API + '/clonar-acta/' + id).success(success).error(error)
 				},
+				clonarActaJurisdiccion: function(id,success,error){
+					$http.put(URLS.BASE_API + '/clonar-acta-jurisdiccion/' + id).success(success).error(error)
+				},
 				sincronizar: function (id, success, error) {
 	               $http.get(URLS.BASE_API + '/sincronizar-validacion/' + id).success(success).error(error)
 	           	},
