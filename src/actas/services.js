@@ -9,6 +9,9 @@
 				ver: function (id, success, error) {
 					$http.get(URLS.BASE_API + '/actas/' + id).success(success).error(error)
 				},
+				checarActaNueva: function (id, success, error) {
+					$http.get(URLS.BASE_API + '/actas/hay-acta-nueva/' + id).success(success).error(error)
+				},
 				cargarConfiguracion: function (id, success, error) {
 					$http.get(URLS.BASE_API + '/configuracion/' + id).success(success).error(error)
 				},
@@ -22,6 +25,12 @@
 						transformRequest: angular.identity,
 						headers: {'Content-Type': undefined}
 					}).success(success).error(error);
+				},
+				clonarActa: function(id,success,error){
+					$http.put(URLS.BASE_API + '/clonar-acta/' + id).success(success).error(error)
+				},
+				clonarActaJurisdiccion: function(id,success,error){
+					$http.put(URLS.BASE_API + '/clonar-acta-jurisdiccion/' + id).success(success).error(error)
 				},
 				sincronizar: function (id, success, error) {
 	               $http.get(URLS.BASE_API + '/sincronizar-validacion/' + id).success(success).error(error)

@@ -71,9 +71,20 @@
                         }else{
                             $scope.lista_clues[i].cuadro_basico = undefined;
                         }
+
+                        /*if($scope.lista_clues[i].inventario.length){
+                            //
+                        }*/
                     }
                     //aca subtotales
                     if(res.data.length){
+                        var inventarios = res.inventario;
+                        var meses = {1:'Enero',2:'Febrero',3:'Marzo',4:'Abril',5:'Mayo',6:'Junio',7:'Julio',8:'Agosto',9:'Septiembre',10:'Octubre',11:'Noviembre',12:'Diciembre'};
+
+                        if(!inventarios){
+                            inventarios = {};
+                        }
+
                         for(var i in res.data){
                             var insumo = res.data[i];
 
@@ -90,6 +101,23 @@
                                 }
                             }else{
                                 insumo.cuadro_basico = 1;
+                            }
+                            
+                            if(inventarios[insumo.clues]){
+                                if(inventarios[insumo.clues][insumo.llave]){
+                                    var inventario = inventarios[insumo.clues][insumo.llave];
+                                    
+                                    for(var m = 1; m <= 12; m++){
+                                        if(inventario[m]){
+                                            insumo.inventario_actual = {
+                                                mes:meses[m],
+                                                anio:inventario.anio,
+                                                fecha: new Date(inventario.fecha_actualizo),
+                                                cantidad:inventario[m]
+                                            };
+                                        }
+                                    }
+                                }
                             }
 
                             if(!$scope.elementos.por_clues[insumo.clues]){
@@ -258,6 +286,7 @@
             var insumo_local = insumo;
             //console.log(insumo);
             $scope.totales.subtotal -= insumo_local.total;
+
             if(insumo_local.tipo == 2){
                 var iva = (insumo_local.total*16/100);
                 $scope.totales.iva -= iva;
@@ -307,6 +336,356 @@
                 $scope.modulo.cambios = true;
             }
             //$localStorage.modulo_requisiciones.cambios = true;
+        };
+
+        $scope.copiarInsumos = function(ev){
+            var useFullScreen = ($mdMedia('sm') || $mdMedia('xs'))  && $scope.customFullscreen;
+            var locals = {
+                modulo: $scope.modulo,
+                clues_seleccionada: $scope.clues_seleccionada
+            };
+
+            $mdDialog.show({
+                controller: function($scope, $mdDialog, modulo, clues_seleccionada) {
+                    $scope.validacion = {};
+                    $scope.acciones = {};
+                    $scope.nueva_clues_seleccionada = {};
+                    $scope.lista_clues = modulo.lista_clues;
+                    $scope.elementos = modulo.elementos;
+                    $scope.subtotales = modulo.subtotales;
+                    $scope.clues_seleccionada = clues_seleccionada;
+                    $scope.nueva_clues_seleccionada = undefined;
+                    $scope.elementos_clues = false;
+
+                    $scope.cluesAutoCompleteItemChange = function(){
+                        $scope.validacion.clues = {};
+
+                        if ($scope.cluesAutoComplete.clues != null){
+                            $scope.nueva_clues_seleccionada = $scope.cluesAutoComplete.clues;
+                            $scope.acciones.seleccion = 0;
+
+                            if($scope.nueva_clues_seleccionada.clues == $scope.clues_seleccionada.clues){
+                                $scope.validacion.clues = {duplicate:true};
+                            }else if($scope.elementos.por_clues[$scope.nueva_clues_seleccionada.clues]){
+                                if($scope.elementos.por_clues[$scope.nueva_clues_seleccionada.clues].insumos.length){
+                                    $scope.acciones.seleccion = 1;
+                                    $scope.elementos_clues = true;
+                                    $scope.validacion.clues = {full:true};
+                                }
+                            }
+                        }else{
+                            $scope.nueva_clues_seleccionada = undefined;
+                            $scope.elementos_clues = false;
+                            $scope.acciones = {};
+                        }
+                    };
+                    $scope.querySearchClues = function(query){
+                        return query ? $scope.lista_clues.filter( createFilterFor(query)) : $scope.lista_clues;
+                        //return $filter('orderBy')(results, 'clues',true);
+                    };
+
+                    function createFilterFor(query) {
+                        var lowercaseQuery = angular.lowercase(query);
+                        return function filterFn(item) {
+                            if(angular.lowercase(item.nombre).indexOf(lowercaseQuery) >= 0 || angular.lowercase(item.clues).indexOf(lowercaseQuery) >= 0){
+                                return true;
+                            }
+                            return false;
+                        };
+                    };
+
+                    $scope.cancel = function() {
+                        $mdDialog.cancel();
+                    };
+                    $scope.copiar = function() {
+                        /*
+                            Puede recibir:
+                                mover: true|false
+                                seleccion: 0,1,2,3
+
+                            Combinaciones:
+                                {seleccion: 0, mover: true} ---> cambiar de clues, sin modificar concentrado
+                                {seleccion: 0} ---> agregar a destino, Agregar a concentrado
+                                {seleccion: 1} --> limpiar destino, quitar de concentrado y agregar de origen, agregar a concentrado
+                                {seleccion: 1, mover: true} --> limpiar destino, quitar de concentrado y agregar de origen, limipiar origen, modificar concentrado
+                                {seleccion: 2} --> agregar a destino lo que no esta, agregar a concentrado
+                                {seleccion: 2, mover: true} --> agregar a destino lo que no esta, limipiar origen, modificar concentrado
+                                
+                                
+                                {seleccion: 3} --> agregar a destino, sumar cantidades, agregar a concentrado
+                                {seleccion: 3, mover: true} --> agregar a destino, sumar cantidades, limipiar origen, modificar concentrado
+                        */
+                        if($scope.nueva_clues_seleccionada){
+                            if($scope.nueva_clues_seleccionada.clues != $scope.clues_seleccionada.clues){
+                                var destino_clues = $scope.nueva_clues_seleccionada.clues;
+                                var origen_clues = $scope.clues_seleccionada.clues;
+
+                                if(!$scope.elementos.por_clues[destino_clues]){
+                                    $scope.elementos.por_clues[destino_clues] = { insumos: [], requisicion_acta_id:0 };
+                                }
+
+                                if($scope.acciones.seleccion == 0){
+                                    $scope.copiarMoverListaInsumos(origen_clues,destino_clues);
+                                }else if($scope.acciones.seleccion == 1){
+                                    for(var i in $scope.elementos.por_clues[destino_clues].insumos){
+                                        var insumo = $scope.elementos.por_clues[destino_clues].insumos[i];
+
+                                        var insumo_concentrado = $scope.elementos.concentrado[$scope.elementos.concentrado_indices[insumo.insumo_id]];
+                                        //ACtualizamos el concentrado de insumos
+                                        insumo_concentrado.cantidad -= insumo.cantidad;
+                                        insumo_concentrado.total -= insumo.total;
+
+                                        //TODO: checar si ya la cantidad es 0, quitar de la lista
+                                        if(insumo_concentrado.cantidad == 0){
+                                            var insumo_concentrado_index = $scope.elementos.concentrado_indices[insumo.id];
+                                            $scope.elementos.concentrado.splice(insumo_concentrado_index,1);
+                                            for(var i in $scope.elementos.concentrado_indices){
+                                                var index = $scope.elementos.concentrado_indices[i];
+                                                if(index > insumo_concentrado_index){
+                                                    $scope.elementos.concentrado_indices[i] -= 1;
+                                                }
+                                            }
+                                            delete $scope.elementos.concentrado_indices[insumo.id];
+                                        }
+
+                                        $scope.restarSubTotales(insumo);
+                                    }
+                                    $scope.elementos.por_clues[destino_clues].insumos.splice(0,$scope.elementos.por_clues[destino_clues].insumos.length);
+
+                                    $scope.copiarMoverListaInsumos(origen_clues,destino_clues);
+                                }else if($scope.acciones.seleccion == 2){
+                                    var insumos_destino = {};
+                                    for(var i in $scope.elementos.por_clues[destino_clues].insumos){
+                                        insumos_destino[$scope.elementos.por_clues[destino_clues].insumos[i].insumo_id] = true;
+                                    }
+
+                                    for(var i in $scope.elementos.por_clues[origen_clues].insumos){
+                                        var insumo = JSON.parse(JSON.stringify($scope.elementos.por_clues[origen_clues].insumos[i]));
+                                        insumo.clues = destino_clues;
+
+                                        if(!insumos_destino[insumo.insumo_id]){
+                                            $scope.elementos.por_clues[destino_clues].insumos.push(insumo);
+
+                                            var insumo_concentrado = $scope.elementos.concentrado[$scope.elementos.concentrado_indices[insumo.insumo_id]];
+                                            //ACtualizamos el concentrado de insumos
+                                            insumo_concentrado.cantidad += insumo.cantidad;
+                                            insumo_concentrado.total += insumo.total;
+
+                                            $scope.agregarSubTotales(insumo);
+                                        }
+                                    }
+
+                                    if($scope.acciones.mover){
+                                        for(var i in $scope.elementos.por_clues[origen_clues].insumos){
+                                            var insumo = $scope.elementos.por_clues[origen_clues].insumos[i];
+
+                                            var insumo_concentrado = $scope.elementos.concentrado[$scope.elementos.concentrado_indices[insumo.insumo_id]];
+                                            //ACtualizamos el concentrado de insumos
+                                            insumo_concentrado.cantidad -= insumo.cantidad;
+                                            insumo_concentrado.total -= insumo.total;
+
+                                            //TODO: checar si ya la cantidad es 0, quitar de la lista
+                                            if(insumo_concentrado.cantidad == 0){
+                                                var insumo_concentrado_index = $scope.elementos.concentrado_indices[insumo.id];
+                                                $scope.elementos.concentrado.splice(insumo_concentrado_index,1);
+                                                for(var i in $scope.elementos.concentrado_indices){
+                                                    var index = $scope.elementos.concentrado_indices[i];
+                                                    if(index > insumo_concentrado_index){
+                                                        $scope.elementos.concentrado_indices[i] -= 1;
+                                                    }
+                                                }
+                                                delete $scope.elementos.concentrado_indices[insumo.id];
+                                            }
+
+                                            $scope.restarSubTotales(insumo);
+                                        }
+                                        $scope.elementos.por_clues[origen_clues].insumos.splice(0,$scope.elementos.por_clues[origen_clues].insumos.length);
+                                    }
+                                }else if($scope.acciones.seleccion == 3){
+                                    var insumos_destino = {};
+                                    for(var i in $scope.elementos.por_clues[destino_clues].insumos){
+                                        insumos_destino[$scope.elementos.por_clues[destino_clues].insumos[i].insumo_id] = $scope.elementos.por_clues[destino_clues].insumos[i];
+                                    }
+
+                                    for(var i in $scope.elementos.por_clues[origen_clues].insumos){
+                                        var insumo = JSON.parse(JSON.stringify($scope.elementos.por_clues[origen_clues].insumos[i]));
+                                        insumo.clues = destino_clues;
+
+                                        if(!insumos_destino[insumo.insumo_id]){
+                                            $scope.elementos.por_clues[destino_clues].insumos.push(insumo);
+                                        }else{
+                                            insumos_destino[insumo.insumo_id].cantidad += insumo.cantidad;
+                                            insumos_destino[insumo.insumo_id].total += insumo.total;
+                                        }
+
+                                        var insumo_concentrado = $scope.elementos.concentrado[$scope.elementos.concentrado_indices[insumo.insumo_id]];
+                                        //ACtualizamos el concentrado de insumos
+                                        insumo_concentrado.cantidad += insumo.cantidad;
+                                        insumo_concentrado.total += insumo.total;
+
+                                        $scope.agregarSubTotales(insumo);
+                                    }
+
+                                    if($scope.acciones.mover){
+                                        for(var i in $scope.elementos.por_clues[origen_clues].insumos){
+                                            var insumo = $scope.elementos.por_clues[origen_clues].insumos[i];
+
+                                            var insumo_concentrado = $scope.elementos.concentrado[$scope.elementos.concentrado_indices[insumo.insumo_id]];
+                                            //ACtualizamos el concentrado de insumos
+                                            insumo_concentrado.cantidad -= insumo.cantidad;
+                                            insumo_concentrado.total -= insumo.total;
+
+                                            //TODO: checar si ya la cantidad es 0, quitar de la lista
+                                            if(insumo_concentrado.cantidad == 0){
+                                                var insumo_concentrado_index = $scope.elementos.concentrado_indices[insumo.id];
+                                                $scope.elementos.concentrado.splice(insumo_concentrado_index,1);
+                                                for(var i in $scope.elementos.concentrado_indices){
+                                                    var index = $scope.elementos.concentrado_indices[i];
+                                                    if(index > insumo_concentrado_index){
+                                                        $scope.elementos.concentrado_indices[i] -= 1;
+                                                    }
+                                                }
+                                                delete $scope.elementos.concentrado_indices[insumo.id];
+                                            }
+
+                                            $scope.restarSubTotales(insumo);
+                                        }
+                                        $scope.elementos.por_clues[origen_clues].insumos.splice(0,$scope.elementos.por_clues[origen_clues].insumos.length);
+                                    }
+                                }
+
+                                if($scope.acciones.mover){
+                                    $mdDialog.hide(true);
+                                }else{
+                                    $mdDialog.hide(false);
+                                }
+                                //console.log($scope.acciones);
+                                //console.log($scope.elementos.por_clues[destino_clues]);
+                            }
+                        }
+                    };
+
+                    $scope.copiarMoverListaInsumos = function(origen_clues,destino_clues){
+                        if($scope.acciones.mover){
+                            $scope.elementos.por_clues[destino_clues].insumos = $scope.elementos.por_clues[origen_clues].insumos;
+                            $scope.elementos.por_clues[origen_clues].insumos = [];
+                        }else{
+                            for(var i in $scope.elementos.por_clues[origen_clues].insumos){
+                                var insumo = JSON.parse(JSON.stringify($scope.elementos.por_clues[origen_clues].insumos[i]));
+                                insumo.clues = destino_clues;
+                                $scope.elementos.por_clues[destino_clues].insumos.push(insumo);
+
+                                var insumo_concentrado = $scope.elementos.concentrado[$scope.elementos.concentrado_indices[insumo.insumo_id]];
+                                //ACtualizamos el concentrado de insumos
+                                insumo_concentrado.cantidad += insumo.cantidad;
+                                insumo_concentrado.total += insumo.total;
+
+                                $scope.agregarSubTotales(insumo);
+                            }
+                        }
+                    }
+
+                    $scope.agregarSubTotales = function(insumo){
+                        if(insumo.tipo == 1 && insumo.cause == 1 && insumo.surfactante == 1){
+                            $scope.subtotales.surfactante_causes += insumo.total;
+                        }else if(insumo.tipo == 1 && insumo.cause == 0 && insumo.surfactante == 1){
+                            $scope.subtotales.surfactante_no_causes += insumo.total;
+                        }else if(insumo.tipo == 1 && insumo.cause == 1 && insumo.controlado == 0){
+                            $scope.subtotales.causes += insumo.total;
+                        }else if(insumo.tipo == 1 && insumo.cause == 1 && insumo.controlado == 1){
+                            $scope.subtotales.controlados += insumo.total;
+                        }else if(insumo.tipo == 1 && insumo.cause == 0){
+                            $scope.subtotales.no_causes += insumo.total;
+                        }else{
+                            $scope.subtotales.material_curacion += (insumo.total+(insumo.total*16/100));
+                        }
+                    };
+
+                    $scope.restarSubTotales = function(insumo){
+                        if(insumo.tipo == 1 && insumo.cause == 1 && insumo.surfactante == 1){
+                            $scope.subtotales.surfactante_causes -= insumo.total;
+                        }else if(insumo.tipo == 1 && insumo.cause == 0 && insumo.surfactante == 1){
+                            $scope.subtotales.surfactante_no_causes -= insumo.total;
+                        }else if(insumo.tipo == 1 && insumo.cause == 1 && insumo.controlado == 0){
+                            $scope.subtotales.causes -= insumo.total;
+                        }else if(insumo.tipo == 1 && insumo.cause == 1 && insumo.controlado == 1){
+                            $scope.subtotales.controlados -= insumo.total;
+                        }else if(insumo.tipo == 1 && insumo.cause == 0){
+                            $scope.subtotales.no_causes -= insumo.total;
+                        }else{
+                            $scope.subtotales.material_curacion -= (insumo.total+(insumo.total*16/100));
+                        }
+                    };
+                },
+                templateUrl: 'src/requisiciones/views/copiar-insumos.html',
+                parent: angular.element(document.body),
+                targetEvent: ev,
+                clickOutsideToClose:true,
+                fullscreen: useFullScreen,
+                locals:locals
+            }).then(function(res) {
+                if(res){
+                    $scope.totales = { iva:0, total:0, subtotal:0 };
+                    $scope.lista_insumos = [];
+                }
+                $scope.modulo.cambios = true;
+            }, function() {});
+        };
+
+        $scope.vaciarInsumos = function(ev){
+            var confirm = $mdDialog.confirm()
+                .title('Vaciar lista de insumos?')
+                .content('¿Esta seguro de vaciar la lista de insumos para esta CLUES?')
+                .targetEvent(ev)
+                .ok('Vaciar')
+                .cancel('Cancelar');
+
+            $mdDialog.show(confirm).then(function() {
+                //$scope.cargando = true;
+                
+                for(var i in $scope.lista_insumos){
+                    var insumo = $scope.lista_insumos[i];
+
+                    if(insumo.tipo == 1 && insumo.cause == 1 && insumo.surfactante == 1){
+                        $scope.subtotales.surfactante_causes -= insumo.total;
+                    }else if(insumo.tipo == 1 && insumo.cause == 0 && insumo.surfactante == 1){
+                        $scope.subtotales.surfactante_no_causes -= insumo.total;
+                    }else if(insumo.tipo == 1 && insumo.cause == 1 && insumo.controlado == 0){
+                        $scope.subtotales.causes -= insumo.total;
+                    }else if(insumo.tipo == 1 && insumo.cause == 1 && insumo.controlado == 1){
+                        $scope.subtotales.controlados -= insumo.total;
+                    }else if(insumo.tipo == 1 && insumo.cause == 0){
+                        $scope.subtotales.no_causes -= insumo.total;
+                    }else{
+                        $scope.subtotales.material_curacion -= (insumo.total+(insumo.total*16/100));
+                    }
+
+                    var insumo_concentrado = $scope.elementos.concentrado[$scope.elementos.concentrado_indices[insumo.id]];
+                    insumo_concentrado.cantidad -= insumo.cantidad;
+                    insumo_concentrado.total -= insumo.total;
+
+                    if(insumo.repetido){
+                        insumo_concentrado.repetido -= 1;
+                        $scope.clues_seleccionada.repetido -= 1;
+                    }
+
+                    if(insumo_concentrado.cantidad == 0){
+                        var insumo_concentrado_index = $scope.elementos.concentrado_indices[insumo.id];
+                        $scope.elementos.concentrado.splice(insumo_concentrado_index,1);
+                        for(var i in $scope.elementos.concentrado_indices){
+                            var index = $scope.elementos.concentrado_indices[i];
+                            if(index > insumo_concentrado_index){
+                                $scope.elementos.concentrado_indices[i] -= 1;
+                            }
+                        }
+                        delete $scope.elementos.concentrado_indices[insumo.id];
+                    }
+                }
+                
+                $scope.totales = { iva:0, total:0, subtotal:0 };
+                $scope.lista_insumos.splice(0,$scope.lista_insumos.length);
+                $scope.modulo.cambios = true;
+            }, function() {});
         };
 
         $scope.cambiaFiltro = function(tipo){
@@ -606,6 +985,7 @@
                                 $scope.insumo.surfactante = $scope.insumoAutoComplete.insumo.surfactante;
                                 $scope.insumo.pedido = $scope.insumoAutoComplete.insumo.pedido;
                                 $scope.insumo.cuadro_basico = $scope.insumoAutoComplete.insumo.cuadro_basico;
+                                $scope.insumo.inventario_actual = $scope.insumoAutoComplete.insumo.inventario_actual;
                                 $scope.insumo.repetido = 0;
                                 $scope.insumo.total = 0.00;
 
@@ -620,12 +1000,13 @@
                     };
                     
                     $scope.querySearchInsumo = function(query) {
-                        return $http.get(URLS.BASE_API + '/insumos',{ params:{ query: query }})
+                        return $http.get(URLS.BASE_API + '/insumos',{ params:{ query: query, clues: $scope.clues_seleccionada.clues }})
                             .then(function(res){
                                 //console.log($scope.clues_seleccionada);
                                 var resultados = [];
                                 var valor_default = 0;
                                 var cuadro_basico = {};
+                                var meses = {1:'Enero',2:'Febrero',3:'Marzo',4:'Abril',5:'Mayo',6:'Junio',7:'Julio',8:'Agosto',9:'Septiembre',10:'Octubre',11:'Noviembre',12:'Diciembre'};
 
                                 if(!$scope.clues_seleccionada.cuadro_basico){
                                     valor_default = 1;
@@ -637,6 +1018,19 @@
                                     res.data.data[i].cuadro_basico = valor_default;
                                     if(cuadro_basico[res.data.data[i].llave]){
                                         res.data.data[i].cuadro_basico = 1;
+                                    }
+
+                                    if(res.data.data[i].inventario){
+                                        for(var m = 1; m <= 12; m++){
+                                            if(res.data.data[i].inventario[m]){
+                                                res.data.data[i].inventario_actual = {
+                                                    mes:meses[m],
+                                                    anio:res.data.data[i].inventario.anio,
+                                                    fecha:new Date(res.data.data[i].inventario.fecha_actualizo),
+                                                    cantidad:res.data.data[i].inventario[m]
+                                                };
+                                            }
+                                        }
                                     }
                                 }
                                 return res.data.data;
@@ -678,12 +1072,13 @@
                 //$localStorage.modulo_requisiciones.cambios = $scope.modulo.cambios;
                 //console.log('cancelado');
             });
-            $scope.$watch(function() {
-                return $mdMedia('xs') || $mdMedia('sm');
-            }, function(wantsFullScreen) {
-                $scope.customFullscreen = (wantsFullScreen === true);
-            });
         };
+
+        $scope.$watch(function() {
+            return $mdMedia('xs') || $mdMedia('sm');
+        }, function(wantsFullScreen) {
+            $scope.customFullscreen = (wantsFullScreen === true);
+        });
 
         $scope.cluesAutoCompleteItemChange = function(){
 
@@ -1185,8 +1580,6 @@
             $scope.cluesAutoCompleteItemChange();
             //$scope.modulo.insumos_estatus = $scope.insumos_estatus;
             //$scope.modulo.lista_clues = $scope.lista_clues;
-
-
         }
 
         function reindicarunidad(elementos_clues)
@@ -1197,6 +1590,10 @@
                 elementos_clues.insumos[i].requisicion_id_unidad = acta_unidad;
             }
         }
+
+        $scope.generarExcel = function(){
+            window.open(URLS.BASE_API +'/requisiciones-excel?token='+$localStorage.control_desabasto.access_token);
+        };
 
         var input = angular.element($document[0].querySelector('input#input-file-id'));
 

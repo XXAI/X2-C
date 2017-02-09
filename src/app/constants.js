@@ -17,7 +17,7 @@
                                 { titulo: 'Requisiciones',          key: '4E4D8E11F6E4A', path: '/requisiciones',               icono: 'file'               },
                                 { titulo: 'Recepcion',              key: '97728B3AD53DB', path: '/recepcion',                   icono: 'truck'              },
                                 { titulo: 'Salidas',                key: '97728B3AD53DB', path: '/salidas',                     icono: 'pill'               }
-                            ]//97728B3AD53DB
+                            ]
                          },
                          { 
                             grupo:'Administrador' ,

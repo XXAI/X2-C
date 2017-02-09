@@ -322,6 +322,8 @@
         $scope.captura_habilitada = 1;
         $scope.subtotales = {causes:0,no_causes:0,surfactante_causes:0,surfactante_no_causes:0,material_curacion:0,controlados:0};
         $scope.cuadro_basico = undefined;
+        $scope.mostrarBotonDesglose = false;
+        $scope.puedeClonarActa = false;
 
         $scope.insumos_clues = {};
         $scope.clues = {};
@@ -342,6 +344,14 @@
                 $scope.acta = res.data;
 				$scope.configuracion = res.configuracion;
                 $scope.captura_habilitada = res.captura_habilitada;
+
+                if($scope.acta.numero){
+                    $scope.puedeClonarActa = true;
+                }
+
+                if($scope.configuracion.tipo_clues == 2){
+                    $scope.mostrarBotonDesglose = true;
+                }
 
                 if(res.clues){
                     $scope.clues = res.clues;
@@ -379,6 +389,8 @@
                 $scope.acta.total = 0;
                 $scope.acta.iva = 0;
                 var requisiciones = {};
+                var meses = {1:'Enero',2:'Febrero',3:'Marzo',4:'Abril',5:'Mayo',6:'Junio',7:'Julio',8:'Agosto',9:'Septiembre',10:'Octubre',11:'Noviembre',12:'Diciembre'};
+
                 if(res.data.requisiciones.length){
                     var insumos_guardados = {};
                     for(var i in res.data.requisiciones){
@@ -409,6 +421,19 @@
                             insumo.surfactante = requisicion.insumos[j].surfactante;
                             insumo.precio = requisicion.insumos[j].precio;
                             insumo.pedido = requisicion.insumos[j].pedido;
+
+                            if(requisicion.insumos[j].inventario){
+                                for(var m = 1; m <= 12; m++){
+                                    if(requisicion.insumos[j].inventario[m]){
+                                        insumo.inventario_actual = {
+                                            mes:meses[m],
+                                            anio:requisicion.insumos[j].inventario.anio,
+                                            fecha: new Date(requisicion.insumos[j].inventario.fecha_actualizo),
+                                            cantidad:requisicion.insumos[j].inventario[m]
+                                        };
+                                    }
+                                }
+                            }
 
                             if($scope.cuadro_basico){
                                 if($scope.cuadro_basico[insumo.llave]){
@@ -561,7 +586,6 @@
             var index = $scope.acta.insumos.indexOf(insumo);
             $scope.acta.insumos.splice(index,1);
             $scope.acta.total = $scope.acta.iva + $scope.acta.subtotal;
-
         };
 
         $scope.cambiaFiltro = function(tipo){
@@ -631,7 +655,7 @@
             $mdDialog.show({
                 //controller: function($scope, $mdDialog, insumo, index) {
                 controller: function($scope, $mdDialog, insumo, index, acta, cuadro_basico, subtotales) {
-                    console.log(cuadro_basico);
+                    //console.log(cuadro_basico);
 
                     //$scope.cargando = true;
                     //$scope.catalogo_insumos = [];
@@ -780,6 +804,7 @@
                                 $scope.insumo.surfactante = $scope.insumoAutoComplete.insumo.surfactante;
                                 $scope.insumo.pedido = $scope.insumoAutoComplete.insumo.pedido;
                                 $scope.insumo.cuadro_basico = $scope.insumoAutoComplete.insumo.cuadro_basico;
+                                $scope.insumo.inventario_actual = $scope.insumoAutoComplete.insumo.inventario_actual;
                                 $scope.insumo.total = 0.00;
                                 
                                 $timeout(function(){
@@ -808,6 +833,19 @@
                                     res.data.data[i].cuadro_basico = valor_default;
                                     if(cuadro_basico[res.data.data[i].llave]){
                                         res.data.data[i].cuadro_basico = 1;
+                                    }
+                                    if(res.data.data[i].inventario){
+                                        var meses = {1:'Enero',2:'Febrero',3:'Marzo',4:'Abril',5:'Mayo',6:'Junio',7:'Julio',8:'Agosto',9:'Septiembre',10:'Octubre',11:'Noviembre',12:'Diciembre'};
+                                        for(var m = 1; m <= 12; m++){
+                                            if(res.data.data[i].inventario[m]){
+                                                res.data.data[i].inventario_actual = {
+                                                    mes:meses[m],
+                                                    anio:res.data.data[i].inventario.anio,
+                                                    fecha:new Date(res.data.data[i].inventario.fecha_actualizo),
+                                                    cantidad:res.data.data[i].inventario[m]
+                                                };
+                                            }
+                                        }
                                     }
                                 }
                                 
@@ -856,6 +894,8 @@
                 clues: $scope.clues,
                 insumos_clues: $scope.insumos_clues[insumo.insumo_id]
             };
+
+            console.log(locals);
 
             $mdDialog.show({
                 //controller: function($scope, $mdDialog, insumo, index) {
@@ -906,6 +946,51 @@
             $mdDialog.show(confirm).then(function() {
                 $scope.acta.estatus = 2;
                 $scope.guardar();
+            }, function() {});
+        };
+
+        $scope.clonarActa = function(ev){
+            var mensaje = '';
+            if($scope.configuracion.tipo_clues == 2){
+                mensaje = 'Cualquier insumo capturado en Requisiciones sera borrado y la información se reemplazara con los datos de esta acta';
+            }
+            var confirm = $mdDialog.confirm()
+                .title('Clonar acta?')
+                .content('¿Esta seguro que desea clonar esta acta? '+mensaje)
+                .targetEvent(ev)
+                .ok('Clonar')
+                .cancel('Cancelar');
+
+            $mdDialog.show(confirm).then(function() {
+                $scope.cargando = true;
+                if($scope.configuracion.tipo_clues == 2){
+                    ActasDataApi.clonarActaJurisdiccion($scope.acta.id,function (res) {
+                        $scope.cargando = false;
+                        
+                        $localStorage.samm_modulo_requisiciones = {cambios:false};
+
+                        $location.path('requisiciones');
+                    }, function (e) {
+                        $scope.cargando = false;
+                        if(e.error_type == 'data_validation'){
+                            Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:e.error});
+                        }else{
+                            Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:'Ocurrió un error al intentar clonar el acta.'});
+                        }
+                    });
+                }else{
+                    ActasDataApi.clonarActa($scope.acta.id,function (res) {
+                        $scope.cargando = false;
+                        $location.path('actas/'+res.data.id+'/editar');
+                    }, function (e) {
+                        $scope.cargando = false;
+                        if(e.error_type == 'data_validation'){
+                            Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:e.error});
+                        }else{
+                            Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:'Ocurrió un error al intentar clonar el acta.'});
+                        }
+                    });
+                }
             }, function() {});
         };
         
@@ -1173,8 +1258,12 @@
             }
         };
 
-        $scope.generarExcel = function(){
-            window.open(URLS.BASE_API +'/acta-excel/'+$routeParams.id+'?token='+$localStorage.control_desabasto.access_token);
+        $scope.generarExcel = function(desglosado){
+            if(desglosado){
+                window.open(URLS.BASE_API +'/acta-excel-desglose/'+$routeParams.id+'?token='+$localStorage.control_desabasto.access_token);
+            }else{
+                window.open(URLS.BASE_API +'/acta-excel/'+$routeParams.id+'?token='+$localStorage.control_desabasto.access_token);
+            }
         };
 
         $scope.exportar = function(){
@@ -1221,7 +1310,7 @@
           UsuarioData.guardarEstadoMenu($scope.menuIsOpen);
         };
         
-        $scope.mostrarIdiomas = function($event){                
+        $scope.mostrarIdiomas = function($event){
             $mdBottomSheet.show({
               templateUrl: './src/app/views/idiomas.html',
               controller: 'ListaIdiomasCtrl',                 
