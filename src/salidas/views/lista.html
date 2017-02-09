@@ -79,14 +79,7 @@
 		        			</div>
 		        		</div>
 		        	</h4>
-		        	<!--<h4>
-		        		<span ng-if="acta.estatus <= 2">
-		        			<strong>Total Importe:</strong> $ {{acta.total_requisitado | number:2}}
-		        		</span>
-		        		<span ng-if="acta.estatus > 2">
-		        			<strong>Total Validado:</strong> $ {{acta.total_validado | number:2}}
-		        		</span>
-		        	</h4>-->
+
 		        </div>
 		        <md-icon md-svg-icon="delete" ng-if="(salida.id && salida.estatus == 1)" ng-permiso="permisoEliminar" ng-click="eliminarSalida(salida,$event)" aria-label="Borrar Salida" class="md-secondary md-hue-3">
 	    		</md-icon>

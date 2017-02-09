@@ -9,7 +9,7 @@
 		})
 		.when('/salidas/:id/editar',{
 			templateUrl: 'src/salidas/views/editar.html',
-			controller: 'FormActaCtrl'
+			controller: 'FormSalidaCtrl'
 		})
 		.when('/salidas/nuevo',{
 			templateUrl: 'src/salidas/views/nuevo.html',

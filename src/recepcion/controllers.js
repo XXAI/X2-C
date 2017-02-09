@@ -479,6 +479,8 @@
                 $scope.ingresos_requisicion[insumo.proveedor_id] = {};
             }*/
 
+
+
             var locals = {
                 insumo: insumo,
                 lista_insumos: $scope.lista_insumos_con_filtro,

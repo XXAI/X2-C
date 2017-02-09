@@ -7,88 +7,47 @@
 		        <md-icon md-svg-icon="menu" ></md-icon>
 		    </md-button>		
 			<h2>
-			  <span>ACTA: {{acta.folio}} </span>
+			  <span>SALIDA: {{salida.folio}} </span>
 			</h2>
 			
 			<span flex></span>
-			<md-button hide-xs hide-sm ng-click="ir('actas')"   aria-label="{{ 'REGRESAR' | translate }}">
+			<md-button hide-xs hide-sm ng-click="ir('salidas')"   aria-label="{{ 'REGRESAR' | translate }}">
 			  <md-icon md-svg-icon="keyboard-backspace"></md-icon>
 			  {{ 'REGRESAR' | translate }}
 			</md-button>   
-			<md-button class="md-icon-button"  hide-gt-sm  ng-click="ir('actas')"   aria-label="{{ 'REGRESAR' | translate }}">
+			<md-button class="md-icon-button"  hide-gt-sm  ng-click="ir('salidas')"   aria-label="{{ 'REGRESAR' | translate }}">
 			  <md-icon md-svg-icon="keyboard-backspace"></md-icon>
 			</md-button>
 
-			<md-button class="md-icon-button" ng-click="toggleDatosActa=!toggleDatosActa"  ng-disabled="cargando" aria-label="Toggle Datos Acta">
-				<md-icon md-svg-icon="{{(toggleDatosActa)?'expand-panel-off':'expand-panel-on'}}"></md-icon>
+			<md-button class="md-icon-button" ng-click="toggleDatosActa=!toggleDatosActa"  ng-disabled="cargando" aria-label="Toggle Datos Salida">
+				<md-icon md-svg-icon="{{(toggleDatosSalida)?'expand-panel-off':'expand-panel-on'}}"></md-icon>
 			</md-button>
 
 			<md-icon md-svg-icon="dots-vertical" style="color: #005DA7;"></md-icon>
 			
-			<md-button ng-if="(acta.estatus == 1)" ng-permiso="permisoEliminar" class="md-icon-button" ng-click="eliminar($event)"  aria-label="{{ 'ELIMINAR' | translate }}">
+			<md-button ng-if="(salida.estatus == 1)" ng-permiso="permisoEliminar" class="md-icon-button" ng-click="eliminar($event)"  aria-label="{{ 'ELIMINAR' | translate }}">
 			  <md-icon md-svg-icon="delete"></md-icon>
 			</md-button>
 
-			<md-button ng-if="(acta.estatus == 1 && captura_habilitada == 1)" ng-permiso="permisoEditar" class="md-accent md-raised" hide-xs hide-sm ng-click="finalizarActa($event)" ng-disabled="cargando"  aria-label="{{ 'FINALIZAR' | translate }}">
+			<md-button ng-if="(salida.estatus == 1 && captura_habilitada == 1)" ng-permiso="permisoEditar" class="md-accent md-raised" hide-xs hide-sm ng-click="finalizarSalida($event)" ng-disabled="cargando"  aria-label="{{ 'FINALIZAR' | translate }}">
 			  <md-icon md-svg-icon="check"></md-icon>
 			  {{ 'FINALIZAR' | translate }}
 			</md-button>
-			<md-button class="md-icon-button md-accent" ng-permiso="permisoEditar" hide-gt-sm  ng-if="(acta.estatus == 1 && captura_habilitada == 1)" ng-disabled="cargando" ng-click="finalizarActa($event)"  aria-label="{{ 'FINALIZAR' | translate }}">
+			<md-button class="md-icon-button md-accent" ng-permiso="permisoEditar" hide-gt-sm  ng-if="(salida.estatus == 1 && captura_habilitada == 1)" ng-disabled="cargando" ng-click="finalizarSalida($event)"  aria-label="{{ 'FINALIZAR' | translate }}">
 			  <md-icon md-svg-icon="check"></md-icon>
 			</md-button>
 
-			<md-button ng-if="(acta.estatus == 1)" ng-permiso="permisoEditar" hide-xs hide-sm ng-click="guardar()" ng-disabled="cargando"  aria-label="{{ 'GUARDAR' | translate }}">
+		    <md-button ng-if="(salida.estatus == 1)" ng-permiso="permisoEditar" hide-xs hide-sm ng-click="editar()" ng-disabled="cargando"  aria-label="{{ 'GUARDAR' | translate }}">
 			  <md-icon md-svg-icon="content-save"></md-icon>
 			  {{ 'GUARDAR' | translate }}
 			</md-button>		 
-			<md-button ng-if="(acta.estatus == 1)" ng-permiso="permisoEditar" class="md-icon-button"  hide-gt-sm ng-disabled="cargando" ng-click="guardar()"  aria-label="{{ 'GUARDAR' | translate }}">
+			<md-button ng-if="(salida.estatus == 1)" ng-permiso="permisoEditar" class="md-icon-button"  hide-gt-sm ng-disabled="cargando" ng-click="editar()"  aria-label="{{ 'GUARDAR' | translate }}">
 			  <md-icon md-svg-icon="content-save"></md-icon>
 			</md-button>
 
-			<md-button ng-if="(acta.estatus > 1 && acta.estatus_sincronizacion < 1 && loggedUser.tipo_conexion == 1)" hide-xs hide-sm ng-click="sincronizar()" class="md-raised md-accent" ng-disabled="cargando"  aria-label="{{ 'ENVIAR' | translate }}">
-			  <md-icon md-svg-icon="send"></md-icon>
-			  {{ 'ENVIAR' | translate }}
-			</md-button>		 
-			<md-button ng-if="(acta.estatus > 1 && acta.estatus_sincronizacion < 1 && loggedUser.tipo_conexion == 1)" class="md-icon-button md-accent"  hide-gt-sm ng-disabled="cargando" ng-click="sincronizar()"  aria-label="{{ 'ENVIAR' | translate }}">
-			  <md-icon md-svg-icon="send"></md-icon>
-			</md-button>
 
-			<md-button ng-permiso="permisoExportar" ng-if="(acta.estatus > 1)" hide-xs hide-sm ng-click="exportar()" ng-disabled="cargando"  aria-label="{{ 'EXPORTAR' | translate }}">
-			  <md-icon md-svg-icon="download"></md-icon>
-			  {{ 'EXPORTAR' | translate }}
-			</md-button>		 
-			<md-button ng-permiso="permisoExportar" ng-if="(acta.estatus > 1)" class="md-icon-button"  hide-gt-sm ng-disabled="cargando" ng-click="exportar()"  aria-label="{{ 'EXPORTAR' | translate }}">
-			  <md-icon md-svg-icon="download"></md-icon>
-			</md-button>
-			
-			<md-menu md-position-mode="target-right target" >
-	          <md-button aria-label="Open demo menu" class="md-icon-button" ng-disabled="cargando" ng-click="$mdOpenMenu($event)">
-	            <md-icon md-menu-origin md-svg-icon="printer"></md-icon>
-	          </md-button>
-	          <md-menu-content width="4" >
-	            <md-menu-item>
-		            <md-button ng-click="imprimir('acta')">
-		                <div layout="row">
-		                    <p flex>Acta</p>
-		                    <md-icon md-menu-align-target md-svg-icon="file" style="margin: auto 3px auto 0;"></md-icon>
-		                </div>
-		            </md-button>
-	            </md-menu-item>
-	            <md-menu-item>
-	            	<md-button ng-click="imprimir('req')">
-		                <div layout="row">
-		                	<p flex>Requisiciones</p>
-		                    <md-icon md-menu-align-target md-svg-icon="file" style="margin: auto 3px auto 0;"></md-icon>
-		                </div>
-		            </md-button>
-	            </md-menu-item>
-	          </md-menu-content>
-	        </md-menu>
 
-	        <md-button class="md-icon-button" ng-disabled="cargando" ng-click="generarExcel()"  aria-label="{{ 'excel' | translate }}">
-			  <md-icon md-svg-icon="file-excel"></md-icon>
-			</md-button>
 		</div>
 	</md-toolbar>
-	<md-content layout="column" flex ng-include="'src/actas/views/form.html'"></md-content>
+	<md-content layout="column" flex ng-include="'src/salidas/views/form.html'"></md-content>
 </div>

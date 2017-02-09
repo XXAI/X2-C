@@ -686,7 +686,7 @@
         };
 
         $scope.cluesAutoCompleteItemChange = function(){
-
+            console.log($scope);
             if ($scope.cluesAutoComplete.clues != null){
                 $scope.clues_seleccionada = $scope.cluesAutoComplete.clues;
 

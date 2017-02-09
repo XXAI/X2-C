@@ -4,24 +4,24 @@
 <md-content layout="column" flex>
 	<md-content ng-show="toggleDatosActa" layout="row" flex="none" layout-wrap layout-padding >
 
-        <md-input-container flex="(if(selectedTipoSalida == 1) ? 30: 100)" md-is-error="" style="margin-bottom:0px;">
+        <md-input-container flex="(if(salida.selectedTipoSalida == 1) ? 30: 100)" md-is-error="" style="margin-bottom:0px;">
             <label>Tipo de Salida</label>
-                <md-select ng-model="selectedTipoSalida">
+                <md-select ng-model="salida.selectedTipoSalida">
                     <md-option ng-value="">Sin tipo de Salida</md-option>
                     <md-option ng-value="tipoSalida.id" ng-repeat="tipoSalida in tiposalida">{{tipoSalida.descripcion}}</md-option>
             </md-select>
         </md-input-container>
     </md-content>
+    <md-content layout="row" flex="none"  ng-if="(salida.selectedTipoSalida == 1)" layout-padding class="layout-padding layout-row flex">
 
-    <md-content layout="row" flex="none"  ng-if="(selectedTipoSalida == 1)" layout-padding class="layout-padding layout-row flex-none">
-        <div flex layout="row">
+        <div flex="50" layout="row">
             <md-autocomplete flex
-                             md-input-id="autocomplete-acta"
+                             md-input-id="autocomplete-salidaacta"
                              md-no-cache="true"
-                             md-selected-item="cluesAutoComplete.clues"
-                             md-search-text="actaAutoComplete.searchText"
-                             md-selected-item-change ="actaAutoCompleteItemChange()"
-                             md-items="item in querySearchActa(actaAutoComplete.searchText)"
+                             md-selected-item="salidaactaAutoComplete.actas"
+                             md-search-text="salidaactaAutoComplete.searchText"
+                             md-selected-item-change ="salidaactaAutoCompleteItemChange()"
+                             md-items="item in querySearchSalidaActa(salidaactaAutoComplete.searchText)"
                              md-item-text="item.folio"
                              md-min-length="0"
                              placeholder="Buscar ACTA"
@@ -29,89 +29,40 @@
                 <md-item-template>
                 <span class="item-title" ng-class="(item.repetido)?'insumo-repetido':''" >
                     <div layout="row" layout-padding>
-                        <!--<div flex="none"><strong><span md-highlight-text="cluesAutoComplete.searchText">CIUDAD:</span></strong> {{item.ciudad}}</div>
-                        <div flex></div>-->
                         <div flex="none"><span><strong>FOLIO:</strong> {{item.folio}}</span></div>
                     </div>
                 </span>
 
                 </md-item-template>
                 <md-not-found>
-                    No hay resultados para  "{{actaAutoComplete.searchText}}".
+                    No hay resultados para  "{{salidaactaAutoComplete.searchText}}".
                 </md-not-found>
             </md-autocomplete>
 
         </div>
+        <div flex="20" layout="row">
+            <md-button class="md-raised md-accent" ng-click="generarDistribucion($event)" ng-disabled="(salida.distribucion == 1)? false:true">
+                <md-icon md-svg-icon="calculator"></md-icon> Generar Distribución
+            </md-button>
+        </div>
+        <div flex="30" layout="row">
+            <md-input-container style="margin: 0px 0; ">
+                <label>Buscar</label>
+                    <input type="text" id="input_search" ng-model="buscar_insumo" ng-change="fun_buscar_insumo(buscar_insumo)" >
 
-        <!--<div flex layout="row">
-            <md-autocomplete flex
-                             md-input-id="autocomplete-clues"
-                             md-no-cache="true"
-                             md-selected-item="cluesAutoComplete.clues"
-                             md-search-text="cluesAutoComplete.searchText"
-                             md-selected-item-change ="cluesAutoCompleteItemChange()"
-                             md-items="item in querySearchClues(cluesAutoComplete.searchText)"
-                             md-item-text="item.clues + ' - ' + item.nombre"
-                             md-min-length="0"
-                             placeholder="Buscar CLUES"
-                             md-menu-class="autocomplete-custom-template">
-                <md-item-template>
-                <span class="item-title" ng-class="(item.repetido)?'insumo-repetido':''" >
-                    <div layout="row" layout-padding>
-                        <div flex="none"><strong><span md-highlight-text="cluesAutoComplete.searchText">CLUES:</span></strong> {{item.clues}}</div>
-                        <div flex></div>
-                        <div flex="none"><span><strong>Claves:</strong> {{item.total_insumos | number}}</span></div>
-                    </div>
-                </span>
-                <span class="item-metadata md-padding">
-                    <span class="item-metastat">
-                        <span md-highlight-text="cluesAutoComplete.searchText" >{{item.nombre}}</span><br>
-                        <small>JURISDICCIÓN {{item.jurisdiccion}}</small>
-                    </span>
-                </span>
-                </md-item-template>
-                <md-not-found>
-                    No hay resultados para  "{{cluesAutoComplete.searchText}}".
-                </md-not-found>
-            </md-autocomplete>
-
-        </div>-->
+            </md-input-container>
+        </div>
     </md-content>
-
-    <md-content layout="row" flex="none" layout-padding class="layout-padding layout-row flex-none">
-        <md-input-container flex="33"  md-is-error="" style="margin-bottom:0px;">
-            <label>Realiza</label>
-            <input ng-model="salida.realiza" >
-            <div class="errors" ng-messages="validacion.ciudad" >
-                <div ng-message="required">{{ 'CAMPO_REQUERIDO' | translate }}</div>
-            </div>
-        </md-input-container>
-        <md-input-container flex="33"  md-is-error="" style="margin-bottom:0px;">
-            <label>Autoriza</label>
-            <input ng-model="salida.autoriza" >
-            <div class="errors" ng-messages="validacion.ciudad" >
-                <div ng-message="required">{{ 'CAMPO_REQUERIDO' | translate }}</div>
-            </div>
-        </md-input-container>
-        <md-input-container flex="34"  md-is-error="" style="margin-bottom:0px;">
-            <label>Recibe</label>
-            <input ng-model="salida.recibe" >
-            <div class="errors" ng-messages="validacion.ciudad" >
-                <div ng-message="required">{{ 'CAMPO_REQUERIDO' | translate }}</div>
-            </div>
-        </md-input-container>
-	</md-content>
 
 	<md-divider></md-divider>
 	<md-subheader flex="none" class="md-primary">
 		<div layout="row">
-			<div flex="5" style="text-align:center;">No. Lote</div>
+
 			<div flex="15" style="text-align:center;">Clave</div>
 			<div flex style="text-align:center;">Descripción del Insumo</div>
-			<div flex="15" style="text-align:center;">Unidad de Medida</div>
-			<div flex="10" style="text-align:center;">Precio Unitario</div>
-			<div flex="10" style="text-align:center;">Cantidad</div>
-			<div flex="20" style="text-align:center;">Importe</div>
+			<div flex="10" style="text-align:center;">Cantidad Surtida / Cantidad Total</div>
+			<div flex="10" style="text-align:center;">Cantidad Salida</div>
+			<div flex="10" style="text-align:center;">Cantidad Restante</div>
 		</div>
 	</md-subheader>
 	<md-divider></md-divider>
@@ -123,15 +74,13 @@
 					<span ng-show="validacion.requisiciones">Es necesario capturar al menos un insumo</span>
 		    	</md-subheader>
 		    </md-list-item>
-			<md-list-item ng-repeat="insumo in acta.insumos | filter: filtroTipo" ng-click="editarInsumo($event,insumo)">
-				<div flex layout="row" ng-class="(insumo.repetido)?'insumo-repetido':((insumo.cuadro_basico)?'':'insumo-no-cuadro-basico')" ng-style="(insumo.requisicion_id)?((insumo.editado)?{'font-style':'italic'}:{'color':'black'}):{'font-weight':'bold'}">
-					<div flex="5" style="text-align:center;">{{insumo.lote}}</div>
-					<div flex="15" style="text-align:center;">{{insumo.clave}}</div>
-					<div flex style="text-align:center;"><p style="line-height:14px; margin:0px;"><small>{{insumo.descripcion}}</small></p></div>
-					<div flex="15" style="text-align:center;"><p style="line-height:14px; margin:0px;"><small>{{insumo.unidad}}</small></p></div>
-					<div flex="10" style="text-align:center;">$ {{insumo.precio | number:2}}</div>
-					<div flex="10" style="text-align:center;">{{insumo.cantidad | number}}</div>
-					<div flex="20" style="text-align:center;">$ {{insumo.total | number:2}}</div>
+			<md-list-item ng-repeat="insumos in salida.insumos | filter: buscar_insumo" ng-click="editarInsumoSalida($event,insumos)" ng-disabled="(insumos.surtido_parcial == insumos.cantidad_total)? true:false">
+			    <div flex layout="row" ng-style="(insumos.error == 0)?((insumos.cantidad_restante > 0)?{'color':'black','font-weight':'bold'}:(insumos.surtido_parcial == insumos.cantidad_restante)?{'color':'black','font-weight':'bold'}:{'color':'grey'}):{'color':'red','font-weight':'bold'}">
+					<div flex="15" style="text-align:center;">{{insumos.clave}}</div>
+					<div flex style="text-align:center;"><p style="line-height:14px; margin:0px;"><small>{{insumos.descripcion}}</small></p></div>
+					<div flex="10" style="text-align:center;">{{insumos.surtido_parcial }} / {{insumos.cantidad_total }}</div>
+					<div flex="10" style="text-align:center;">{{insumos.surtido_salida }}</div>
+					<div flex="10" style="text-align:center;">{{insumos.cantidad_restante}}</div>
 				</div>
 		    	<md-icon ng-if="(acta.estatus < 2)" md-svg-icon="delete" ng-click="eliminarInsumo(insumo)" aria-label="quitar" class="md-secondary md-hue-3">
 		    	</md-icon>
@@ -141,34 +90,28 @@
 	</md-content>
 	<md-divider></md-divider>
 	<md-content layout="row" flex="none" layout-wrap>
-		<md-button class="md-raised md-accent" ng-click="agregarInsumo($event)" ng-if="(acta.estatus < 2)" ng-disabled="cargando">
-			<md-icon md-svg-icon="plus"></md-icon> Agregar Insumo
-		</md-button>
-		<div flex="none" ng-if="(acta.estatus > 1)" style="overflow:hidden;">
-			<md-input-container style="margin-bottom:0px;height:35px;">
-				<label>Validado</label>
-				<input value="{{(acta.estatus < 3)?'Sin Validar':(acta.fecha_validacion | date:'yyyy-MM-dd HH:mm')+' hrs'}}">
-			</md-input-container>
-		</div>
+
 		<div flex></div>
+
 		<div flex="none" layout="row" style="overflow:hidden;">
 			<md-input-container flex="none" style="margin-bottom:0px;height:35px;">
-				<label>Subtotal</label>
-				<input value="$ {{acta.subtotal | number:2}}" readonly>
+                <label>Cantidad Surtida / Total</label>
+				<input value="{{salida.cantidad_surtida }} / {{salida.cantidad_total }}" readonly>
 			</md-input-container>
 			<md-input-container flex="none" style="margin-bottom:0px;height:35px;">
-				<label>I.V.A.</label>
-				<input value="$ {{acta.iva | number:2}}" readonly>
+				<label>Salida</label>
+				<input value="{{salida.cantidad_solicitada }}" readonly>
 			</md-input-container>
 			<md-input-container flex="none" style="margin-bottom:0px;height:35px;">
-				<label>Total</label>
-				<input value="$ {{acta.total | number:2}}" readonly>
+				<label>Restante</label>
+				<input value="{{salida.cantidad_restante }}" readonly>
 			</md-input-container>
 		</div>
 	</md-content>
+
 </md-content>
 
-<md-content layout="column" flex="15" class="md-whiteframe-z2">
+<!--<md-content layout="column" flex="15" class="md-whiteframe-z2">
 	<md-subheader class="md-primary md-hue-1">
 		Totales por tipo:
 	</md-subheader>
@@ -220,6 +163,6 @@
 		<label>Total Insumos</label>
 		<input value="{{(acta.insumos | filter: filtroTipo).length | number}}" readonly>
 	</md-input-container>
-</md-content>
+</md-content>-->
 
 </div>
