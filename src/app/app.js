@@ -21,7 +21,9 @@
 									'RecepcionModule',
 									'SalidasModule',
 									'RecetasModule',
-									'ConfiguracionModule']);
+									'ConfiguracionModule',
+									'InventarioModule']);
+
 	   
 	app.config(['$mdThemingProvider','$mdIconProvider','$routeProvider','$httpProvider','$translateProvider','$mdDateLocaleProvider',function($mdThemingProvider,$mdIconProvider,$routeProvider,$httpProvider,$translateProvider,$mdDateLocaleProvider){
 		$mdDateLocaleProvider.months = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
