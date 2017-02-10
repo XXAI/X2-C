@@ -1,0 +1,94 @@
+<md-dialog aria-label="form insumo" flex ng-cloak>
+  <form>
+    <md-toolbar>
+      <div class="md-toolbar-tools">
+        <h2>Insumo</h2>
+        <span flex></span>
+        <md-button class="md-icon-button" ng-click="cancel()">
+          <md-icon md-svg-icon="close" aria-label="Close dialog"></md-icon>
+        </md-button>
+      </div>
+    </md-toolbar>
+    <md-dialog-content>
+      <div class="md-dialog-content">
+        <md-progress-linear  ng-if="cargando" class="md-accent" style="position:fixed; top:-3px; left:0px; z-index:999"  md-mode="indeterminate"></md-progress-linear>
+        <div flex layout="row" layout-wrap>
+          <md-autocomplete flex="100"
+            ng-disabled="cargando"
+            md-input-id="autocomplete-insumos"
+            md-autofocus="!insumo"
+            md-no-cache="true"
+            md-selected-item="insumoAutoComplete.insumo"
+            md-search-text="insumoAutoComplete.searchText"
+            md-selected-item-change ="insumoAutoCompleteItemChange()"
+            md-items="item in querySearchInsumo(insumoAutoComplete.searchText)"
+            md-item-text="item.clave"
+            md-min-length="1"
+            placeholder="Buscar insumo"
+            md-menu-class="autocomplete-custom-template">
+            <md-item-template>
+              <span class="item-title">
+                <div layout="row" layout-padding ng-class="(item.cuadro_basico)?'':'insumo-no-cuadro-basico'" >
+                  <div flex="none"><strong>Lote:</strong> {{item.lote}}</div>
+                  <div flex></div>
+                  <div flex="none"><strong>Clave:</strong> <span md-highlight-text="insumoAutoComplete.searchText" >{{item.clave}}</span></div>
+                  <div flex></div>
+                  <div flex="none"><strong>Tipo:</strong> {{(item.tipo == 1 && item.cause == 1)?'Causes':((item.tipo == 2)?'Material de Curación':'No Causes')}}</div>
+                  <div flex></div>
+                  <div flex="none"><span><strong>Precio: </strong>$ {{item.precio}}</span></div>
+                </div>
+              </span>
+              <span class="item-metadata md-padding" ng-class="(item.cuadro_basico)?'':'insumo-no-cuadro-basico'" >
+                <span class="item-metastat">
+                  <span md-highlight-text="insumoAutoComplete.searchText" >{{item.descripcion}}</span>
+                </span>
+              </span>
+            </md-item-template>
+            <md-not-found>
+              No hay resultados para  "{{insumoAutoComplete.searchText}}".
+            </md-not-found>
+          </md-autocomplete>
+          <div ng-show="validacion.insumo" class="hint" ng-messages="validacion.insumo"  style="color:rgb(221,44,0);">
+            <div ng-message="required"><small>{{ 'CAMPO_REQUERIDO' | translate }}</small></div>
+            <div ng-message="duplicate"><small>El insumo ya se encuentra en la lista</small></div>
+          </div>
+        </div>
+        <br>
+        <div flex layout="row" layout-wrap ng-show="(insumo)" ng-class="(insumo.cuadro_basico)?'':'insumo-no-cuadro-basico'" >
+          <div flex="100">
+            <div class="hint">{{insumo.descripcion}}</div>
+          </div>
+          <md-input-container flex>
+            <label>Lote</label>
+            <input value="{{insumo.lote}}" disabled>
+          </md-input-container>
+          <md-input-container flex>
+            <label>Unidad</label>
+            <input value="{{insumo.unidad}}" disabled>
+          </md-input-container>
+          <md-input-container flex>
+            <label>Precio</label>
+            <input value="$ {{insumo.precio | number:2}}" disabled>
+          </md-input-container>
+          <md-input-container flex md-is-error="validacion.cantidad">
+            <label>Cantidad</label>
+            <input type="number" id="input_cantidad" ng-model="insumo.cantidad" ng-change="calcularTotal()" ng-keyup="$event.keyCode == 13 ? answer() : null">
+            <div class="errors" ng-messages="validacion.cantidad" >
+              <div ng-message="required">{{ 'CAMPO_REQUERIDO' | translate }}</div>
+            </div>
+          </md-input-container>
+          <md-input-container flex>
+            <label>Total</label>
+            <input value="$ {{insumo.total | number:2}}" disabled>
+          </md-input-container>
+        </div>
+      </div>
+    </md-dialog-content>
+    <md-dialog-actions layout="row">
+      <span flex></span>
+      <md-button ng-disabled="cargando" class="md-raised md-primary" ng-click="answer()" style="margin-right:20px;">
+        <md-icon md-svg-icon="{{(index >= 0)?'pencil-box':'plus-box'}}"></md-icon> {{(index >= 0)?'Modificar':'Agregar'}}
+      </md-button>
+    </md-dialog-actions>
+  </form>
+</md-dialog>
