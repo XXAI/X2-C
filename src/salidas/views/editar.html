@@ -40,6 +40,7 @@
 		    <md-button ng-if="(salida.estatus == 1)" ng-permiso="permisoEditar" hide-xs hide-sm ng-click="editar()" ng-disabled="cargando"  aria-label="{{ 'GUARDAR' | translate }}">
 			  <md-icon md-svg-icon="content-save"></md-icon>
 			  {{ 'GUARDAR' | translate }}
+			  
 			</md-button>		 
 			<md-button ng-if="(salida.estatus == 1)" ng-permiso="permisoEditar" class="md-icon-button"  hide-gt-sm ng-disabled="cargando" ng-click="editar()"  aria-label="{{ 'GUARDAR' | translate }}">
 			  <md-icon md-svg-icon="content-save"></md-icon>
