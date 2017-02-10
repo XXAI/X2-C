@@ -17,6 +17,8 @@
         $scope.filtroTipo = 1;
         $scope.usuario_id = $scope.loggedUser.id;
 
+        
+
         //console.log($localStorage.samm_modulo_requisiciones);
         if(!$localStorage.samm_modulo_requisiciones){
             $localStorage.samm_modulo_requisiciones = {cambios:false};
