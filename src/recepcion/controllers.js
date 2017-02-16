@@ -331,6 +331,7 @@
             
             $scope.entregas_guardadas = {};
             $scope.entregas_imprimir = {};
+            $scope.lista_entregas_imprimir = [];
 
             if($scope.acta.entradas.length){
                 for(var i in $scope.acta.entradas){
@@ -351,7 +352,8 @@
                         if(!$scope.entregas_imprimir[entrega.proveedor_id]){
                             $scope.entregas_imprimir[entrega.proveedor_id] = entrega;
                         }
-                        //$scope.entregas_imprimir[entrega.proveedor_id].push(entrega);
+                        entrega.proveedor_nombre = proveedores[entrega.proveedor_id].nombre;
+                        $scope.lista_entregas_imprimir.push(entrega);
                     }
 
                     if(entrega.estatus == 1){
@@ -553,7 +555,7 @@
                         var errores = false;
 
                         $scope.ingreso.cantidad = 0;
-                        var indices_a_quitar = [];
+                        //var indices_a_quitar = [];
                         for(var i in $scope.ingreso.lotes){
                             var lote_capturado = $scope.ingreso.lotes[i];
 
@@ -593,7 +595,8 @@
                                     lote_capturado.validacion.cantidad = {max:true};
                                     errores = true;
                                 }else if(lote_capturado.cantidad == 0){
-                                    indices_a_quitar.push(i);
+                                    //indices_a_quitar.push(i);
+                                    $scope.ingreso.lotes.splice(i,1);
                                 }
                             }
                         }
@@ -602,11 +605,11 @@
                             return false;
                         }
 
-                        if(indices_a_quitar.length){
+                        /*if(indices_a_quitar.length){
                             for(var i in indices_a_quitar){
                                 $scope.ingreso.lotes.splice(indices_a_quitar[i],1);
                             }
-                        }
+                        }*/
 
                         if(!$scope.lista_ingresos[$scope.insumo.insumo_id] && $scope.ingreso.lotes.length){
                             $scope.lista_ingresos[$scope.insumo.insumo_id] = $scope.ingreso;
@@ -857,6 +860,18 @@
                     Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:'Ocurrió un error al intentar guardar los datos.'});
                 }
             });
+        };
+
+        $scope.abrirListaEntradas = function(){
+            $mdSidenav('lista-entradas-acta').open();
+        };
+
+        $scope.cerrarListaEntradas = function(){
+            $mdSidenav('lista-entradas-acta').close();
+        };
+
+        $scope.generarExcel = function(){
+            window.open(URLS.BASE_API +'/entrada-acta-excel/'+$routeParams.id+'?token='+$localStorage.control_desabasto.access_token);
         };
         
         $scope.menuCerrado = !UsuarioData.obtenerEstadoMenu();
