@@ -1,0 +1,90 @@
+
+<md-dialog aria-label="form insumo" flex ng-cloak>
+  <form>
+
+    <md-toolbar>
+      <div class="md-toolbar-tools">
+        <h2>Salida de Insumos </h2>
+        <span flex></span>
+        <md-button class="md-icon-button" ng-click="cancel()">
+          <md-icon md-svg-icon="close" aria-label="Close dialog"></md-icon>
+        </md-button>
+      </div>
+    </md-toolbar>
+      <md-subheader class="md-primary md-hue-1">
+          <div flex layout="row" layout-wrap>
+
+              <md-input-container flex="none" style="margin-bottom:0px;height:46px;">
+                  <label>Clave</label>
+                  <input value="{{insumo_editado.clave}}" readonly>
+              </md-input-container>
+              <md-input-container flex style="margin-bottom:0px;height:46px;">
+                  <label>Descripción</label>
+                  <input value="{{insumo_editado.descripcion}}" readonly>
+              </md-input-container>
+              <md-input-container flex="none" style="margin-bottom:0px;height:46px;">
+                  <label>Surtido / Total</label>
+                  <input value="{{insumo_editado.surtido_parcial | number}} / {{insumo_editado.cantidad_total | number}}" readonly>
+              </md-input-container>
+              <md-input-container flex="none" style="margin-bottom:0px;height:46px;">
+                  <label>Restante</label>
+                  <input value="{{insumo_editado.cantidad_restante | number}} " readonly>
+              </md-input-container>
+              <md-input-container flex="none" style="margin-bottom:0px;height:46px;">
+                  <label>Inventario</label>
+                  <input value="{{insumo_editado.stock | number}} " readonly>
+              </md-input-container>
+
+          </div>
+      </md-subheader><!--You can use md-no-sticky class-->
+    <md-dialog-content>
+      <md-list layout="column">
+        <md-list-item ng-repeat="clues_insumo in insumo_editado.unidades  track by $index">
+
+          <div flex layout="row" layout-wrap layout-padding>
+            <md-input-container style="margin-bottom:0px;" flex md-is-error="ingreso_lote.validacion.lote">
+              <label>Clues</label>
+              <input ng-model="clues_insumo.clues_unidad" readonly>
+
+            </md-input-container>
+            <md-input-container style="margin-bottom:0px;" flex="50" md-is-error="ingreso_lote.validacion.fecha_caducidad">
+              <label>Unidad</label>
+              <input ng-model="clues_insumo.nombre_unidad">
+
+            </md-input-container>
+            <md-input-container style="margin-bottom:0px;" flex md-is-error="ingreso_lote.validacion.cantidad">
+              <label>Cant. Surtido/Validada</label>
+              <input ng-model="clues_insumo.surtido_validado_unidad" readonly>
+
+            </md-input-container>
+          <md-input-container style="margin-bottom:0px;" flex md-is-error="ingreso_lote.validacion.cantidad">
+              <label>Cantidad</label>
+              <input type="number" id="cantidad_{{$index}}" ng-model="clues_insumo.surtido_salida_unidad" ng-change="recalculaCantidades($index)" ng-keyup="$event.keyCode == 13 ? answer(true) : null"  ng-disabled="(clues_insumo.surtido_parcial_unidad == clues_insumo.cantidad_restante_total_unidad)?true:false">
+              <div class="errors" ng-messages="clues_insumo.validacion.cantidad" md-auto-hide="false">
+                  <div ng-message="required">{{ 'CAMPO_REQUERIDO' | translate }}</div>
+                  <div ng-message="min">La cantidad no debe ser menor que 0</div>
+                  <div ng-message="max">La cantidad de salida no debe reabasar la cantidad validada</div>
+              </div>
+          </md-input-container>
+              <md-input-container style="margin-bottom:0px;" flex md-is-error="ingreso_lote.validacion.cantidad">
+                  <label>Restante</label>
+                  <input type="number" ng-model="clues_insumo.cantidad_restante_unidad" readonly>
+
+              </md-input-container>
+            <div flex="none">
+              <md-icon></md-icon>
+            </div>
+          </div>
+          <md-divider></md-divider>
+        </md-list-item>
+      </md-list>
+      <div class="md-dialog-content" layout="column"></div>
+    </md-dialog-content>
+    <md-dialog-actions layout="row">
+      <span flex></span>
+      <md-button class="md-raised md-primary" ng-click="answer(true)">
+        <md-icon md-svg-icon="check"></md-icon> Aceptar
+      </md-button>
+    </md-dialog-actions>
+  </form>
+</md-dialog>

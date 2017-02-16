@@ -17,6 +17,8 @@
         $scope.filtroTipo = 1;
         $scope.usuario_id = $scope.loggedUser.id;
 
+        
+
         //console.log($localStorage.samm_modulo_requisiciones);
         if(!$localStorage.samm_modulo_requisiciones){
             $localStorage.samm_modulo_requisiciones = {cambios:false};
@@ -165,6 +167,7 @@
                         }
 
                         $scope.totales.total = $scope.totales.subtotal + $scope.totales.iva;
+
                     }
 
                     cuadro_basico_clues = undefined;
@@ -788,6 +791,7 @@
                     };
 
                     $scope.answer = function() {
+
                         if(!$scope.insumo){
                             $scope.validacion.insumo = {'required':true};
                             return false;
@@ -811,6 +815,7 @@
                         }
                         
                         if($scope.index != undefined){
+
                             var insumo_local = $scope.lista_insumos[$scope.index];
 
                             //ACtualizamos el concentrado de insumos
@@ -932,6 +937,7 @@
                         document.querySelector('#autocomplete-insumos').focus();
                         //console.log('--answer^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^');
                         $scope.modulo.cambios = true;
+
                     };
 
                     $scope.calcularTotal = function(){
@@ -1077,7 +1083,7 @@
         });
 
         $scope.cluesAutoCompleteItemChange = function(){
-
+            console.log($scope);
             if ($scope.cluesAutoComplete.clues != null){
                 $scope.clues_seleccionada = $scope.cluesAutoComplete.clues;
 
@@ -1091,15 +1097,15 @@
                     $scope.elementos.por_clues[$scope.clues_seleccionada.clues].requisicion_acta_id = 0;
                 }else{
                     $scope.requisicion_id_unidad = $scope.elementos.por_clues[$scope.clues_seleccionada.clues].requisicion_acta_id;
-                }*/
+                }
+                $scope.lista_insumos = $scope.elementos.por_clues[$scope.clues_seleccionada.clues].insumos;*/
 
             }else{
                 $scope.requisicion_id_unidad = undefined;
                 $scope.clues_seleccionada = undefined;
                 $scope.lista_insumos = $scope.elementos.concentrado;
             }
-            //console.log($scope);
-            //console.log($scope.requisicion_id_unidad);
+
 
             var subtotal = 0;
             var iva = 0;

@@ -1,0 +1,168 @@
+<div layout="row" flex id="modulo-contenedor">
+	
+
+<md-content layout="column" flex>
+	<md-content ng-show="toggleDatosActa" layout="row" flex="none" layout-wrap layout-padding >
+
+        <md-input-container flex="(if(salida.selectedTipoSalida == 1) ? 30: 100)" md-is-error="" style="margin-bottom:0px;">
+            <label>Tipo de Salida</label>
+                <md-select ng-model="salida.selectedTipoSalida">
+                    <md-option ng-value="">Sin tipo de Salida</md-option>
+                    <md-option ng-value="tipoSalida.id" ng-repeat="tipoSalida in tiposalida">{{tipoSalida.descripcion}}</md-option>
+            </md-select>
+        </md-input-container>
+    </md-content>
+    <md-content layout="row" flex="none"  ng-if="(salida.selectedTipoSalida == 1)" layout-padding class="layout-padding layout-row flex">
+
+        <div flex="50" layout="row">
+            <md-autocomplete flex
+                             md-input-id="autocomplete-salidaacta"
+                             md-no-cache="true"
+                             md-selected-item="salidaactaAutoComplete.actas"
+                             md-search-text="salidaactaAutoComplete.searchText"
+                             md-selected-item-change ="salidaactaAutoCompleteItemChange()"
+                             md-items="item in querySearchSalidaActa(salidaactaAutoComplete.searchText)"
+                             md-item-text="item.folio"
+                             md-min-length="0"
+                             placeholder="Buscar ACTA"
+                             md-menu-class="autocomplete-custom-template">
+                <md-item-template>
+                <span class="item-title" ng-class="(item.repetido)?'insumo-repetido':''" >
+                    <div layout="row" layout-padding>
+                        <div flex="none"><span><strong>FOLIO:</strong> {{item.folio}}</span></div>
+                    </div>
+                </span>
+
+                </md-item-template>
+                <md-not-found>
+                    No hay resultados para  "{{salidaactaAutoComplete.searchText}}".
+                </md-not-found>
+            </md-autocomplete>
+
+        </div>
+        <div flex="20" layout="row">
+            <md-button class="md-raised md-accent" ng-click="generarDistribucion($event)" ng-disabled="(salida.distribucion == 1)? false:true">
+                <md-icon md-svg-icon="calculator"></md-icon> Generar Distribución
+            </md-button>
+        </div>
+        <div flex="30" layout="row">
+            <md-input-container style="margin: 0px 0; ">
+                <label>Buscar</label>
+                    <input type="text" id="input_search" ng-model="buscar_insumo" ng-change="fun_buscar_insumo(buscar_insumo)" >
+
+            </md-input-container>
+        </div>
+    </md-content>
+
+	<md-divider></md-divider>
+	<md-subheader flex="none" class="md-primary">
+		<div layout="row">
+
+			<div flex="15" style="text-align:center;">Clave</div>
+			<div flex style="text-align:center;">Descripción del Insumo</div>
+			<div flex="10" style="text-align:center;">Cantidad Surtida / Cantidad Total</div>
+			<div flex="10" style="text-align:center;">Cantidad Salida</div>
+			<div flex="10" style="text-align:center;">Cantidad Restante</div>
+		</div>
+	</md-subheader>
+	<md-divider></md-divider>
+	<md-content flex>
+		<md-list>
+			<md-list-item ng-if="acta.insumos.length == 0">
+		    	<md-subheader class="{{(validacion.requisiciones)?'md-warn':''}}">
+		    		<span ng-hide="validacion.requisiciones">No hay insumos de médicamentos capturados</span>
+					<span ng-show="validacion.requisiciones">Es necesario capturar al menos un insumo</span>
+		    	</md-subheader>
+		    </md-list-item>
+			<md-list-item ng-repeat="insumos in salida.insumos | filter: buscar_insumo" ng-click="editarInsumoSalida($event,insumos)" ng-disabled="(insumos.surtido_parcial == insumos.cantidad_total)? true:false">
+			    <div flex layout="row" ng-style="(insumos.error == 0)?((insumos.cantidad_restante > 0)?{'color':'black','font-weight':'bold'}:(insumos.surtido_parcial == insumos.cantidad_restante)?{'color':'black','font-weight':'bold'}:{'color':'grey'}):{'color':'red','font-weight':'bold'}">
+					<div flex="15" style="text-align:center;">{{insumos.clave}}</div>
+					<div flex style="text-align:center;"><p style="line-height:14px; margin:0px;"><small>{{insumos.descripcion}}</small></p></div>
+					<div flex="10" style="text-align:center;">{{insumos.surtido_parcial }} / {{insumos.cantidad_total }}</div>
+					<div flex="10" style="text-align:center;">{{insumos.surtido_salida }}</div>
+					<div flex="10" style="text-align:center;">{{insumos.cantidad_restante}}</div>
+				</div>
+		    	<md-icon ng-if="(acta.estatus < 2)" md-svg-icon="delete" ng-click="eliminarInsumo(insumo)" aria-label="quitar" class="md-secondary md-hue-3">
+		    	</md-icon>
+				<md-divider></md-divider>
+			</md-list-item>
+		</md-list>
+	</md-content>
+	<md-divider></md-divider>
+	<md-content layout="row" flex="none" layout-wrap>
+
+		<div flex></div>
+
+		<div flex="none" layout="row" style="overflow:hidden;">
+			<md-input-container flex="none" style="margin-bottom:0px;height:35px;">
+                <label>Cantidad Surtida / Total</label>
+				<input value="{{salida.cantidad_surtida }} / {{salida.cantidad_total }}" readonly>
+			</md-input-container>
+			<md-input-container flex="none" style="margin-bottom:0px;height:35px;">
+				<label>Salida</label>
+				<input value="{{salida.cantidad_solicitada }}" readonly>
+			</md-input-container>
+			<md-input-container flex="none" style="margin-bottom:0px;height:35px;">
+				<label>Restante</label>
+				<input value="{{salida.cantidad_restante }}" readonly>
+			</md-input-container>
+		</div>
+	</md-content>
+
+</md-content>
+
+<!--<md-content layout="column" flex="15" class="md-whiteframe-z2">
+	<md-subheader class="md-primary md-hue-1">
+		Totales por tipo:
+	</md-subheader>
+	<md-input-container flex="none" style="margin-bottom:0px; height:35px;">
+		<label>Causes:</label>
+		<input value="$ {{subtotales.causes | number:2}}" readonly>
+	</md-input-container>
+	
+	<md-input-container flex="none" style="margin-bottom:0px; height:35px;">
+		<label>No Causes:</label>
+		<input value="$ {{subtotales.no_causes | number:2}}" readonly>
+	</md-input-container>
+	
+	<md-input-container flex="none" style="margin-bottom:0px; height:35px;">
+		<label>Material de Curación:</label>
+		<input value="$ {{subtotales.material_curacion | number:2}}" readonly>
+	</md-input-container>
+
+	<md-input-container flex="none" style="margin-bottom:0px; height:35px;">
+		<label>Controlados:</label>
+		<input value="$ {{subtotales.controlados | number:2}}" readonly>
+	</md-input-container>
+
+	<md-input-container flex="none" style="margin-bottom:0px; height:35px;">
+		<label>Surfactante Causes:</label>
+		<input value="$ {{subtotales.surfactante_causes | number:2}}" readonly>
+	</md-input-container>
+
+	<md-input-container flex="none" style="margin-bottom:0px; height:35px;">
+		<label>Surfactante No Causes:</label>
+		<input value="$ {{subtotales.surfactante_no_causes | number:2}}" readonly>
+	</md-input-container>
+
+	<md-subheader class="md-primary md-hue-1">
+		Filtrar por tipo:
+	</md-subheader>
+	<md-radio-group ng-model="filtroTipo" class="md-primary md-padding" ng-change="cambiaFiltro(filtroTipo)">
+		<md-radio-button ng-value="1">Todos</md-radio-button>
+		<md-radio-button ng-value="{tipo:1,cause:1,controlado:0,surfactante:0}">Causes</md-radio-button>
+		<md-radio-button ng-value="{tipo:1,cause:0,surfactante:0}">No Causes</md-radio-button>
+		<md-radio-button ng-value="{tipo:2,cause:0}">Material de Curación</md-radio-button>
+		<md-radio-button ng-value="{tipo:1,cause:1,controlado:1,surfactante:0}">Controlados</md-radio-button>
+		<md-radio-button ng-value="{tipo:1,cause:1,surfactante:1}">Surfactante Causes</md-radio-button>
+		<md-radio-button ng-value="{tipo:1,cause:0,surfactante:1}">Surfactante No Causes</md-radio-button>
+	</md-radio-group>
+	<div flex></div>
+	<md-divider></md-divider>
+	<md-input-container flex="none" style="margin-bottom:0px;">
+		<label>Total Insumos</label>
+		<input value="{{(acta.insumos | filter: filtroTipo).length | number}}" readonly>
+	</md-input-container>
+</md-content>-->
+
+</div>

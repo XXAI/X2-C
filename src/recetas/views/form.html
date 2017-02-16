@@ -1,0 +1,212 @@
+<md-sidenav ng-class="(menuCerrado)?'menu-principal-izq':''" layout="column"   class="md-sidenav-left md-whiteframe-z2" md-component-id="left" md-is-locked-open="$mdMedia('gt-sm')"   ng-include="'src/app/views/menu.html'"></md-sidenav>
+<div layout="column" flex id="modulo-nuevo">
+	<md-progress-linear  ng-if="cargando" class="md-accent" style="position:fixed; top:-3px; left:0px; z-index:999"  md-mode="indeterminate"></md-progress-linear>
+	<md-toolbar layout="column" class="md-whiteframe-z2">
+		<div class="md-toolbar-tools">    
+			<md-button hide-gt-sm class="md-icon-button " ng-click="toggleMenu(true)" aria-label="Menu">
+		        <md-icon md-svg-icon="menu" ></md-icon>
+		    </md-button>		
+			<h2  ng-if="imprimir_receta"><span>Folio: {{ folio }}</span></h2>
+			<span flex></span>
+
+			<md-button ng-permiso="permisoGuardar" class="md-accent md-raised" ng-if="captura_receta" hide-xs hide-sm ng-click="crearReceta($event)" ng-disabled="cargando"  aria-label="{{ 'GUARDAR RECETA' | translate }}">
+			  <md-icon md-svg-icon="content-save"></md-icon>
+			  {{ 'GUARDAR RECETA' | translate }}
+			</md-button>
+			<md-button ng-permiso="permisoGuardar" class="md-icon-button md-accent"  ng-if="captura_receta" hide-gt-sm  ng-disabled="cargando" ng-click="crearReceta($event)"  aria-label="{{ 'GUARDAR RECETA' | translate }}">
+			  <md-icon md-svg-icon="content-save"></md-icon>
+			</md-button>
+
+            <md-button ng-permiso="permisoGuardar" class="md-accent md-raised" ng-if="imprimir_receta" hide-xs hide-sm ng-click="imprimirReceta($event)" ng-disabled="cargando"  aria-label="{{ 'IMPRIMIR RECETA' | translate }}">
+                <md-icon md-svg-icon="printer"></md-icon>
+                {{ 'IMPRIMIR RECETA' | translate }}
+            </md-button>
+            <md-button ng-permiso="permisoGuardar" class="md-icon-button md-accent"  ng-if="imprimir_receta" hide-gt-sm  ng-disabled="cargando" ng-click="imprimirReceta($event)"  aria-label="{{ 'IMPRIMIR RECETA' | translate }}">
+                <md-icon md-svg-icon="printer"></md-icon>
+            </md-button>
+
+            <md-button hide-xs hide-sm ng-click="ir('recetas')"   aria-label="{{ 'REGRESAR' | translate }}">
+                <md-icon md-svg-icon="keyboard-backspace"></md-icon>
+                {{ 'REGRESAR' | translate }}
+            </md-button>
+            <md-button class="md-icon-button"  hide-gt-sm  ng-click="ir('recetas')"   aria-label="{{ 'REGRESAR' | translate }}">
+                <md-icon md-svg-icon="keyboard-backspace"></md-icon>
+            </md-button>
+
+
+        </div>
+	</md-toolbar>
+
+
+	<div layout="row" flex id="modulo-contenedor" >
+
+		<div layout="column" flex class="relative" layout-fill role="main" >
+			<md-content layout="row" flex="none" layout-padding>
+                <!--<div flex="20" layout="row">
+                    <md-input-container flex="100" md-is-error="" style="margin-bottom:0px;">
+                        <label>Tipo de Receta</label>
+                        <md-select ng-model="salida.selectedTipoSalida">
+                            <md-option ng-value="">Sin tipo de Receta</md-option>
+                            <md-option ng-value="" ng-repeat="">{{}}</md-option>
+                        </md-select>
+                    </md-input-container>
+                </div>-->
+                <div flex="33" layout="row">
+                    <md-autocomplete flex
+                                     md-input-id="autocomplete-autoriza"
+                                     md-no-cache="true"
+                                     md-selected-item="autorizaAutoComplete.id"
+                                     md-search-text="autorizaAutoComplete.searchText"
+                                     md-selected-item-change =""
+                                     md-items="item in querySearchautoriza(autorizaAutoComplete.searchText, 1)"
+                                     md-item-text="item.autoriza"
+                                     md-min-length="0"
+                                     placeholder="Autoriza"
+                                     md-menu-class="autocomplete-custom-template"
+                                    ng-style="(validacion.autoriza)?{'border':'1px solid red'}:{}">
+                        <md-item-template>
+		            	<span class="item-title">
+		                	<div layout="row" layout-padding>
+                                <div flex="none"><strong><span md-highlight-text="autorizaAutoComplete.searchText"></span></strong> {{item.autoriza}}</div>
+                            </div>
+		            	</span>
+		            	</md-item-template>
+                        <md-not-found>
+                            No hay resultados para  "{{elaboraAutoComplete.searchText}}".
+                        </md-not-found>
+                    </md-autocomplete>
+                    <!--<div>
+                        <div ng-show="validacion.autoriza" class="hint" ng-messages="validacion.autoriza"  style="color:rgb(221,44,0); display: block !important;">
+                            <div ng-message="required"><small>{{ 'CAMPO_REQUERIDO' | translate }}</small></div>
+                        </div>
+                    </div>-->
+                </div>
+                <div flex="33" layout="row">
+                    <md-autocomplete flex="100"
+                                     md-input-id="autocomplete-realiza"
+                                     md-no-cache="true"
+                                     md-selected-item="responsableAutoComplete.id"
+                                     md-search-text="responsableAutoComplete.searchText"
+                                     md-selected-item-change =""
+                                     md-items="item in querySearchresponsable(responsableAutoComplete.searchText, 2)"
+                                     md-item-text="item.realiza"
+                                     md-min-length="0"
+                                     placeholder="Responsable"
+                                     md-menu-class="autocomplete-custom-template"
+                                     ng-style="(validacion.responsable)?{'border':'1px solid red'}:{}">
+                        <md-item-template>
+		            	<span class="item-title">
+		                	<div layout="row" layout-padding>
+                                <div flex="none"><strong><span md-highlight-text="responsableAutoComplete.searchText"></span></strong> {{item.realiza}}</div>
+                            </div>
+		            	</span>
+                        </md-item-template>
+                        <md-not-found>
+                            No hay resultados para  "{{elaboraAutoComplete.searchText}}".
+                        </md-not-found>
+                    </md-autocomplete>
+                    <!--<div ng-show="validacion.responsable" class="hint" ng-messages="validacion.responsable"  style="color:rgb(221,44,0);">
+                        <div ng-message="required"><small>{{ 'CAMPO_REQUERIDO' | translate }}</small></div>
+                    </div>-->
+                </div>
+
+                <div flex="33" layout="row">
+                    <md-autocomplete flex
+                                     md-input-id="autocomplete-recibe"
+                                     md-no-cache="true"
+                                     md-selected-item="recibeAutoComplete.id"
+                                     md-search-text="recibeAutoComplete.searchText"
+                                     md-selected-item-change =""
+                                     md-items="item in querySearchrecibe(recibeAutoComplete.searchText, 3)"
+                                     md-item-text="item.recibe"
+                                     md-min-length="0"
+                                     placeholder="Responsable"
+                                     md-menu-class="autocomplete-custom-template"
+                                     ng-style="(validacion.recibe)?{'border':'1px solid red'}:{}">
+                        <md-item-template>
+		            	<span class="item-title">
+		                	<div layout="row" layout-padding>
+                                <div flex="none"><strong><span md-highlight-text="recibeAutoComplete.searchText"></span></strong> {{item.recibe}}</div>
+                            </div>
+		            	</span>
+                        </md-item-template>
+                        <md-not-found>
+                            No hay resultados para  "{{elaboraAutoComplete.searchText}}".
+                        </md-not-found>
+                    </md-autocomplete>
+
+                    <!--<div ng-show="validacion.recibe" class="hint" ng-messages="validacion.recibe"  style="color:rgb(221,44,0);">
+                        <div ng-message="required"><small>{{ 'CAMPO_REQUERIDO' | translate }}</small></div>
+                    </div>-->
+                </div>
+
+
+			</md-content>
+            <md-content layout="row" flex="none" layout-padding>
+
+                <div flex="100" layout="row">
+                    <md-input-container flex="100" style="margin-bottom:0px;height:40px;">
+                        <label>Diagnostico</label>
+                        <input type="text" ng-model="diagnostico">
+                    </md-input-container>
+                </div>
+            </md-content>
+			<md-divider></md-divider>
+
+			<md-subheader flex="none" class="md-primary">
+				<div layout="row">
+					<div flex="10" flex-md="30" style="text-align:center;">Clave</div>
+					<div flex="40" flex-md="40" style="text-align:center;">Descripción del Insumo</div>
+					<div flex="20" style="text-align:center;" hide show-gt-md>Cantidad / Frecuencia</div>
+					<div flex="10" style="text-align:center;" hide show-gt-md>Días</div>
+					<div flex="20" style="text-align:center;" hide show-gt-md>Unidades</div>
+
+				</div>
+			</md-subheader>
+
+			<md-divider></md-divider>
+
+			<md-virtual-repeat-container style="height:880px;" id="lista-insumos">
+				<md-list>
+					<md-list-item ng-if="lista_insumos.length == 0">
+				    	<md-subheader class="{{(validacion.receta)?'md-warn':''}} md-no-sticky">
+				    		<span ng-show="validacion.receta">Es necesario capturar al menos un insumo</span>
+				    	</md-subheader>
+				    </md-list-item>
+					<md-list-item class="md-2-line paciente-item" md-virtual-repeat="insumo in lista_insumos | filter: filtroTipo" ng-click="(imprimir_receta)?'':editarInsumo($event,insumo)" md-item-size="50">
+						<div flex layout="row" ng-class="(insumo.repetido)?'insumo-repetido':((insumo.cuadro_basico)?'':'insumo-no-cuadro-basico')" ng-style="(!insumos_estatus.nuevos[insumo.id])?((insumos_estatus.editados[insumo.id])?{'font-style':'italic'}:{'color':'black'}):{'font-weight':'bold'}">
+
+							<div flex="10" flex-md="30" style="text-align:center;">{{insumo.clave}}</div>
+							<div flex="40" flex-md="40" style="text-align:center;"><p style="line-height:14px; margin:0px;"><small>{{insumo.descripcion}}</small></p></div>
+							<div flex="20" flex-md="40" style="text-align:center;"><p style="line-height:14px; margin:0px;"><small>{{insumo.cantidad}} / {{insumo.frecuencia}} hrs.</small></p></div>
+							<div flex="10" style="text-align:center;" hide show-gt-md>{{insumo.dias | number}}</div>
+							<div flex="20" style="text-align:center;">{{insumo.unidades}} {{insumo.unidad}}</div>
+						</div>
+				    	<md-icon md-svg-icon="delete" ng-if="!imprimir_receta" ng-click="eliminarInsumo($event, insumo)" aria-label="quitar" class="md-secondary md-hue-3">
+				    	</md-icon>
+						<md-divider></md-divider>
+					</md-list-item>
+				</md-list>
+			</md-virtual-repeat-container>
+
+			<md-divider></md-divider>
+
+			<md-content layout="row" flex="none" layout-wrap>
+				<md-button class="md-raised md-accent" ng-if="captura_receta" ng-click="agregarInsumo($event)">
+					<md-icon md-svg-icon="plus"></md-icon> Agregar Insumo
+				</md-button>
+
+				<!--<div flex></div>
+				<div flex="none" layout="row" style="overflow:hidden;">
+					<md-input-container flex="none" style="margin-bottom:0px;height:35px;">
+						<label>Cantidad de Insumos</label>
+						<input value="{{totales.subtotal | number:2}}" readonly>
+					</md-input-container>
+
+				</div>-->
+			</md-content>
+		</div>
+
+
+	</div>
+</div>
