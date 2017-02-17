@@ -16,9 +16,9 @@
                                 { titulo: 'Solicitudes',                key: '6F5427E97863A', path: '/solicitudes',                 icono: 'file-document'      },
                                 { titulo: 'Requisiciones',              key: '4E4D8E11F6E4A', path: '/requisiciones',               icono: 'file'               },
                                 { titulo: 'Recepcion',                  key: '97728B3AD53DB', path: '/recepcion',                   icono: 'truck'              },
-                                { titulo: 'Recepción sin Pedido',       key: '97728B3AD53DB---', path: '/recepcion-sin-pedido',        icono: 'truck-trailer'      },
-                                { titulo: 'Salidas',                    key: 'D894AC3542EBB', path: '/salidas',                     icono: 'truck-delivery'         },
-                                { titulo: 'Recetas',                    key: 'D894AC3542EBB', path: '/recetas',                     icono: 'file-send'  }
+                                { titulo: 'Recepción sin Pedido',       key: '97728B3AD53DB--', path: '/recepcion-sin-pedido',        icono: 'truck-trailer'      },
+                                { titulo: 'Salidas',                    key: 'D894AC3542EBB--', path: '/salidas',                     icono: 'truck-delivery'         },
+                                { titulo: 'Recetas',                    key: 'D894AC3542EBB--', path: '/recetas',                     icono: 'file-send'  }
                             ]//97728B3AD53DB
                          },
                          { 
