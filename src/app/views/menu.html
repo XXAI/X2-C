@@ -36,7 +36,7 @@
 		  	<md-icon ng-class="{'md-primary': menuSelected == '/dashboard'}" md-svg-icon="view-dashboard">
 		  		<md-tooltip md-direction="right" show-gt-sm>{{'DASHBOARD'|translate}}</md-tooltip>
 		  	</md-icon>
-		    <p ng-show="menuIsOpen" ng-style="menuSelected == '/dashboard' ? { 'font-weight':'bold' }: { 'font-weight': 'inherit' }" translate="DASHBOARD"></p>
+		    <p ng-show="menuIsOpen" ng-style="menuSelected == '/dashboard' ? { 'color':'rgb(33,150,243)' }: { 'font-weight': 'inherit' }" translate="DASHBOARD"></p>
 		</md-list-item>
 
 		<div ng-repeat="grupo in menu">
@@ -46,7 +46,7 @@
 			  	<md-icon ng-class="{'md-primary': menuSelected == item.path}" md-svg-icon="{{ item.icono }}">
 			  		<md-tooltip md-direction="right" show-gt-sm>{{item.titulo}}</md-tooltip>
 			  	</md-icon>
-			    <p ng-show="menuIsOpen" ng-style="menuSelected == item.path ? { 'font-weight':'bold' }: { 'font-weight': 'inherit' }">{{ item.titulo | translate }}</p>
+			    <p ng-show="menuIsOpen" ng-style="menuSelected == item.path ? { 'color':'rgb(33,150,243)' }: { 'font-weight': 'inherit' }">{{ item.titulo | translate }}</p>
 			</md-list-item>
 		</div>
 
@@ -57,7 +57,7 @@
 		  	<md-icon ng-class="{'md-primary': menuSelected == '/acerca-de'}" md-svg-icon="information">
 		  		<md-tooltip md-direction="right" show-gt-sm>{{'ACERCA_DE'|translate}}</md-tooltip>
 		  	</md-icon>
-		    <p ng-show="menuIsOpen" ng-style="menuSelected == '/acerca-de' ? { 'font-weight':'bold' }: { 'font-weight': 'inherit' }" translate="ACERCA_DE"></p>
+		    <p ng-show="menuIsOpen" ng-style="menuSelected == '/acerca-de' ? { 'color':'rgb(33,150,243)' }: { 'font-weight': 'inherit' }" translate="ACERCA_DE"></p>
 		</md-list-item>
 	</md-list>
 </md-content>

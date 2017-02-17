@@ -1,0 +1,43 @@
+<md-dialog aria-label="form insumo" flex ng-cloak>
+  <md-progress-linear  ng-if="cargando" class="md-accent" style="position:fixed; top:-3px; left:0px; z-index:999"  md-mode="indeterminate"></md-progress-linear>
+  <form>
+    <md-subheader class="md-accent md-hue-1">
+      <strong>Finalizar entrega</strong><br>
+    </md-subheader><!--You can use md-no-sticky class-->
+    <md-subheader class="md-accent">
+      La entrega se cerrara  y ya no podra editarse.
+    </md-subheader><!--You can use md-no-sticky class-->
+    <md-divider></md-divider>
+    <md-dialog-content id="modulo-dialogo">
+      <div class="md-dialog-content" layout="row" layout-wrap>
+        <md-input-container flex="50" md-is-error="validacion.nombre_recibe" class="md-block" style="margin-bottom:0px;">
+          <label>Nombre de Quien Recibe</label>
+          <input ng-model="recepcion.nombre_recibe">
+          <div class="errors" ng-messages="validacion.nombre_recibe" >
+                  <div ng-message="required">{{ 'CAMPO_REQUERIDO' | translate }}</div>
+                </div>
+        </md-input-container>
+        <md-input-container flex="50" md-is-error="validacion.nombre_entrega" class="md-block" style="margin-bottom:0px;">
+          <label>Nombre de Quien Entrega</label>
+          <input ng-model="recepcion.nombre_entrega">
+          <div class="errors" ng-messages="validacion.nombre_entrega" >
+                  <div ng-message="required">{{ 'CAMPO_REQUERIDO' | translate }}</div>
+                </div>
+        </md-input-container>
+        <md-input-container flex="100">
+          <label>Observaciones</label>
+          <textarea ng-model="recepcion.observaciones"></textarea>
+        </md-input-container>
+      </div>
+    </md-dialog-content>
+    <md-dialog-actions layout="row">
+      <span flex></span>
+      <md-button class="md-raised" ng-click="cancel()" ng-disabled="cargando">
+        <md-icon md-svg-icon="close"></md-icon> Cancelar
+      </md-button>
+      <md-button class="md-raised md-accent" ng-click="answer()" ng-disabled="cargando">
+        <md-icon md-svg-icon="check"></md-icon> Finalizar
+      </md-button>
+    </md-dialog-actions>
+  </form>
+</md-dialog>

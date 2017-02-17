@@ -1,0 +1,37 @@
+<md-dialog aria-label="form acta" flex ng-cloak id="fomulario-dialogo-clonar-acta">
+  <form>
+    <md-toolbar>
+      <div class="md-toolbar-tools">
+        <h2>Cancelar Acta</h2>
+        <span flex></span>
+        <md-button class="md-icon-button" ng-click="cancel()" ng-disabled="cargando">
+          <md-icon md-svg-icon="close" aria-label="Close dialog"></md-icon>
+        </md-button>
+      </div>
+    </md-toolbar>
+    <md-divider></md-divider>
+    <md-dialog-content>
+      <div class="md-dialog-content">
+        <md-progress-linear  ng-if="cargando" class="md-accent" style="position:fixed; top:-3px; left:0px; z-index:999"  md-mode="indeterminate"></md-progress-linear>
+        <div layout="row" flex="none" layout-wrap>
+          <md-input-container flex="100" md-is-error="validacion.motivos_cancelacion" style="margin-bottom:0px;">
+            <label>Motivos de la cancelación</label>
+            <input ng-model="acta.motivos_cancelacion">
+            <div class="errors" ng-messages="validacion.motivos_cancelacion" >
+              <div ng-message="required">{{ 'CAMPO_REQUERIDO' | translate }}</div>
+            </div>
+          </md-input-container>
+        </div>
+      </div>
+    </md-dialog-content>
+    <md-dialog-actions layout="row">
+      <span flex></span>
+      <md-button class="md-raised md-warn" ng-disabled="cargando" ng-click="answer()" style="margin-right:20px;">
+        <md-icon md-svg-icon="folder-remove"></md-icon> Cancelar Acta
+      </md-button>
+      <md-button class="md-raised" ng-disabled="cargando" ng-click="cancel()" style="margin-right:20px;">
+        Cerrar
+      </md-button>
+    </md-dialog-actions>
+  </form>
+</md-dialog>
