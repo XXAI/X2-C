@@ -7,15 +7,15 @@
 		        <md-icon md-svg-icon="menu" ></md-icon>
 		    </md-button>		
 			<h2>
-			  <span>Recepción: {{acta.folio}} </span>
+			  <span>Recepción sin Pedido </span>
 			</h2>
 			
 			<span flex></span>
-			<md-button hide-xs hide-sm ng-click="ir('recepcion')"   aria-label="{{ 'REGRESAR' | translate }}">
+			<md-button hide-xs hide-sm ng-click="ir('recepcion-sin-pedido')"   aria-label="{{ 'REGRESAR' | translate }}">
 			  <md-icon md-svg-icon="keyboard-backspace"></md-icon>
 			  {{ 'REGRESAR' | translate }}
 			</md-button>   
-			<md-button class="md-icon-button"  hide-gt-sm  ng-click="ir('recepcion')"   aria-label="{{ 'REGRESAR' | translate }}">
+			<md-button class="md-icon-button"  hide-gt-sm  ng-click="ir('recepcion-sin-pedido')"   aria-label="{{ 'REGRESAR' | translate }}">
 			  <md-icon md-svg-icon="keyboard-backspace"></md-icon>
 			</md-button>
 
@@ -48,80 +48,17 @@
 			<md-button class="md-icon-button" ng-permiso="permisoRecibir" hide-gt-sm  ng-if="(recepcion.estatus == 1)" ng-disabled="(cargando || !recepcionIniciada)" ng-click="guardarEntrega($event)"  aria-label="{{ 'GUARDAR' | translate }}">
 			  <md-icon md-svg-icon="content-save"></md-icon>
 			</md-button>
-
-			<md-menu md-position-mode="target-right target" >
-	          <md-button aria-label="Open demo menu" class="md-icon-button" ng-disabled="(cargando || !recepcionIniciada)" ng-click="$mdOpenMenu($event)">
-	            <md-icon md-menu-origin md-svg-icon="printer"></md-icon>
-	          </md-button>
-	          <md-menu-content width="4" >
-	            <md-menu-item ng-if="(recepcion.estatus >= 2)">
-		            <md-button ng-click="imprimirEntrega(recepcion.id)" ng-disabled="(recepcion.estatus < 2)">
-		                <div layout="row">
-		                    <p flex>Recepción actual: {{recepcion.fecha_recibe | date:'yyyy-MM-dd'}}</p>
-		                    <md-icon md-menu-align-target md-svg-icon="file" style="margin: auto 3px auto 0;"></md-icon>
-		                </div>
-		            </md-button>
-	            </md-menu-item>
-	            <md-menu-item ng-if="(reporte_imprimir && recepcion.estatus < 2)">
-	            	<md-button ng-click="imprimirEntrega(reporte_imprimir.id)">
-		                <div layout="row">
-		                	<p flex>Recepción previa: {{reporte_imprimir.fecha_recibe | date:'yyyy-MM-dd'}}</p>
-		                    <md-icon md-menu-align-target md-svg-icon="file" style="margin: auto 3px auto 0;"></md-icon>
-		                </div>
-		            </md-button>
-	            </md-menu-item>
-	            <md-menu-item ng-if="(!reporte_imprimir && recepcion.estatus == 1)">
-	            	<md-button ng-click="imprimirEntrega(reporte_imprimir.id)" ng-disabled="true">
-	            		Sin Recepciones
-	            	</md-button>
-	            </md-menu-item>
-	          </md-menu-content>
-	        </md-menu>
-
-	        <md-button class="md-icon-button" ng-disabled="cargando" ng-click="generarExcel()"  aria-label="{{ 'excel' | translate }}">
-			  <md-icon md-svg-icon="file-excel"></md-icon>
-			</md-button>
-
-	        <md-button class="md-icon-button" ng-click="abrirListaEntradas()"  ng-disabled="cargando" aria-label="ver entradas">
-				<md-icon md-svg-icon="truck-delivery"></md-icon>
-			</md-button>
 		</div>
 	</md-toolbar>
-
-	<md-sidenav class="md-sidenav-right md-whiteframe-z2" md-component-id="lista-entradas-acta">
-		<div layout="column" class="relative" layout-fill role="main">
-			<md-toolbar class="md-theme-light">
-				<h1 class="md-toolbar-tools">Lista de Entradas<div flex></div><md-button class="md-icon-button" aria-label="buscar" ng-click="cerrarListaEntradas()" >
-				  <md-icon md-svg-icon="close"></md-icon>
-				</md-button></h1>
-			</md-toolbar>
-			<md-content>
-				<md-list layout="column">
-		      		<md-list-item class="md-3-line paciente-item" ng-click="imprimirEntrega(entrega.id)" ng-repeat="entrega in lista_entregas_imprimir">
-				      	<div class="md-list-item-text">
-				        	<h3>
-				        		<strong>Recepción:</strong> {{entrega.fecha_recibe | date:'yyyy-MM-dd'}} {{entrega.hora_recibe_date | date:'HH:mm'}}
-				        	</h3>
-				        	<p>
-				        		{{entrega.proveedor_nombre}}
-				        	</p>
-				        </div>
-		      		</md-list-item>
-				</md-list>
-			</md-content>
-		</div>
-	</md-sidenav>
-
-
 	<md-content ng-show="toggleDatosActa" layout="row" flex="none" layout-wrap layout-padding style="overflow:visible;">
 		<md-input-container flex="60" class="md-block"  md-is-error="validacion.proveedor_id" style="margin-bottom:0px;" ng-disabled="(acta.estatus != 4 || cargando)">
 			<label>Proveedor</label>
-			<md-select ng-model="aplicar_proveedor.id" aria-label="proveedor general" ng-change="cambiarProveedor()">
+			<md-select ng-model="aplicar_proveedor.id" aria-label="proveedor general" ng-change="cambiarProveedor()" ng-disabled="cargando">
 				<md-option ng-value="">
 					Sin Proveedor
 				</md-option>
 				<md-option ng-repeat="proveedor in proveedores" ng-value="proveedor.id">
-					{{(entregas_guardadas[proveedor.id])?'* ':''}}{{proveedor.nombre}} [ Ultima Recepción: {{((entregas_imprimir[proveedor.id])?(entregas_imprimir[proveedor.id].fecha_recibe | date:'dd/MM/yyyy') + ' | ' + (entregas_imprimir[proveedor.id].porcentaje_cantidad | number:2) + ' % completado':'Ninguna')}} ]
+					{{proveedor.nombre}}
 				</md-option>
 			</md-select>
 			<div class="errors" ng-messages="validacion.proveedor_id" >
@@ -147,19 +84,19 @@
 	<md-divider></md-divider>
 
 	<md-content layout="row" flex="none">
-	    <md-input-container md-no-float flex="50" class="md-block" style="margin-bottom:0px;">
+	    <md-input-container md-no-float flex class="md-block" style="margin-bottom:0px;">
 	    	<md-icon md-svg-icon="magnify"></md-icon>
-	    	<input ng-model="filtro_insumos.busqueda" placeholder="Buscar" ng-keyup="$event.keyCode == 13 ? cambiar_filtro_insumos() : null">
+	    	<input ng-model="filtro_insumos.busqueda" placeholder="Filtrar" ng-keyup="$event.keyCode == 13 ? cambiar_filtro_insumos() : null">
 	    </md-input-container>
 	    <md-input-container flex="30" style="margin-bottom:0px;">
 	    	<md-select aria-label="filtro-tipo-requisicion" ng-model="filtro_insumos.tipo_insumo" ng-model-options="{trackBy: '$value.clave'}" ng-change="cambiar_filtro_insumos()">
 	    		<md-option ng-value="tipo" ng-repeat="tipo in tipos_requisiciones">{{ tipo.descripcion }}</md-option>
 	    	</md-select>
 	    </md-input-container>
-	    <md-input-container flex="20">
-			<md-checkbox ng-change="cambiar_filtro_insumos()" ng-model="filtro_insumos.ocultar_completos" aria-label="Checkbox 1">
-				Ocultar completos
-			</md-checkbox>
+	    <md-input-container flex="none" style="margin-bottom:0px;margin-top:0px;">
+		    <md-button class="md-raised md-accent" ng-click="agregarInsumo($event)" ng-if="(recepcion.estatus < 2)" ng-disabled="(cargando || !recepcionIniciada)">
+				<md-icon md-svg-icon="plus"></md-icon> Agregar Insumo
+			</md-button>
 	    </md-input-container>
 	</md-content>
 
@@ -169,7 +106,7 @@
 		<div layout="row" layout-padding style="font-size: 14px;font-weight: 500;line-height: 1em;color: rgb(33,150,243);">
 			<div flex="15" style="text-align:center;padding-left:0px;padding-right:0px;">Clave</div>
 			<div flex style="text-align:center;padding-left:0px;padding-right:0px;">Descripción</div>
-			<div flex="25" style="text-align:center;padding-left:0px;padding-right:0px;">Cantidad TTotal</div>
+			<div flex="25" style="text-align:center;padding-left:0px;padding-right:0px;">Cantidad Total</div>
 			<div flex="10" style="text-align:center;padding-left:0px;padding-right:0px;">Recibido</div>
 			<div flex="10" style="text-align:center;padding-left:0px;padding-right:0px;">Restante</div>
 		</div>

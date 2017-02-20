@@ -1,0 +1,214 @@
+<md-sidenav ng-class="(menuCerrado)?'menu-principal-izq':''" layout="column"   class="md-sidenav-left md-whiteframe-z2" md-component-id="left" md-is-locked-open="$mdMedia('gt-sm')"   ng-include="'src/app/views/menu.html'"></md-sidenav>
+
+<div layout="column" flex id="modulo-nuevo">
+	<md-progress-linear  ng-if="cargando" class="md-accent" style="position:fixed; top:-3px; left:0px; z-index:999"  md-mode="indeterminate"></md-progress-linear>
+	<md-toolbar  id="modulo-contenedor" layout="column" class="md-whiteframe-z2">
+		<div class="md-toolbar-tools">    
+			<md-button hide-gt-sm class="md-icon-button " ng-click="toggleMenu(true)" aria-label="Menu">
+		        <md-icon md-svg-icon="menu" ></md-icon>
+		    </md-button>		
+			<h2>
+			  <span>Recepción sin Pedido </span>
+			</h2>
+			
+			<span flex></span>
+			<md-button hide-xs hide-sm ng-click="ir('recepcion-sin-pedido')"   aria-label="{{ 'REGRESAR' | translate }}">
+			  <md-icon md-svg-icon="keyboard-backspace"></md-icon>
+			  {{ 'REGRESAR' | translate }}
+			</md-button>   
+			<md-button class="md-icon-button"  hide-gt-sm  ng-click="ir('recepcion-sin-pedido')"   aria-label="{{ 'REGRESAR' | translate }}">
+			  <md-icon md-svg-icon="keyboard-backspace"></md-icon>
+			</md-button>
+
+			<md-button class="md-icon-button" ng-click="toggleDatosActa=!toggleDatosActa"  ng-disabled="cargando" aria-label="Toggle Datos Acta">
+				<md-icon md-svg-icon="{{(toggleDatosActa)?'expand-panel-off':'expand-panel-on'}}"></md-icon>
+			</md-button>
+
+			<md-icon md-svg-icon="dots-vertical" style="color: #005DA7;"></md-icon>
+			
+			<md-button ng-if="(recepcion.estatus == 1)" ng-permiso="permisoRecibir" class="md-accent md-raised" hide-xs hide-sm ng-click="finalizarEntrega($event)" ng-disabled="(cargando || !recepcionIniciada)"  aria-label="{{ 'FINALIZAR' | translate }}">
+			  <md-icon md-svg-icon="check"></md-icon>
+			  {{ 'FINALIZAR' | translate }}
+			</md-button>
+			<md-button class="md-icon-button md-accent" ng-permiso="permisoRecibir" hide-gt-sm  ng-if="(recepcion.estatus == 1)" ng-disabled="(cargando || !recepcionIniciada)" ng-click="finalizarEntrega($event)"  aria-label="{{ 'FINALIZAR' | translate }}">
+			  <md-icon md-svg-icon="check"></md-icon>
+			</md-button>
+
+			<md-button ng-if="(recepcion.estatus == 2)" hide-xs hide-sm ng-click="sincronizar()" class="md-raised md-accent" ng-disabled="cargando"  aria-label="{{ 'ENVIAR' | translate }}">
+			  <md-icon md-svg-icon="send"></md-icon>
+			  {{ 'ENVIAR' | translate }}
+			</md-button>		 
+			<md-button ng-if="(recepcion.estatus == 2)" class="md-icon-button md-accent"  hide-gt-sm ng-disabled="cargando" ng-click="sincronizar()"  aria-label="{{ 'ENVIAR' | translate }}">
+			  <md-icon md-svg-icon="send"></md-icon>
+			</md-button>
+
+			<md-button ng-if="(recepcion.estatus == 1)" ng-permiso="permisoRecibir" hide-xs hide-sm ng-click="guardarEntrega($event)" ng-disabled="(cargando || !recepcionIniciada)"  aria-label="{{ 'GUARDAR' | translate }}">
+			  <md-icon md-svg-icon="content-save"></md-icon>
+			  {{ 'GUARDAR' | translate }}
+			</md-button>
+			<md-button class="md-icon-button" ng-permiso="permisoRecibir" hide-gt-sm  ng-if="(recepcion.estatus == 1)" ng-disabled="(cargando || !recepcionIniciada)" ng-click="guardarEntrega($event)"  aria-label="{{ 'GUARDAR' | translate }}">
+			  <md-icon md-svg-icon="content-save"></md-icon>
+			</md-button>
+		</div>
+	</md-toolbar>
+	<div layout="row" flex id="modulo-contenedor">
+		<div layout="column" flex class="relative" layout-fill role="main" >
+			<md-content ng-show="toggleDatosActa" layout="row" flex="none" layout-wrap layout-padding >
+				<md-input-container flex="60" class="md-block"  md-is-error="validacion.proveedor_id" style="margin-bottom:0px;" ng-disabled="(acta.estatus != 4 || cargando)">
+					<label>Proveedor</label>
+					<md-select ng-model="aplicar_proveedor.id" aria-label="proveedor general" ng-change="cambiarProveedor()" ng-disabled="cargando">
+						<md-option ng-value="">
+							Sin Proveedor
+						</md-option>
+						<md-option ng-repeat="proveedor in proveedores" ng-value="proveedor.id">
+							{{proveedor.nombre}}
+						</md-option>
+					</md-select>
+					<div class="errors" ng-messages="validacion.proveedor_id" >
+		              <div ng-message="required">{{ 'CAMPO_REQUERIDO' | translate }}</div>
+		            </div>
+				</md-input-container>
+				<md-input-container flex="20" md-is-error="validacion.fecha_recibe" style="margin-bottom:0px;">
+					<label>Fecha de Recepción</label>
+					<input type="date" ng-model="recepcion.fecha_recibe">
+					<div class="errors" ng-messages="validacion.fecha_recibe" >
+		              <div ng-message="required">{{ 'CAMPO_REQUERIDO' | translate }}</div>
+		            </div>
+				</md-input-container>
+				<md-input-container flex="20" md-is-error="validacion.hora_recibe" style="margin-bottom:0px;">
+					<label>Hora de Recepción</label>
+					<input type="time" ng-model="recepcion.hora_recibe_date">
+					<div class="errors" ng-messages="validacion.hora_recibe" >
+		              <div ng-message="required">{{ 'CAMPO_REQUERIDO' | translate }}</div>
+		            </div>
+				</md-input-container>
+			</md-content>
+
+			<md-divider></md-divider>
+
+			<md-subheader flex="none" class="md-primary">
+				<div layout="row">
+					<div flex="15" flex-md="30" style="text-align:center;">Clave</div>
+					<div flex="40" flex-md="45" style="text-align:center;">Descripción del Insumo</div>
+					<div flex="15" style="text-align:center;" >Inventario</div>
+					<div flex="10" style="text-align:center;" hide show-gt-md>Precio Unitario</div>
+					<div flex="10" style="text-align:center;" hide show-gt-md>Cantidad</div>
+					<div flex="20" style="text-align:center;">Importe</div>
+				</div>
+			</md-subheader>
+
+			<md-divider></md-divider>
+
+			<md-virtual-repeat-container style="height:880px;" id="lista-insumos">
+				<md-list>
+					<md-list-item ng-if="recepcion.insumos.length == 0">
+				    	<md-subheader class="{{(validacion.requisiciones)?'md-warn':''}}">
+				    		<span ng-hide="validacion.requisiciones">No hay insumos de médicamentos capturados</span>
+							<span ng-show="validacion.requisiciones">Es necesario capturar al menos un insumo</span>
+				    	</md-subheader>
+				    </md-list-item>
+					<md-list-item class="md-2-line paciente-item" md-virtual-repeat="insumo in recepcion.insumos | filter: filtroTipo" ng-click="editarInsumo($event,insumo)" md-item-size="50">
+						<div flex layout="row" ng-class="(insumo.repetido)?'insumo-repetido':((insumo.cuadro_basico)?'':'insumo-no-cuadro-basico')" ng-style="(insumo.requisicion_id)?((insumo.editado)?{'font-style':'italic'}:{'color':'black'}):{'font-weight':'bold'}">
+							<div flex="15" flex-md="30" style="text-align:center;">{{insumo.clave}}</div>
+							<div flex="40" flex-md="45" style="text-align:center;">
+								<p style="line-height:14px; margin:0px;">
+									<small>{{insumo.descripcion}}</small>
+								</p>
+							</div>
+							<div flex="15" style="text-align:center;">
+								<div ng-if="insumo.inventario_actual">{{insumo.inventario_actual.cantidad}}<br><small>{{insumo.inventario_actual.fecha | date:'dd/MM/yyyy'}}</small></div>
+								<p ng-if="!insumo.inventario_actual" style="line-height:14px; margin:0px;"><small>-</small></p>
+							</div>
+							<div flex="10" style="text-align:center;" hide show-gt-md>$ {{insumo.precio | number:2}}</div>
+							<div flex="10" style="text-align:center;" hide show-gt-md>{{insumo.cantidad | number}}</div>
+							<div flex="20" style="text-align:center;">$ {{insumo.total | number:2}}</div>
+						</div>
+				    	<md-icon ng-if="(recepcion.estatus < 2)" md-svg-icon="delete" ng-click="eliminarInsumo(insumo)" aria-label="quitar" class="md-secondary md-hue-3">
+				    	</md-icon>
+						<md-divider></md-divider>
+					</md-list-item>
+				</md-list>
+			</md-virtual-repeat-container>
+
+			<md-divider></md-divider>
+
+			<md-content layout="row" flex="none" layout-wrap>
+				<md-button class="md-raised md-accent" ng-click="agregarInsumo($event)" ng-if="(recepcion.estatus < 2)" ng-disabled="(cargando || !recepcionIniciada)">
+					<md-icon md-svg-icon="plus"></md-icon> Agregar Insumo
+				</md-button>
+				<div flex="none" ng-if="(recepcion.estatus > 1)" style="overflow:hidden;">
+				</div>
+				<div flex></div>
+				<div flex="none" layout="row" style="overflow:hidden;">
+					<md-input-container flex="none" style="margin-bottom:0px;height:35px;">
+						<label>Subtotal</label>
+						<input value="$ {{recepcion.subtotal | number:2}}" readonly>
+					</md-input-container>
+					<md-input-container flex="none" style="margin-bottom:0px;height:35px;">
+						<label>I.V.A.</label>
+						<input value="$ {{recepcion.iva | number:2}}" readonly>
+					</md-input-container>
+					<md-input-container flex="none" style="margin-bottom:0px;height:35px;">
+						<label>Total</label>
+						<input value="$ {{recepcion.total | number:2}}" readonly>
+					</md-input-container>
+				</div>
+			</md-content>
+		</div>
+
+		<div flex="none" flex-md="20" layout="column" class="md-whiteframe-z2" style="overflow:hidden;">
+			<md-content layout="column" flex>
+				<md-subheader class="md-primary md-hue-1">
+					Totales por tipo:
+				</md-subheader>
+				<md-input-container flex="none" style="margin-bottom:0px; height:35px;">
+					<label>Causes:</label>
+					<input value="$ {{subtotales.causes | number:2}}" readonly>
+				</md-input-container>
+				
+				<md-input-container flex="none" style="margin-bottom:0px; height:35px;">
+					<label>No Causes:</label>
+					<input value="$ {{subtotales.no_causes | number:2}}" readonly>
+				</md-input-container>
+				
+				<md-input-container flex="none" style="margin-bottom:0px; height:35px;">
+					<label>Material de Curación:</label>
+					<input value="$ {{subtotales.material_curacion | number:2}}" readonly>
+				</md-input-container>
+
+				<md-input-container flex="none" style="margin-bottom:0px; height:35px;">
+					<label>Controlados:</label>
+					<input value="$ {{subtotales.controlados | number:2}}" readonly>
+				</md-input-container>
+
+				<md-input-container flex="none" style="margin-bottom:0px; height:35px;">
+					<label>Surfactante Causes:</label>
+					<input value="$ {{subtotales.surfactante_causes | number:2}}" readonly>
+				</md-input-container>
+
+				<md-input-container flex="none" style="margin-bottom:0px; height:35px;">
+					<label>Surfactante No Causes:</label>
+					<input value="$ {{subtotales.surfactante_no_causes | number:2}}" readonly>
+				</md-input-container>
+
+				<md-subheader class="md-primary md-hue-1">
+					Filtrar por tipo:
+				</md-subheader>
+				<md-radio-group ng-model="filtroTipo" class="md-primary md-padding" ng-change="cambiaFiltro(filtroTipo)">
+					<md-radio-button ng-value="1">Todos</md-radio-button>
+					<md-radio-button ng-value="{tipo:1,cause:1,controlado:0,surfactante:0}">Causes</md-radio-button>
+					<md-radio-button ng-value="{tipo:1,cause:0,surfactante:0}">No Causes</md-radio-button>
+					<md-radio-button ng-value="{tipo:2,cause:0}">Material de Curación</md-radio-button>
+					<md-radio-button ng-value="{tipo:1,cause:1,controlado:1,surfactante:0}">Controlados</md-radio-button>
+					<md-radio-button ng-value="{tipo:1,cause:1,surfactante:1}">Surfactante Causes</md-radio-button>
+					<md-radio-button ng-value="{tipo:1,cause:0,surfactante:1}">Surfactante No Causes</md-radio-button>
+				</md-radio-group>
+			</md-content>
+			<md-divider></md-divider>
+			<md-input-container flex="none" style="margin-bottom:0px;height:35px;">
+				<label>Total Insumos</label>
+				<input value="{{(recepcion.insumos | filter: filtroTipo).length | number}}" readonly>
+			</md-input-container>
+		</div>
+	</div>
+</div>

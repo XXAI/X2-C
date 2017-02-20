@@ -1,0 +1,147 @@
+<md-dialog aria-label="form insumo" flex ng-cloak>
+  <form>
+    <md-toolbar>
+      <div class="md-toolbar-tools">
+        <h2>Insumo</h2>
+        <span flex></span>
+        <md-button class="md-icon-button" ng-click="cancel()">
+          <md-icon md-svg-icon="close" aria-label="Close dialog"></md-icon>
+        </md-button>
+      </div>
+    </md-toolbar>
+      <!--div class="md-dialog-content">
+        <md-progress-linear  ng-if="cargando" class="md-accent" style="position:fixed; top:-3px; left:0px; z-index:999"  md-mode="indeterminate"></md-progress-linear>
+      </div-->
+    <md-subheader class="md-primary md-hue-1">
+      <div flex layout="row" layout-wrap>
+        <md-autocomplete flex="100"
+          ng-disabled="cargando"
+          md-input-id="autocomplete-insumos"
+          md-autofocus="!insumo"
+          md-no-cache="true"
+          md-selected-item="insumoAutoComplete.insumo"
+          md-search-text="insumoAutoComplete.searchText"
+          md-selected-item-change ="insumoAutoCompleteItemChange()"
+          md-items="item in querySearchInsumo(insumoAutoComplete.searchText)"
+          md-item-text="item.clave"
+          md-min-length="1"
+          placeholder="Buscar insumo"
+          md-menu-class="autocomplete-custom-template">
+          <md-item-template>
+            <span class="item-title">
+              <div layout="row" layout-padding ng-class="(item.cuadro_basico)?'':'insumo-no-cuadro-basico'" >
+                <div flex="none"><strong>Lote:</strong> {{item.lote}}</div>
+                <div flex></div>
+                <div flex="none"><span><strong>Clave:</strong> {{item.clave}}</span></div>
+                <div flex></div>
+                <div flex="none"><strong>Tipo:</strong> {{(item.tipo == 1 && item.cause == 1)?'Causes':((item.tipo == 2)?'Material de Curación':'No Causes')}}</div>
+                <div flex></div>
+                <div flex="none"><span><strong>Precio: </strong>$ {{item.precio}}</span></div>
+              </div>
+              <div ng-if="item.inventario_actual" layout="row" layout-padding ng-class="(item.cuadro_basico)?'':'insumo-no-cuadro-basico'" >
+                <div flex="none"><strong>Cantidad:</strong> {{item.inventario_actual.cantidad}}</div>
+                <div flex></div>
+                <div flex="none"><span><strong>Mes:</strong> {{item.inventario_actual.mes}} {{item.inventario_actual.anio}}</span></div>
+                <div flex></div>
+                <div flex="none"><span><strong>Inventario: </strong> {{item.inventario_actual.fecha | date:'dd/MM/yyyy HH:MM'}} hrs.</span></div>
+              </div>
+            </span>
+            <span class="item-metadata md-padding" ng-class="(item.cuadro_basico)?'':'insumo-no-cuadro-basico'" >
+              <span class="item-metastat">
+                <span md-highlight-text="insumoAutoComplete.searchText" >{{item.descripcion}}</span>
+              </span>
+            </span>
+          </md-item-template>
+          <md-not-found>
+            No hay resultados para  "{{insumoAutoComplete.searchText}}".
+          </md-not-found>
+        </md-autocomplete>
+        <div ng-show="validacion.insumo" class="hint" ng-messages="validacion.insumo"  style="color:rgb(221,44,0);">
+          <div ng-message="required"><small>{{ 'CAMPO_REQUERIDO' | translate }}</small></div>
+          <div ng-message="duplicate"><small>El insumo ya se encuentra en la lista</small></div>
+        </div>
+      </div>
+      <br>
+      <div flex layout="row" layout-wrap ng-show="(insumo)" ng-class="(insumo.cuadro_basico)?'':'insumo-no-cuadro-basico'">
+        <div flex="100">
+          {{insumo.descripcion}}
+        </div>
+        <md-input-container flex="none" style="margin-bottom:0px;height:46px;">
+          <label>Lote</label>
+          <input value="{{insumo.lote}}" readonly>
+        </md-input-container>
+        <md-input-container flex style="margin-bottom:0px;height:46px;">
+          <label>Unidad</label>
+          <input value="{{insumo.unidad}}" readonly>
+        </md-input-container>
+        <md-input-container flex="none" style="margin-bottom:0px;height:46px;">
+          <label>Precio</label>
+          <input value="$ {{insumo.precio | number:2}}" readonly>
+        </md-input-container>
+        <md-input-container flex="none" style="margin-bottom:0px;height:46px;">
+          <label>Cantidad</label>
+          <input value="{{insumo.cantidad | number}}" readonly>
+        </md-input-container>
+        <md-input-container flex="none" style="margin-bottom:0px;height:46px;">
+          <label>Total</label>
+          <input value="$ {{insumo.total | number:2}}" readonly>
+        </md-input-container>
+        <div flex="100" layout="row" ng-if="insumo.inventario_actual">
+          <div flex="none"><strong>Cantidad:</strong> {{insumo.inventario_actual.cantidad}}</div>
+          <div flex></div>
+          <div flex="none"><span><strong>Mes:</strong> {{insumo.inventario_actual.mes}} {{insumo.inventario_actual.anio}}</span></div>
+          <div flex></div>
+          <div flex="none"><span><strong>Inventario: </strong> {{insumo.inventario_actual.fecha | date:'dd/MM/yyyy HH:MM'}} hrs.</span></div>
+        </div>
+      </div>
+    </md-subheader><!--You can use md-no-sticky class-->
+    <md-dialog-content>
+      <md-list layout="column" ng-show="(insumo)">
+        <md-list-item ng-repeat="ingreso_lote in insumo.lotes track by $index">
+          <div flex layout="row" layout-wrap layout-padding>
+            <md-input-container style="margin-bottom:0px;" flex md-is-error="ingreso_lote.validacion.cantidad">
+              <label>Cantidad</label>
+              <input type="number" id="ingreso_cantidad_{{$index}}" ng-model="ingreso_lote.cantidad" ng-change="actualizarCantidad()" ng-keyup="$event.keyCode == 13 ? answer() : actualizarCantidad()">
+              <div class="errors" ng-messages="ingreso_lote.validacion.cantidad" md-auto-hide="false">
+                <div ng-message="required">{{ 'CAMPO_REQUERIDO' | translate }}</div>
+                <div ng-message="min">La cantidad no debe ser menor que 0</div>
+              </div>
+            </md-input-container>
+            <md-input-container style="margin-bottom:0px;" flex md-is-error="ingreso_lote.validacion.lote">
+              <label>Lote</label>
+              <input ng-model="ingreso_lote.lote">
+              <div class="errors" ng-messages="ingreso_lote.validacion.lote" >
+                <div ng-message="required">{{ 'CAMPO_REQUERIDO' | translate }}</div>
+              </div>
+            </md-input-container>
+            <md-input-container style="margin-bottom:0px;" flex md-is-error="ingreso_lote.validacion.fecha_caducidad">
+              <label>Fecha de Caducidad</label>
+              <input type="date" ng-model="ingreso_lote.fecha_caducidad">
+              <div class="errors" ng-messages="ingreso_lote.validacion.fecha_caducidad" md-auto-hide="false">
+                <div ng-message="required">{{ 'CAMPO_REQUERIDO' | translate }}</div>
+                <div ng-message="min">El medicamento ya está caducado</div>
+                <div ng-message="rojo">La caducidad debe ser mayor a 3 meses de la recepción</div>
+                <div ng-message="amarillo">El medicamento caducará dentro de 3 a 6 meses</div>
+              </div>
+            </md-input-container>
+            <div flex="none">
+              <md-icon></md-icon>
+            </div>
+          </div>
+          <md-icon md-svg-icon="delete" ng-if="(insumo.lotes.length > 1)" ng-click="quitarLote($index)" aria-label="quitar lote" class="md-secondary md-hue-3">
+          </md-icon>
+          <md-divider></md-divider>
+        </md-list-item>
+      </md-list>
+    </md-dialog-content>
+    <md-dialog-actions layout="row">
+      <span flex></span>
+      <md-button ng-disabled="!insumo" class="md-raised" ng-click="agregarLote()">
+        <md-icon md-svg-icon="plus-circle"></md-icon> Agregar Lote
+      </md-button>
+      <md-button ng-disabled="cargando" class="md-raised md-primary" ng-click="answer()">
+        <md-icon md-svg-icon="check"></md-icon> Aceptar
+      </md-button>
+    </md-dialog-actions>
+  </form>
+</md-dialog>
