@@ -3,7 +3,7 @@
 	angular.module('InventarioModule')
 	   	.factory('InventarioDataApi', ['$http', 'URLS', function ($http, URLS) {
 	       	return {
-	           	requisiciones: function (success, error) {
+	           	lista: function (success, error) {
 					$http.get(URLS.BASE_API + '/inventario').success(success).error(error)
 	           	},
 	           	catalogos: function (success, error) {

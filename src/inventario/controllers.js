@@ -23,13 +23,46 @@
        $scope.meses = meses; 
        $scope.anios=anios;
 
-       $scope.meses_select=1;
-       $scope.anio_select=2017;
-
+       $scope.meses_select  = 1;
+       $scope.anio_select   = 2017;
+        
+        $scope.lista_insumos = [];
+        
+        function carga_lista()
+        {
+            $scope.lista_insumos = [];
+            InventarioDataApi.lista(function(res)
+            {
+                var contador = 0;
+                console.log(res);
+                for(var i in res.data){
+                    res.data[i][1]; 
+                    var obj =
+                     {
+                         id :               res.data[i].id,
+                         clave :            res.data[i].clave,
+                         descripcion:       res.data[i].descripcion,
+                         valor:             res.data[i].valor,
+                         fecha:             res.data[i].created_at
+                     }
+                     $scope.lista_insumos[obj.id] = obj;
+                 }
+            },function(e){
+                    Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Error:',mensaje:'Ocurrió un error al intentar obtener los datos.'});
+                    console.log(e);
+                }
+            );    
+        }
+        
+        carga_lista();
+        
+        $scope.generarExcel = function(){
+            window.open(URLS.BASE_API +'/inventario-excel?token='+$localStorage.control_desabasto.access_token+"&anio="+$scope.anio_select);
+        };
 
         $scope.permisoGuardar = '2438B88CD5ECC';
 
-          $scope.menuCerrado = !UsuarioData.obtenerEstadoMenu();
+        $scope.menuCerrado = !UsuarioData.obtenerEstadoMenu();
         if(!$scope.menuCerrado){
           $scope.menuIsOpen = true;
         }
@@ -83,14 +116,12 @@
 
                 if($scope.informacionArchivo){
                     InventarioDataApi.importar($scope.informacionArchivo,function(res){
-
                         $scope.cargando = false;
                         input.val(null);
                         $scope.informacionArchivo = null;
-                        //$scope.importarDatos(res);
-                      console.log("cachando ");
+                        
                       Mensajero.mostrarToast({contenedor:'#modulo-contenedor',titulo:'Exito:',mensaje:'Sincronización exitosa'});
-                       //$scope.lista_insumos = $scope.elementos.concentrado;
+                      carga_lista();
                     },function(e){
                         $scope.cargando = false;
                         input.val(null);
