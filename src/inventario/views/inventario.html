@@ -8,29 +8,18 @@
 		    </md-button>		
 			<h2><span></span></h2>
 			<span flex></span>
-
-			<md-button ng-if='(captura_habilitada)' ng-permiso="permisoGuardar" class="md-accent md-raised" hide-xs hide-sm ng-click="crearActa($event)" ng-disabled="cargando"  aria-label="{{ 'CREAR ACTA' | translate }}">
-			  <md-icon md-svg-icon="check"></md-icon>
-			  {{ 'CREAR ACTA' | translate }}
+            
+            <!--<md-button class="md-icon-button" ng-click="generarExcel()"  aria-label="{{ 'excel' | translate }}">
+			  <md-icon md-svg-icon="file-excel"></md-icon>
+			</md-button>-->
+			<md-button class="md-accent md-raised" hide-xs hide-sm ng-click="generarExcel($event)" ng-disabled="cargando"  aria-label="{{ 'EXPORTAR HISTORIAL' | translate }}">
+			  <md-icon md-svg-icon="file-excel"></md-icon>
+			  {{ 'EXPORTAR HISTORIAL' | translate }}
 			</md-button>
-			<md-button ng-if='(captura_habilitada)' ng-permiso="permisoGuardar" class="md-icon-button md-accent"  hide-gt-sm  ng-disabled="cargando" ng-click="crearActa($event)"  aria-label="{{ 'CREAR ACTA' | translate }}">
-			  <md-icon md-svg-icon="check"></md-icon>
+			<md-button class="md-icon-button md-accent"  hide-gt-sm  ng-disabled="cargando" ng-click="generarExcel($event)"  aria-label="{{ 'EXPORTAR HISTORIAL' | translate }}">
+			  <md-icon md-svg-icon="file-excel"></md-icon>
 			</md-button>
-
-				 
-			<md-button ng-permiso="permisoGuardar" class="md-icon-button"  hide-gt-sm ng-disabled="cargando" ng-click="guardar()"  aria-label="{{ 'GUARDAR' | translate }}">
-			  <md-icon md-svg-icon="content-save{{(modulo.cambios)?'-all':''}}"></md-icon>
-			</md-button>
-
-			<md-button ng-if="modulo.cambios" hide-xs hide-sm ng-click="deshacer($event)" ng-disabled="cargando"  aria-label="{{ 'DESCARTAR CAMBIOS' | translate }}">
-			  <md-icon md-svg-icon="undo"></md-icon>
-			  {{ 'DESCARTAR CAMBIOS' | translate }}
-			</md-button>		 
-			<md-button ng-if="modulo.cambios" class="md-icon-button"  hide-gt-sm ng-disabled="cargando" ng-click="deshacer($event)"  aria-label="{{ 'DESCARTAR CAMBIOS' | translate }}">
-			  <md-icon md-svg-icon="undo"></md-icon>
-			</md-button>
-
-
+			
 		</div>
 	</md-toolbar>
 
@@ -40,14 +29,14 @@
 				<div flex layout="row">
 					
 					<div flex="none">
-						<input class="ng-hide" id="input-file-id" type="file" accept=".xls"/>
+						<input class="ng-hide" id="input-file-id" type="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"/>
 						<label for="input-file-id" class="md-button md-primary">
 				    		<md-icon md-svg-icon="attachment"></md-icon> Importar archivo
 				    	</label>
 
 					</div>
 
-					<md-select ng-model="meses_select" aria-label="proveedor general">
+				    <md-select ng-model="meses_select" aria-label="proveedor general">
 						<md-option ng-repeat="mes in meses" ng-value="mes.id">
 							{{mes.nombre}}
 						</md-option>	
@@ -59,10 +48,6 @@
 						</md-option>
 					</md-select>
 					
-
-					
-						
-
 				</div>
 			</md-content>
 
@@ -71,19 +56,9 @@
 			<md-subheader flex="none" class="md-primary">
 				<div layout="row">
 					<div flex="15" flex-md="30" style="text-align:center;">Clave</div>
-					<div flex="35" flex-md="40" style="text-align:center;">Descripción del Insumo</div>
-					<div flex="15" style="text-align:center;" hide show-gt-md>Enero</div>
-					<div flex="15" style="text-align:center;" hide show-gt-md>Febrero</div>
-					<div flex="15" style="text-align:center;" hide show-gt-md>Marzo</div>
-					<div flex="15" style="text-align:center;" hide show-gt-md>Abril</div>
-					<div flex="15" style="text-align:center;" hide show-gt-md>Mayo</div>
-					<div flex="15" style="text-align:center;" hide show-gt-md>Junio</div>
-					<div flex="15" style="text-align:center;" hide show-gt-md>Julio</div>
-					<div flex="15" style="text-align:center;" hide show-gt-md>Agosto</div>
-					<div flex="15" style="text-align:center;" hide show-gt-md>Septiembre</div>
-					<div flex="15" style="text-align:center;" hide show-gt-md>Octubre</div>
-					<div flex="15" style="text-align:center;" hide show-gt-md>Noviembre</div>
-					<div flex="15" style="text-align:center;" hide show-gt-md>Diciembre</div>
+					<div flex="55" flex-md="40" style="text-align:center;">Descripción del Insumo</div>
+					<div flex="15" style="text-align:center;">Cantidad</div>
+					<div flex="15" style="text-align:center;">Fecha Actualización</div>
 				</div>
 			</md-subheader>
 
@@ -97,17 +72,12 @@
 							<span ng-show="validacion.requisiciones">Es necesario capturar al menos un insumo</span>
 				    	</md-subheader>
 				    </md-list-item>
-					<md-list-item class="md-2-line paciente-item" md-virtual-repeat="insumo in lista_insumos | filter: filtroTipo" ng-click="editarInsumo($event,insumo)" md-item-size="50">
-						<div flex layout="row" ng-class="(insumo.repetido)?'insumo-repetido':((insumo.cuadro_basico)?'':'insumo-no-cuadro-basico')" ng-style="(!insumos_estatus.nuevos[insumo.id])?((insumos_estatus.editados[insumo.id])?{'font-style':'italic'}:{'color':'black'}):{'font-weight':'bold'}">
-							<div flex="5" style="text-align:center;">{{insumo.lote}}</div>
-							<div flex="15" flex-md="30" style="text-align:center;">{{insumo.clave}}</div>
-							<div flex="35" flex-md="40" style="text-align:center;"><p style="line-height:14px; margin:0px;"><small>{{insumo.descripcion}}</small></p></div>
-							<div flex="15" style="text-align:center;" hide show-gt-md>
-								<p style="line-height:14px; margin:0px;"><small>{{insumo.unidad}}</small></p>
-							</div>
-							<div flex="10" style="text-align:center;" hide show-gt-md>$ {{insumo.precio | number:2}}</div>
-							<div flex="10" style="text-align:center;" hide show-gt-md>{{insumo.cantidad | number}}</div>
-							<div flex="20" style="text-align:center;">$ {{insumo.total | number:2}}</div>
+					<md-list-item class="md-2-line paciente-item" md-virtual-repeat="insumo in lista_insumos | filter: filtroTipo" md-item-size="50">
+						<div flex layout="row" >
+							<div flex="15" style="text-align:center;">{{insumo.clave}}</div>
+							<div flex="55" flex-md="30" style="text-align:center;">{{insumo.descripcion}}</div>
+							<div flex="15" style="text-align:center;">{{insumo.valor}}</div>
+							<div flex="15" style="text-align:center;">{{insumo.fecha}}</div>
 						</div>
 				    	<md-icon ng-if="clues_seleccionada" md-svg-icon="delete" ng-click="eliminarInsumo(insumo)" aria-label="quitar" class="md-secondary md-hue-3">
 				    	</md-icon>
