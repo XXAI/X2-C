@@ -892,6 +892,7 @@
                                 $scope.subtotales.material_curacion -= (insumo_local.total+(insumo_local.total*16/100));
                                 $scope.subtotales.material_curacion += ($scope.insumo.total+($scope.insumo.total*16/100));
                             }
+                            $scope.totales.subtotal -= insumo_local.total;
                         }else{
                             
                             $scope.lista_insumos.push($scope.insumo);
@@ -961,7 +962,7 @@
 
                         }
                         $scope.lista_insumos = insumos;
-                        console.log($scope);
+                        //console.log($scope);
                     }
 
                     $scope.insumoAutoCompleteItemChange = function(){
@@ -1083,7 +1084,7 @@
         });
 
         $scope.cluesAutoCompleteItemChange = function(){
-            console.log($scope);
+            //console.log($scope);
             if ($scope.cluesAutoComplete.clues != null){
                 $scope.clues_seleccionada = $scope.cluesAutoComplete.clues;
 
@@ -1246,7 +1247,7 @@
             var insumos = prepararGuardado();
             var parametros = {insumos: insumos};
 
-            console.log(parametros);
+            //console.log(parametros);
             RequisicionesDataApi.guardar(parametros,function (res) {
                 $scope.cargando = false;
                 $scope.insumos_estatus = {
